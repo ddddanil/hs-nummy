@@ -1,13 +1,11 @@
 module Main where
 
-import Protolude
-import Data.Metrology.Poly ( (%) )
-import Data.Metrology.Parser
-import Data.Metrology.SI 
+import Protolude hiding (getLine)
 import Data.Metrology.Show
+import Text.Parsec (parse)
+import System.IO (getLine)
 
-val :: Length
-val = 5 Data.Metrology.Poly.% Metre
+import Nummy.Parser (quantity)
 
 main :: IO ()
-main = print val
+main = print =<< parse quantity "" <$> getLine
