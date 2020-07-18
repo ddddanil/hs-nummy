@@ -4,9 +4,9 @@ module Nummy.Parser where
 
 import GHC.Base (String)
 import Protolude
-import Data.Metrology.Poly ( (%) )
+import Data.Metrology.Poly ( quOf )
 import Data.Metrology.Parser (parseUnitType, SymbolTable, mkSymbolTable)
--- import Data.Metrology.Qu ( MkQu_U )
+import Data.Metrology.Vector ( MkQu_D, Dimension )
 import Data.Units.SI
 import Data.Units.SI.Prefixes
 import Data.Metrology.Show
@@ -41,7 +41,7 @@ parseUnit = parseUnitType symbolTable
 -- Parsec functions
 
 unitS :: CharParser st String
-unitS = many1 unitSymbols <|> (parenthesis $ unitSymbols `sepBy` P.optional space) where
+unitS = many1 unitSymbols <|> parenthesis (unitSymbols `sepBy` P.optional space) where
    unitSymbols = alphaNum <|> oneOf "*/^-"
    parenthesis = between (char '(') (char ')')
 
@@ -51,8 +51,8 @@ unit = do
    either unexpected return $ parseUnit u
 
 
-quantity :: CharParser st (Double, TH.Type)
-quantity = do
+quantityT :: CharParser st (Double, TH.Type)
+quantityT = do
    n <- floating2 True
    _ <- P.optional space
    u <- unit

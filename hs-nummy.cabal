@@ -24,8 +24,11 @@ executable nummy
     default-extensions: NoImplicitPrelude
     build-depends:
         base
+      , text
       , units
       , protolude
+      , ansi-terminal
+      , ansi-wl-pprint
       , wl-pprint
       , wl-pprint-text
       , parsec
