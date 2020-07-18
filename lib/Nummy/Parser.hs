@@ -1,39 +1,21 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TemplateHaskellQuotes #-}
-module Nummy.Parser where
+module Nummy.Parser (quantityT) where
 
 import GHC.Base (String)
 import Protolude
 import Data.Metrology.Poly ( quOf )
-import Data.Metrology.Parser (parseUnitType, SymbolTable, mkSymbolTable)
+import Data.Metrology.Parser (parseUnitType)
 import Data.Metrology.Vector ( MkQu_D, Dimension )
-import Data.Units.SI
-import Data.Units.SI.Prefixes
-import Data.Metrology.Show
 import Language.Haskell.TH as TH
-import Data.Generics
 import Text.Parsec as P hiding ( (<|>) )
 import Text.ParserCombinators.Parsec.Char as P.Char
 import Text.ParserCombinators.Parsec.Prim as P.Prim hiding ( (<|>) )
 import Text.ParserCombinators.Parsec.Combinator as P.Comb
 import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
+import Nummy.Parser.Definitions
 
 
 -- TH functions
-
-stripModules :: Data a => a -> a
-stripModules = everywhere (mkT (mkName . nameBase))
-
-symbolTable :: SymbolTable Name Name
-Right symbolTable =
-   mkSymbolTable (stripModules [ ("k", ''Kilo)
-                               , ("da", ''Deca)
-                               , ("m", ''Milli)
-                               , ("d", ''Deci) ])
-                 (stripModules [ ("m", ''Meter)
-                               , ("s", ''Second)
-                               , ("min", ''Minute)
-                               , ("am", ''Ampere) ])
 
 parseUnit :: String -> Either String TH.Type
 parseUnit = parseUnitType symbolTable

@@ -3,7 +3,9 @@ name:          hs-nummy
 version:       0.0
 
 library
-    exposed-modules:    Nummy.Parser
+    exposed-modules:
+        Nummy.Parser
+      , Nummy.Parser.Definitions
     hs-source-dirs:     lib
     default-language:   Haskell2010
     default-extensions: NoImplicitPrelude
@@ -19,12 +21,15 @@ library
 
 executable nummy
     main-is:            Main.hs
+    other-modules:      Main.Repl
     hs-source-dirs:     exe
     default-language:   Haskell2010
-    default-extensions: NoImplicitPrelude
+    default-extensions: NoImplicitPrelude, OverloadedStrings
     build-depends:
         base
       , text
+      , mtl
+      , transformers
       , units
       , protolude
       , ansi-terminal
