@@ -13,7 +13,9 @@ import Nummy.Parser (quantityT)
 
 showTuple (n, u) = show n ++ " " ++ show u
 action = parse quantityT ""
-showParse s = second (fromString . showTuple) $ action (unpack s)
+
+showParse :: Text -> Either [Char] Text
+showParse s = bimap show (fromString . showTuple) $ action (unpack s)
 
 main :: IO ()
 main = repl showParse

@@ -30,6 +30,7 @@ executable nummy
       , text
       , mtl
       , transformers
+      , syb
       , units
       , protolude
       , ansi-terminal
