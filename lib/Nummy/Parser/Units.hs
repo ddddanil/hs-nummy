@@ -28,4 +28,4 @@ singleUnit = choice
   where
   getUnit = fromJust . lookupUnit Nothing
   prefix = choice $ map string prefixTable
-  bare_unit = choice $ map string unitTable
+  bare_unit = choice $ map string baseUnitTable
