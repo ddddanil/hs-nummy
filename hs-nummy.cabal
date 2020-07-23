@@ -6,13 +6,12 @@ library
     exposed-modules:
         Nummy.Parser
       , Nummy.Parser.Definitions
+      , Nummy.Metrology.Dimension
     hs-source-dirs:     lib
     default-language:   Haskell2010
-    default-extensions: NoImplicitPrelude
+    default-extensions: NoImplicitPrelude, OverloadedStrings
     build-depends:
         base
-      , units
-      , units-defs
       , protolude
       , template-haskell
       , syb
@@ -31,7 +30,6 @@ executable nummy
       , mtl
       , transformers
       , syb
-      , units
       , protolude
       , ansi-terminal
       , ansi-wl-pprint
