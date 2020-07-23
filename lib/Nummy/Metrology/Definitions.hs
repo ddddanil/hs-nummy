@@ -1,6 +1,6 @@
 module Nummy.Metrology.Definitions (
   Value, Unit, Dimension
-, (|*|), (|/|)
+, (|*|), (|/|), (#*), (#/)
 , baseUnitTable, prefixTable, modifierTable
 , lookupUnit
 , applyPrefix
@@ -34,6 +34,10 @@ symbol_table =
   -- Mass
   , (["g", "gram", "gramm"], (baseDim "Mass", 1%1000))
   , (["lbs", "pound"], (baseDim "Mass", 0.453592))
+  -- Time
+  , (["s", "sec", "second"], (baseDim "Time", 1))
+  , (["m", "min", "minute"], (baseDim "Time", 60))
+  , (["h", "hour"], (baseDim "Time", 3600))
   -- Prefixes   km   ns
   , (["k", "kilo"], (baseDim "Prefix", 1000))
   , (["m", "milli"], (baseDim "Prefix", 1 % 1000))
@@ -72,6 +76,7 @@ lookupUnit md unit = case md of
     matches_unit = elem unit . fst
     matches_dimension dim = (==dim) . fst . snd
 
+
 -- Unit and Dimension manipulation
 
 applyPrefix :: Unit -> Unit -> Unit
@@ -86,7 +91,7 @@ sanitizeDimension = combineDimensions (+) [] . filter (\d -> not(prefix d || mod
   noPower = (== 0) . snd
 
 combineDimensions :: (Value -> Value -> Value) -> Dimension -> Dimension -> Dimension
-combineDimensions op d1 d2 = unfoldr merge_same . sort $ d1 ++ d2
+combineDimensions op d1 d2 = unfoldr merge_same . sortOn fst $ d1 ++ d2  -- works bc sort is stable
   where
     merge_same ((d1,x):(d2,y):rest)
       | d1 == d2 = Just ((d1, op x y), rest)
@@ -101,3 +106,13 @@ infixl 7 |*|
 infixl 7 |/|
 (|/|) :: Dimension -> Dimension -> Dimension
 d1 |/| d2 = sanitizeDimension . combineDimensions (+) d1 $ map (second negate) d2
+
+infixl 7 #*
+(#*) :: Unit -> Unit -> Unit
+u1 #* u2 = ubimap (ubimap ((|*|), (*)) u1) u2 where
+  ubimap = uncurry bimap
+
+infixl 7 #/
+(#/) :: Unit -> Unit -> Unit
+u1 #/ u2 = ubimap (ubimap ((|/|), (/)) u1) u2 where
+  ubimap = uncurry bimap

@@ -1,9 +1,10 @@
 module Nummy.Parser.Units (
-  singleUnit
+  unit
 ) where
 
 import Protolude hiding (Prefix, Infix, try)
 import Data.Maybe (fromJust)
+import Data.String (String)
 import Text.Parsec as P hiding ( (<|>) )
 import Text.Parsec.Char as P.Char
 import Text.Parsec.Prim as P.Prim hiding ( (<|>) )
@@ -13,8 +14,8 @@ import Text.Parsec.String as P.String
 
 import Nummy.Metrology.Definitions
 
-singleUnit :: Parser Unit
-singleUnit = choice
+baseUnit :: Parser Unit
+baseUnit = choice
   [ try $ do {
       p <- getUnit <$> prefix;
       u <- getUnit <$> bare_unit;
@@ -29,3 +30,13 @@ singleUnit = choice
   getUnit = fromJust . lookupUnit Nothing
   prefix = choice $ map string prefixTable
   bare_unit = choice $ map string baseUnitTable
+
+unit :: Parser Unit
+unit = buildExpressionParser unitOpTable baseUnit
+
+unitOpTable :: (Monad m) => OperatorTable String () m Unit
+unitOpTable =
+  [ [ Infix (char ' ' >> return (#*) ) AssocLeft ]
+  , [ Infix (char '/' >> return (#/) ) AssocLeft ]
+  , [ Infix (char '*' >> return (#*) ) AssocLeft ]
+  ]

@@ -1,7 +1,4 @@
-{-# LANGUAGE PartialTypeSignatures #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
-module Nummy.Parser () where
+module Nummy.Parser (parse_nummy) where
 
 import GHC.Base (String)
 import Protolude
@@ -13,4 +10,4 @@ import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
 
 import Nummy.Parser.Units
 
-parse_nummy = singleUnit >> eof
+parse_nummy = unit >> eof
