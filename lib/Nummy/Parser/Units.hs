@@ -35,15 +35,29 @@ baseUnit = choice
   prefix = oneOfStr prefixTable
   bare_unit = oneOfStr baseUnitTable
 
-unit :: Parser Unit
-unit = buildExpressionParser unitOpTable baseUnit
+fullUnit :: Parser Unit
+fullUnit = buildExpressionParser fullUnitOpTable baseUnit
 
-unitOpTable :: (Monad m) => OperatorTable String () m Unit
-unitOpTable =
+fullUnitOpTable :: (Monad m) => OperatorTable String () m Unit
+fullUnitOpTable =
+  -- Add pow ^
   [ [ Infix (char ' ' >> return (#*) ) AssocLeft ]
   , [ Infix (char '/' >> return (#/) ) AssocLeft ]
   , [ Infix (char '*' >> return (#*) ) AssocLeft ]
   ]
+
+shortUnit :: Parser Unit
+shortUnit = buildExpressionParser shortUnitOpTable baseUnit
+
+shortUnitOpTable :: (Monad m) => OperatorTable String () m Unit
+shortUnitOpTable =
+  [ [ Infix (char '*' >> return (#*) ) AssocLeft ]
+  , [ Infix (char '/' >> return (#/) ) AssocLeft ]
+  ]
+
+unit :: Parser Unit
+unit = try (brackets fullUnit) <|> try shortUnit where
+  brackets = between (char '(') (char ')')
 
 -- Quantity
 

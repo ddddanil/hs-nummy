@@ -8,9 +8,11 @@ import Data.Text (unpack, pack)
 import Text.Parsec (parse)
 
 import Nummy.Parser (parse_nummy)
+import Nummy.Metrology.Show (showQu)
 import Main.Repl (repl)
 
-repackParse = bimap show (pack . show) . parse parse_nummy "" . unpack
+smartRepl = repl $ bimap show (pack . showQu) . parse parse_nummy "" . unpack
+dumbRepl = interact $ either (pack . show) (pack . showQu) . parse parse_nummy "" . unpack
 
 main :: IO ()
-main = repl repackParse
+main = dumbRepl

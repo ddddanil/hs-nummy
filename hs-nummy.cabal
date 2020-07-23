@@ -3,7 +3,9 @@ name:          hs-nummy
 version:       0.0
 
 library
-    exposed-modules: Nummy.Parser
+    exposed-modules:
+        Nummy.Parser
+      , Nummy.Metrology.Show
     other-modules:
         Nummy.Parser.Units
       , Nummy.Metrology.Definitions

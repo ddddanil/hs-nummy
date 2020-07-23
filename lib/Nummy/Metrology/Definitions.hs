@@ -1,10 +1,10 @@
 module Nummy.Metrology.Definitions (
   Value, Unit, Dimension, Quantity
-, (|*|), (|/|), (#*), (#/)
+, (|*|), (|/|), (#*), (#/), (#+), (#-)
 , baseUnitTable, prefixTable, modifierTable
 , lookupUnit
 , applyPrefix, applyModifier
-, mkQu
+, mkQu, quIn
 -- , sanitizeDimension
 -- , combineDimensions
 ) where
@@ -115,6 +115,7 @@ infixl 7 |/|
 (|/|) :: Dimension -> Dimension -> Dimension
 d1 |/| d2 = sanitizeDimension . combineDimensions (+) d1 $ map (second negate) d2
 
+
 infixl 7 #*
 (#*) :: Unit -> Unit -> Unit
 u1 #* u2 = ubimap (ubimap ((|*|), (*)) u1) u2 where
@@ -124,4 +125,18 @@ infixl 7 #/
 (#/) :: Unit -> Unit -> Unit
 u1 #/ u2 = ubimap (ubimap ((|/|), (/)) u1) u2 where
   ubimap = uncurry bimap
+
+infix 6 #+
+(#+) :: Unit -> Unit -> Maybe Unit
+(d1, v1) #+ (d2, v2) = if d1 /= d2 then Nothing
+                       else Just (d1, v1 + v2)
+
+infix 6 #-
+(#-) :: Unit -> Unit -> Maybe Unit
+(d1, v1) #- (d2, v2) = if d1 /= d2 then Nothing
+                       else Just (d1, v1 - v2)
+
+quIn :: Quantity -> Unit -> Maybe Quantity
+quIn (d1, v1) (d2, v2) = if d1 /= d2 then Nothing
+                         else Just (d1, v1 / v2)
 
