@@ -1,5 +1,5 @@
 module Nummy.Parser.Units (
-  unit
+  unit, quantity
 ) where
 
 import Protolude hiding (Prefix, Infix, try)
@@ -7,12 +7,16 @@ import Data.Maybe (fromJust)
 import Data.String (String)
 import Text.Parsec as P hiding ( (<|>) )
 import Text.Parsec.Char as P.Char
-import Text.Parsec.Prim as P.Prim hiding ( (<|>) )
-import Text.Parsec.Combinator as P.Comb
 import Text.Parsec.Expr as P.Expr
 import Text.Parsec.String as P.String
+import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
 
 import Nummy.Metrology.Definitions
+
+oneOfStr :: [[Char]] -> Parser [Char]
+oneOfStr ss = choice $ map (try . string) ss
+
+-- Dimension
 
 baseUnit :: Parser Unit
 baseUnit = choice
@@ -28,8 +32,8 @@ baseUnit = choice
   ]
   where
   getUnit = fromJust . lookupUnit Nothing
-  prefix = choice $ map string prefixTable
-  bare_unit = choice $ map string baseUnitTable
+  prefix = oneOfStr prefixTable
+  bare_unit = oneOfStr baseUnitTable
 
 unit :: Parser Unit
 unit = buildExpressionParser unitOpTable baseUnit
@@ -40,3 +44,23 @@ unitOpTable =
   , [ Infix (char '/' >> return (#/) ) AssocLeft ]
   , [ Infix (char '*' >> return (#*) ) AssocLeft ]
   ]
+
+-- Quantity
+
+numericalQu :: Parser Value
+numericalQu = do
+  n <- floating2 False :: Parser Double
+  let rn = toRational n
+  maym <- optionMaybe modifier
+  case maym of
+    Nothing -> return rn
+    Just m -> let m' = fromJust $ lookupUnit (Just [("Modifier", 1)]) m
+              in return $ applyModifier m' rn
+  where modifier = oneOfStr modifierTable
+
+quantity :: Parser Quantity
+quantity = do
+  v <- numericalQu
+  _ <- space
+  u <- unit
+  return $ mkQu v u

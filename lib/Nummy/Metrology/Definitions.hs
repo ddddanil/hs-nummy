@@ -1,9 +1,10 @@
 module Nummy.Metrology.Definitions (
-  Value, Unit, Dimension
+  Value, Unit, Dimension, Quantity
 , (|*|), (|/|), (#*), (#/)
 , baseUnitTable, prefixTable, modifierTable
 , lookupUnit
-, applyPrefix
+, applyPrefix, applyModifier
+, mkQu
 -- , sanitizeDimension
 -- , combineDimensions
 ) where
@@ -18,6 +19,7 @@ type Value = Rational
 type Label = String
 type Dimension = [(Label, Value)]
 type Unit = (Dimension, Value)  -- (Dimension, conversion to SI)
+type Quantity = (Dimension, Value)
 
 
 -- Table and its parts
@@ -83,6 +85,12 @@ applyPrefix :: Unit -> Unit -> Unit
 applyPrefix ([("Prefix", 1)], p) (d, value) = (d, p * value)
 applyPrefix (_, _) _ = error "You must apply a prefix"
 
+applyModifier :: Unit -> Value -> Value
+applyModifier m v = v * snd m
+
+mkQu :: Value -> Unit -> Quantity
+mkQu v (d, u) = (d, v * u)
+
 -- Remove prefixes, modifiers, with power 0 and merge same base dimensions
 sanitizeDimension :: Dimension -> Dimension
 sanitizeDimension = combineDimensions (+) [] . filter (\d -> not(prefix d || modifier d || noPower d) ) where
@@ -116,3 +124,4 @@ infixl 7 #/
 (#/) :: Unit -> Unit -> Unit
 u1 #/ u2 = ubimap (ubimap ((|/|), (/)) u1) u2 where
   ubimap = uncurry bimap
+
