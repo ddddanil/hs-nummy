@@ -22,10 +22,10 @@ repl action = do
 
 readRepl :: ReplStateM ()
 readRepl = do
-  lift getKey >>= transform
   st <- get
   echoLine $ pretty (action st (line st))
   -- echoLine $ show (c, line st)
+  lift getKey >>= transform
   where
     pretty res =
         let peek = case res of

@@ -3,7 +3,7 @@ module Nummy.Metrology.Unit (
 , dimlessUnit
 , applyPrefix, applyModifier
 , mkQu, quIn
-, (#*), (#/), (#+), (#-)
+, (#*), (#/), (#+), (#-), (#^)
 ) where
 
 import Protolude hiding (Prefix)
@@ -38,6 +38,12 @@ quIn (d1, v1) (d2, v2) = if d1 /= d2 then Nothing
 
 
 -- Operators
+
+infixl 8 #^
+(#^) :: Unit -> Unit -> Maybe Unit
+(d, v) #^ (dp, p) = if dp /= baseDim Dimensionless then Nothing else
+  if denominator p == 1 then Just (d |^| p, v ^ numerator p)
+  else Just (d |^| p, toRational (fromRational v ** fromRational p))
 
 infixl 7 #*
 (#*) :: Unit -> Unit -> Unit

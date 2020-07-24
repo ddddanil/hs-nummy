@@ -1,7 +1,7 @@
 module Nummy.Metrology.Dimension (
   Value, Label, Dimension(..), BaseDim(..)
 , baseDim, isPrefix, isModifier, isBaseUnit, isDimless, isNone
-, (|*|), (|/|)
+, (|*|), (|/|), (|^|)
 ) where
 
 import Protolude hiding (Prefix)
@@ -56,6 +56,10 @@ combineDimensions op (Dimension d1) (Dimension d2) = Dimension $ unfoldr merge_s
 
 
 -- Operators
+
+infixl 8 |^|
+(|^|) :: Dimension -> Value -> Dimension
+(Dimension d1) |^| v = Dimension $ map (second (*v)) d1
 
 infixl 7 |*|
 (|*|) :: Dimension -> Dimension -> Dimension

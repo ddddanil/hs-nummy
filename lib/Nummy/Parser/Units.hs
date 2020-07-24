@@ -3,8 +3,8 @@ module Nummy.Parser.Units (
 ) where
 
 import Protolude hiding (Prefix, Infix, try)
-import Data.Maybe (fromJust)
 import Data.String (String)
+import Data.Maybe (fromJust)
 import Text.Parsec as P hiding ( (<|>) )
 import Text.Parsec.Char as P.Char
 import Text.Parsec.Expr as P.Expr
@@ -17,6 +17,7 @@ import Nummy.Metrology.Unit
 
 oneOfStr :: [[Char]] -> Parser [Char]
 oneOfStr ss = choice $ map (try . string) . sortBy (flip compare `on` length) $ ss
+
 
 -- Dimension
 
@@ -37,28 +38,32 @@ baseUnit = P.option dimlessUnit $ choice
   prefix = oneOfStr prefixTable
   bare_unit = oneOfStr baseUnitTable
 
-fullUnit :: Parser Unit
-fullUnit = buildExpressionParser fullUnitOpTable baseUnit
 
 fullUnitOpTable :: (Monad m) => OperatorTable String () m Unit
 fullUnitOpTable =
-  -- Add pow ^
-  [ [ Infix (char ' ' >> return (#*) ) AssocLeft ]
+  [ [ Infix (char '^' >> return pow_op ) AssocLeft ]
+  , [ Infix (char ' ' >> return (#*) ) AssocLeft ]
   , [ Infix (char '/' >> return (#/) ) AssocLeft ]
   , [ Infix (char '*' >> return (#*) ) AssocLeft ]
   ]
-
-shortUnit :: Parser Unit
-shortUnit = buildExpressionParser shortUnitOpTable baseUnit
+  where pow_op = (fromJust.) . (#^)
 
 shortUnitOpTable :: (Monad m) => OperatorTable String () m Unit
 shortUnitOpTable =
-  [ [ Infix (char '*' >> return (#*) ) AssocLeft ]
+  [ [ Infix (char '^' >> return pow_op ) AssocLeft ]
+  , [ Infix (char '*' >> return (#*) ) AssocLeft ]
   , [ Infix (char '/' >> return (#/) ) AssocLeft ]
   ]
+  where pow_op = (fromJust.) . (#^)
+
+unitExpr :: OperatorTable String () Identity Unit -> Parser Unit
+unitExpr table = buildExpressionParser table $
+            choice [ try baseUnit, try dimlessQu ]
+        where dimlessQu = rawValue >>= \v -> return $ mkQu v dimlessUnit
+
 
 unit :: Parser Unit
-unit = try (brackets fullUnit) <|> try shortUnit where
+unit = try (brackets $ unitExpr fullUnitOpTable) <|> try (unitExpr shortUnitOpTable) where
   brackets = between (char '(') (char ')')
 
 -- Quantity
