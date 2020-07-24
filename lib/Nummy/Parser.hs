@@ -7,6 +7,7 @@ import Text.Parsec.String as P.String
 
 import Nummy.Parser.Units
 import Nummy.Metrology.Unit
+import Nummy.Metrology.Quantity
 
 parse_all :: Parser a -> Parser a
 parse_all p = do

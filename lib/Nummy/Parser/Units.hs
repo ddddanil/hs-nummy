@@ -14,6 +14,7 @@ import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
 
 import Nummy.Metrology.Definitions hiding (length, mass, time)
 import Nummy.Metrology.Dimension as Dimension
+import Nummy.Metrology.Quantity
 import Nummy.Metrology.Unit
 
 

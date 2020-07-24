@@ -1,10 +1,9 @@
 module Nummy.Metrology.Unit (
-  Unit, Quantity(..), Prefix, Modifier
+  Unit,  Prefix, Modifier
 , dimlessUnit, dimlessCoeff, conversion_ratio, complex_conversion, canonical_unit
 , applyPrefix, applyModifier
-, mkQu, quIn, dimOfUnit, dimOfQu
+, mkQu, dimOfUnit
 , (#^), (#!^), (#*), (#/)
-, (%+), (%-), (%*), (%/), (%^), (%!^)
 ) where
 
 import Protolude hiding (Prefix)
@@ -12,19 +11,17 @@ import Data.String (String)
 import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Metrology.Dimension
+import Nummy.Metrology.Quantity
 
 
 type Prefix = Value
 type Modifier = Value
-newtype Quantity = Quantity (Dimension, Value) deriving (Show, Eq) -- (Dimension, conversion to SI)
-instance PP.Pretty Quantity where
-  pretty (Quantity (d, v)) =
-    PP.pretty (fromRational v :: Double)
-    <> if not $ isDimless d
-      then PP.char ' ' <> PP.pretty d
-      else PP.empty
+
+
+-- Type
 
 newtype Unit = Unit (Value -> Quantity)        -- s -> (a, s)  thats a State monad !!
+
 instance PP.Pretty Unit where
   pretty (Unit u) = PP.pretty (u 1)
 
@@ -49,10 +46,8 @@ complex_conversion dim f = Unit $ \v -> Quantity (dim, f v)
 dimOfUnit :: Unit -> Dimension
 dimOfUnit (Unit u) = dimOfQu $ u 1
 
-dimOfQu :: Quantity -> Dimension
-dimOfQu (Quantity (d, v)) = d
 
--- Unit and Quantity manipulation
+-- Unit manipulation
 
 applyPrefix :: Prefix -> Unit -> Unit
 applyPrefix p (Unit u) = Unit $ \v -> (u v) %* (p `mkQu` dimlessUnit)
@@ -62,12 +57,6 @@ applyModifier m v = v * m
 
 mkQu :: Value -> Unit -> Quantity
 mkQu v (Unit u) = u v   -- haha
-
-quIn :: Quantity -> Unit -> Maybe Quantity
-quIn (Quantity (d, v)) (Unit u) =
-  let Quantity (du, v') = u v
-  in if d /= du then Nothing
-  else Just $ Quantity (d, v')
 
 
 -- Unit operators
@@ -109,42 +98,3 @@ infixl 7 #/
         Quantity (d2, v2) = u2 1
     in Quantity (d1 |/| d2, v1 / v2)
 
-
--- Quantity operators
-
-infixl 8 %!^
-(%!^) :: Quantity -> Quantity -> Maybe Quantity
-q %!^ (Quantity (d, v)) =
-  if isDimless d
-  then Just (q %^ v)
-  else Nothing
-
-infixl 8 %^
-(%^) :: Quantity -> Value -> Quantity
-(Quantity (d1, v1)) %^ p = Quantity $ (d1 |^| p, pow v1 p)
-  where
-    pow :: Value -> Value -> Value
-    pow v p =
-      if denominator p == 1
-      then v ^ (numerator p)
-      else toRational $ fromRational v ** fromRational p
-
-infixl 7 %*
-(%*) :: Quantity -> Quantity -> Quantity
-(Quantity u1) %* (Quantity u2) = Quantity $ ubimap (ubimap ((|*|), (*)) u1) u2 where
-  ubimap = uncurry bimap
-
-infixl 7 %/
-(%/) :: Quantity -> Quantity -> Quantity
-(Quantity u1) %/ (Quantity u2) = Quantity $ ubimap (ubimap ((|/|), (/)) u1) u2 where
-  ubimap = uncurry bimap
-
-infix 6 %+
-(%+) :: Quantity -> Quantity -> Maybe Quantity
-(Quantity (d1, v1)) %+ (Quantity (d2, v2)) = if d1 /= d2 then Nothing
-                                             else Just $ Quantity (d1, v1 + v2)
-
-infix 6 %-
-(%-) :: Quantity -> Quantity -> Maybe Quantity
-(Quantity (d1, v1)) %- (Quantity (d2, v2)) = if d1 /= d2 then Nothing
-                                             else Just $ Quantity (d1, v1 - v2)
