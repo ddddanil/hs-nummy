@@ -43,15 +43,25 @@ baseUnit = choice
       return $ applyPrefix p u;
     }
   , parseBaseUnit
+  , parseDimlessCoeff
   ]
 
+parseDimlessCoeff :: Parser Unit
+parseDimlessCoeff = do
+  v <- rawValue
+  return $ dimlessCoeff v
+
 -- add pow ^ later
-fullUnitOpTable :: (Monad m) => OperatorTable String () m Unit
+fullUnitOpTable :: OperatorTable String () Identity Unit
 fullUnitOpTable =
-  [ [ Infix (char ' ' >> notFollowedBy space >> return (#*) ) AssocRight ]
+  [ [ Infix (char '^' >> lookAhead parseDimlessCoeff >> return pow) AssocLeft ]
+  , [ Infix (char ' ' >> notFollowedBy space >> return (#*) ) AssocRight ]
   , [ Infix (char '/' >> return (#/) ) AssocLeft ]
   , [ Infix (char '*' >> return (#*) ) AssocLeft ]
   ]
+  where
+    pow :: Unit -> Unit -> Unit
+    pow u1 u2 = fromJust $ (u1 #!^ u2)
 
 shortUnitOpTable :: (Monad m) => OperatorTable String () m Unit
 shortUnitOpTable =

@@ -1,10 +1,10 @@
 module Nummy.Metrology.Unit (
   Unit, Quantity(..), Prefix, Modifier
-, dimlessUnit, conversion_ratio, complex_conversion, canonical_unit
+, dimlessUnit, dimlessCoeff, conversion_ratio, complex_conversion, canonical_unit
 , applyPrefix, applyModifier
 , mkQu, quIn, dimOfUnit, dimOfQu
-, (#*), (#/)
-, (%+), (%-), (%*), (%/)
+, (#^), (#!^), (#*), (#/)
+, (%+), (%-), (%*), (%/), (%^), (%!^)
 ) where
 
 import Protolude hiding (Prefix)
@@ -35,6 +35,9 @@ instance Eq Unit where
 
 dimlessUnit :: Unit
 dimlessUnit = Unit $ \v -> Quantity (dimless, v)
+
+dimlessCoeff :: Value -> Unit
+dimlessCoeff c = Unit $ \v -> Quantity (dimless, c * v)
 
 canonical_unit :: Dimension -> Unit
 canonical_unit dim = conversion_ratio dim 1
@@ -71,13 +74,26 @@ quIn (Quantity (d, v)) (Unit u) =
 
 -- Unit operators
 
-{-
+infix 8 #!^
+(#!^) :: Unit -> Unit -> Maybe Unit
+u1 #!^ (Unit u2) =
+  let Quantity (d, v) = u2 1
+  in if isDimless d
+     then Just (u1 #^ v)
+     else Nothing
+
 infixl 8 #^
-(#^) :: Unit -> Unit -> Maybe Unit
-(d, v) #^ (dp, p) = if dp /= baseDim Dimensionless then Nothing else
-  if denominator p == 1 then Just (d |^| p, v ^ numerator p)
-  else Just (d |^| p, toRational (fromRational v ** fromRational p))
--}
+(#^) :: Unit -> Value -> Unit
+(Unit u) #^ p = Unit $
+  \v ->
+    let Quantity (d, v') = u 1
+    in Quantity (d |^| p, v * (pow v' p))
+  where
+    pow :: Value -> Value -> Value
+    pow v p =
+      if denominator p == 1
+      then v ^ (numerator p)
+      else toRational $ fromRational v ** fromRational p
 
 infixl 7 #*
 (#*) :: Unit -> Unit -> Unit
@@ -86,7 +102,6 @@ infixl 7 #*
     let Quantity (d1, v1) = u1 v
         Quantity (d2, v2) = u2 1
     in Quantity (d1 |*| d2, v1 * v2)
-
 
 infixl 7 #/
 (#/) :: Unit -> Unit -> Unit
@@ -98,6 +113,23 @@ infixl 7 #/
 
 
 -- Quantity operators
+
+infixl 8 %!^
+(%!^) :: Quantity -> Quantity -> Maybe Quantity
+q %!^ (Quantity (d, v)) =
+  if isDimless d
+  then Just (q %^ v)
+  else Nothing
+
+infixl 8 %^
+(%^) :: Quantity -> Value -> Quantity
+(Quantity (d1, v1)) %^ p = Quantity $ (d1 |^| p, pow v1 p)
+  where
+    pow :: Value -> Value -> Value
+    pow v p =
+      if denominator p == 1
+      then v ^ (numerator p)
+      else toRational $ fromRational v ** fromRational p
 
 infixl 7 %*
 (%*) :: Quantity -> Quantity -> Quantity

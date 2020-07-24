@@ -1,6 +1,6 @@
 cabal-version: 2.2
 name:          hs-nummy
-version:       0.0
+version:       0.1
 
 library
     exposed-modules:

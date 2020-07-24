@@ -54,6 +54,8 @@ testUnits =
   , testGroup "Division"
     [ testParse Succeed unit "m/s"  $ unit' (Def.length |/| Def.time, 1)
     , testParse Succeed unit "km/h" $ unit' (Def.length |/| Def.time, 5 % 18)
+    , testParse Succeed unit "1/s"  $ unit' (dimless |/| Def.time, 1)
+    , testParse Succeed unit "2/km" $ unit' (dimless |/| Def.time, 2/1000)      -- Whats wrong with this thing
     ]
   , testGroup "Multiplication"
     -- Commutative prefixes
@@ -66,6 +68,10 @@ testUnits =
     -- Same dimension
     , testParse Succeed unit "m*m" $ unit' (Def.length |*| Def.length, 1)
     , testParse Succeed unit "km*m" $ unit' (Def.length |*| Def.length, 1000)
+    ]
+  , testGroup "Powers"
+    [ testParse Succeed unit "(m^2)" $ unit' (Def.length |^| 2, 1)
+    , testParse Succeed unit "(km^2)" $ unit' (Def.length |^| 2, 1000000)
     ]
   ]
 

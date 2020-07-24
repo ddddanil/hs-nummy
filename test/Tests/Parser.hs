@@ -32,5 +32,5 @@ checkParse (Left _) _  = False
 checkParse (Right a) f = f a
 
 testParse :: (Eq a) => TestType -> Parser a -> String -> (a -> Bool) -> TestTree
-testParse t p s f = testCase (show s) $ (testType t) result @? ""
+testParse t p s f = testCase (show s) $ (testType t) result @? "testParse"
   where result = checkParse (getParse p s) f
