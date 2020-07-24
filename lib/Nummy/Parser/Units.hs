@@ -25,15 +25,17 @@ parseMaybe :: Maybe a -> Parser a
 parseMaybe Nothing = parserFail "Could not unpack Maybe"
 parseMaybe (Just x) = return x
 
-parseBaseUnit = oneOfStr baseUnitTable >>= \u -> parseMaybe (lookupUnit Nothing u) <?> "Could not look up a unit"
-parsePrefix = oneOfStr prefixTable >>= \p -> parseMaybe (lookupPrefix p) <?> "Could not look up a prefix"
-parseModifier = oneOfStr modifierTable >>= \m -> parseMaybe (lookupModifier m) <?> "Could not look up a modifier"
+parseBaseUnit = (oneOfStr baseUnitTable <?> "known unit symbol") >>= \u -> parseMaybe (lookupUnit Nothing u) <?> "known unit symbol"
+parsePrefix = (oneOfStr prefixTable <?> "known prefix") >>= \p -> parseMaybe (lookupPrefix p) <?> "known prefix"
+parseModifier = (oneOfStr modifierTable <?> "known modifier") >>= \m -> parseMaybe (lookupModifier m) <?> "known modifier"
+
+parenthesis = between (char '(' >> spaces >> notFollowedBy space) (spaces >> char ')')
 
 
 -- Unit parser
 
 baseUnit :: Parser Unit
-baseUnit = P.option dimlessUnit $ choice
+baseUnit = choice
   [ try $ do {
       p <- parsePrefix;
       u <- parseBaseUnit;
@@ -45,7 +47,7 @@ baseUnit = P.option dimlessUnit $ choice
 -- add pow ^ later
 fullUnitOpTable :: (Monad m) => OperatorTable String () m Unit
 fullUnitOpTable =
-  [ [ Infix (char ' ' >> return (#*) ) AssocLeft ]
+  [ [ Infix (char ' ' >> notFollowedBy space >> return (#*) ) AssocRight ]
   , [ Infix (char '/' >> return (#/) ) AssocLeft ]
   , [ Infix (char '*' >> return (#*) ) AssocLeft ]
   ]
@@ -62,8 +64,7 @@ unitExpr table = buildExpressionParser table baseUnit
         -- where dimlessQu = rawValue >>= \v -> return $ mkQu v dimlessUnit
 
 unit :: Parser Unit
-unit = try (brackets $ unitExpr fullUnitOpTable) <|> try (unitExpr shortUnitOpTable) where
-  brackets = between (char '(' >> spaces) (spaces >> char ')')
+unit = try (parenthesis $ unitExpr fullUnitOpTable) <|> try (unitExpr shortUnitOpTable) <?> "unit"
 
 
 -- Quantity parser
@@ -80,9 +81,9 @@ rawValue = do
   return $ toRational n
 
 quantity :: Parser Quantity
-quantity = choice [try wideQu, try slimQu, dimlessQu] where
+quantity = try wideQu <|> try slimQu <|> dimlessQu <?> "quantity" where
   wideQu = do
-    v <- modifiedValue
+    v <- try modifiedValue <|> rawValue
     _ <- space
     u <- unit
     guard . not . isDimless . ofDim $ u
@@ -92,5 +93,5 @@ quantity = choice [try wideQu, try slimQu, dimlessQu] where
     u <- unit
     return $ mkQu v u
   dimlessQu = do
-    v <- modifiedValue
+    v <- try modifiedValue <|> rawValue
     return $ mkQu v dimlessUnit

@@ -40,6 +40,7 @@ executable nummy
 test-suite tests
   main-is:             Tests.hs
   hs-source-dirs:      test
+  default-language:    Haskell2010
   type:                exitcode-stdio-1.0
   build-depends:
       base
@@ -47,4 +48,5 @@ test-suite tests
     , parsec
     , tasty
     , tasty-hunit
+    , tasty-expected-failure
     , hs-nummy

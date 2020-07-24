@@ -6,6 +6,7 @@ module Nummy.Metrology.Dimension (
 
 import Protolude hiding (Prefix)
 import Data.String (String)
+import Data.List (lookup, foldl1)
 
 
 -- Types
@@ -34,18 +35,20 @@ isBaseUnit _ = False
 
 -- Remove components with power 0 and merge same base dimensions
 sanitizeDimension :: Dimension -> Dimension
-sanitizeDimension (Dimension dim) = combineDimensions (+) (Dimension []) . Dimension . filter (\d -> not $ noPower d ) $ dim
-  where noPower = (== 0) . snd
+sanitizeDimension (Dimension dim) = combineDimensions (+) (Dimension []) . Dimension . filter (\d -> power d && has_dim d ) $ dim
+  where power = (/= 0) . snd; has_dim = (/= Dimensionless) . fst
 
 combineDimensions :: (Value -> Value -> Value) -> Dimension -> Dimension -> Dimension
-combineDimensions op (Dimension d1) (Dimension d2) = Dimension $ unfoldr merge_same . sortOn fst $ d1 ++ d2  -- works bc sort is stable
-  where
-    merge_same ((d1,x):(d2,y):rest)
-      | d1 == d2 = Just ((d1, op x y), rest)
-      | otherwise = Just ((d1, x), (d2,y):rest)
-    merge_same ((d,x):rest) = Just ((d,x), rest)
-    merge_same _ = Nothing
+combineDimensions op (Dimension d1) (Dimension d2) = Dimension $ sort . map (second $ foldl1 op) . groupAssoc $ d1 ++ d2
 
+groupAssoc :: (Eq a) => [(a, b)] -> [(a, [b])]
+groupAssoc = foldl add []
+  where
+    add :: (Eq a) => [(a, [b])] -> (a, b) -> [(a, [b])]
+    add acc (k, v) =
+      case lookup k acc of
+        Just _ -> map (\(k', vs) -> if k == k' then (k, vs ++ [v]) else (k', vs) ) acc
+        Nothing -> (k,[v]):acc
 
 -- Operators
 
