@@ -8,6 +8,7 @@ module Nummy.Metrology.Dimension (
 import Protolude hiding (Prefix)
 import Data.String (String)
 import Data.List (lookup, partition, foldl1)
+import qualified Text.PrettyPrint.Leijen as PP
 
 
 -- Types
@@ -16,29 +17,29 @@ type Value = Rational
 type Label = String
 
 data BaseDim = Length | Mass | Time | Current | Temp deriving (Eq, Ord, Show)
-instance Print BaseDim where
-  hPutStr h Length  = hPutStr h ("m" :: Text)
-  hPutStr h Mass    = hPutStr h ("kg" :: Text)
-  hPutStr h Time    = hPutStr h ("s" :: Text)
-  hPutStr h Current = hPutStr h ("A" :: Text)
-  hPutStr h Temp    = hPutStr h ("K" :: Text)
-  hPutStrLn h a = hPutStr h a >> hPutStrLn h ("" :: Text)
+instance PP.Pretty BaseDim where
+  pretty Length  = PP.text "m"
+  pretty Mass    = PP.text "kg"
+  pretty Time    = PP.text "s"
+  pretty Current = PP.text "A"
+  pretty Temp    = PP.text "K"
 
 newtype Dimension = Dimension { factors :: [(BaseDim, Value)] } deriving (Show)
 
-instance Print Dimension where
-  hPutStr h (Dimension dim) = do
-    let (num, den) =  partition ((> 0) . snd) dim
-    let print_term (d, p) = do {
-      hPutStr h d;
-      when (abs p /= 1) $ hPutStr h ("^" ++ show (fromRational $ abs p :: Double));
-    }
-    when (num == []) $ hPutStr h ("1" :: Text)
-    _ <- mapM print_term num
-    unless (den == []) $ hPutStr h ("/" :: Text)
-    _ <- mapM print_term den
-    return ()
-  hPutStrLn h a = hPutStr h a >> hPutStrLn h ("" :: Text)
+instance PP.Pretty Dimension where
+  pretty (Dimension dim) =
+    if show num_line == ("" :: Text)
+    then PP.char '1'
+    else num_line
+    <>
+    if show den_line == ("" :: Text)
+    then PP.empty
+    else PP.char '/' <> den_line
+    where
+      (num, den) = partition ((> 0) . snd) dim
+      print_term (d, p) = PP.pretty d <> if abs p /= 1 then PP.char '^' <> PP.pretty (fromRational (abs p) :: Double) else PP.empty
+      num_line = PP.hsep $ map print_term num
+      den_line = PP.hsep $ map print_term den
 
 instance Eq Dimension where
   d1 == d2 = f d1 == f d2 where f = factors . sanitizeDimension

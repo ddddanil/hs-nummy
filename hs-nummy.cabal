@@ -16,12 +16,12 @@ library
         base
       , protolude
       , syb
+      , wl-pprint
       , parsec
       , parsec-numbers
 
 executable nummy
     main-is:            Main.hs
-    other-modules:      Main.Repl
     hs-source-dirs:     exe
     default-language:   Haskell2010
     default-extensions: NoImplicitPrelude, OverloadedStrings
@@ -33,6 +33,8 @@ executable nummy
       , syb
       , protolude
       , ansi-terminal
+      , wl-pprint
+      , haskeline
       , parsec
       , hs-nummy
 

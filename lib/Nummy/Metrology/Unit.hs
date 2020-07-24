@@ -9,8 +9,7 @@ module Nummy.Metrology.Unit (
 
 import Protolude hiding (Prefix)
 import Data.String (String)
-import GHC.Show (Show)
-import GHC.Err (error)
+import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Metrology.Dimension
 
@@ -18,17 +17,16 @@ import Nummy.Metrology.Dimension
 type Prefix = Value
 type Modifier = Value
 newtype Quantity = Quantity (Dimension, Value) deriving (Show, Eq) -- (Dimension, conversion to SI)
-instance Print Quantity where
-  hPutStr h (Quantity (d, v)) = do
-    hPutStr h (show $ fromRational v :: Text)
-    hPutStr h (" " :: Text)
-    hPutStr h d
-  hPutStrLn h a = hPutStr h a >> hPutStrLn h ("" :: Text)
+instance PP.Pretty Quantity where
+  pretty (Quantity (d, v)) =
+    PP.pretty (fromRational v :: Double)
+    <> if not $ isDimless d
+      then PP.char ' ' <> PP.pretty d
+      else PP.empty
 
 newtype Unit = Unit (Value -> Quantity)        -- s -> (a, s)  thats a State monad !!
-instance Print Unit where
-  hPutStr h (Unit u) = hPutStr h (u 1)
-  hPutStrLn h a = hPutStr h a >> hPutStrLn h ("" :: Text)
+instance PP.Pretty Unit where
+  pretty (Unit u) = PP.pretty (u 1)
 
 instance Eq Unit where
   u1 == u2 = 1 `mkQu` u1 == 1 `mkQu` u2
