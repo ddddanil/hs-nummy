@@ -5,6 +5,7 @@ module Nummy.Parser.Units (
 import Protolude hiding (Prefix, Infix, try)
 import Data.String (String)
 import Data.Maybe (fromJust)
+import Data.Ratio (approxRational)
 import Text.Parsec as P hiding ( (<|>) )
 import Text.Parsec.Char as P.Char
 import Text.Parsec.Expr as P.Expr
@@ -78,7 +79,8 @@ modifiedValue = do
 rawValue :: Parser Value
 rawValue = do
   n <- floating2 False :: Parser Double
-  return $ toRational n
+  return $ approxRational n epsilon
+  where epsilon = 0.000001
 
 quantity :: Parser Quantity
 quantity = try wideQu <|> try slimQu <|> dimlessQu <?> "quantity" where

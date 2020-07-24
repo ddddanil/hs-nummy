@@ -1,6 +1,6 @@
 import Protolude ((%))
 import Test.Tasty       (TestTree, defaultMain, testGroup, localOption, Timeout(Timeout))
-import Test.Tasty.HUnit (testCase, (@?=), Assertion, assertBool, assertEqual, assertFailure)
+import Test.Tasty.HUnit (testCase, (@?=), (@=?), Assertion, assertBool, assertEqual, assertFailure)
 import Test.Tasty.ExpectedFailure (expectFail, expectFailBecause)
 import Text.Parsec hiding (parseTest)
 import Text.Parsec.String
@@ -83,6 +83,8 @@ testQuantities =
   [ testGroup "Base"
     -- Dimensionless
     [ testParse quantity "10" (baseDim Dimensionless, 10)
+    , testParse quantity "7.5" (baseDim Dimensionless, 15%2)
+    , testParse quantity "999.2" (baseDim Dimensionless, 4996%5)
     -- Different allowed spacings
     , testParse quantity "5m" (Def.length, 5)
     , testParse quantity "6 m" (Def.length, 6)
@@ -99,12 +101,22 @@ testQuantities =
     , testParse quantity "9k mm" (Def.length, 9)
     , testParse quantity "2m mg" (Def.mass, 2)
     ]
+  , testGroup "Complex"
+    [ testParse quantity "1.5m/s" (Def.length |/| Def.time, 3%2)
+    , testParse quantity "9.8 (m/s s)" (Def.length |/| (Def.time |*| Def.time), 49%5)
+    ]
+  ]
+
+testDimensions =
+  testGroup "Dimensions"
+  [ testCase "len * len = len ^ 2" $ (Def.length |*| Def.length) @=? (Def.length |^| 2)
   ]
 
 main :: IO ()
 main = defaultMain $
   testGroup "Tests"
-  [ testUnits
+  [ testDimensions
+  , testUnits
   , testQuantities
   ]
 
