@@ -3,9 +3,9 @@ name:          hs-nummy
 version:       0.0
 
 library
-    exposed-modules: Nummy.Parser
-    other-modules:
-        Nummy.Parser.Units
+    exposed-modules:
+        Nummy.Parser
+      , Nummy.Parser.Units
       , Nummy.Metrology.Definitions
       , Nummy.Metrology.Dimension
       , Nummy.Metrology.Unit
@@ -16,7 +16,6 @@ library
     build-depends:
         base
       , protolude
-      , template-haskell
       , syb
       , parsec
       , parsec-numbers
@@ -35,8 +34,17 @@ executable nummy
       , syb
       , protolude
       , ansi-terminal
-      , ansi-wl-pprint
-      , wl-pprint
-      , wl-pprint-text
       , parsec
       , hs-nummy
+
+test-suite tests
+  main-is:             Tests.hs
+  hs-source-dirs:      test
+  type:                exitcode-stdio-1.0
+  build-depends:
+      base
+    , protolude
+    , parsec
+    , tasty
+    , tasty-hunit
+    , hs-nummy

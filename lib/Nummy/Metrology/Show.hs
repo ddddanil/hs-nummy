@@ -16,6 +16,9 @@ instance Show BaseDim where
   show Time = "s"
   show _ = ""
 
+instance Show Dimension where
+  show = showDim
+
 showDim :: Dimension -> String
 showDim dim
   | isDimless dim || isNone dim = ""

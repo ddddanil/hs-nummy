@@ -1,6 +1,7 @@
 module Nummy.Metrology.Definitions (
   baseUnitTable, prefixTable, modifierTable
 , lookupUnit
+, length, mass, time
 ) where
 
 import Protolude hiding (length, Prefix)

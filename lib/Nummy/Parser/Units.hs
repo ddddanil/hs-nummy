@@ -11,8 +11,8 @@ import Text.Parsec.Expr as P.Expr
 import Text.Parsec.String as P.String
 import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
 
-import Nummy.Metrology.Definitions
-import Nummy.Metrology.Dimension
+import Nummy.Metrology.Definitions hiding (length, mass, time)
+import Nummy.Metrology.Dimension as Dimension
 import Nummy.Metrology.Unit
 
 oneOfStr :: [[Char]] -> Parser [Char]
@@ -24,7 +24,7 @@ oneOfStr ss = choice $ map (try . string) . sortBy (flip compare `on` length) $ 
 baseUnit :: Parser Unit
 baseUnit = P.option dimlessUnit $ choice
   [ try $ do {
-      p <- getUnit <$> prefix;
+      p <- getPrefix <$> prefix;
       u <- getUnit <$> bare_unit;
       return $ applyPrefix p u;
     }
@@ -35,6 +35,7 @@ baseUnit = P.option dimlessUnit $ choice
   ]
   where
   getUnit = fromJust . lookupUnit Nothing
+  getPrefix = fromJust . lookupUnit (Just $ baseDim Dimension.Prefix)
   prefix = oneOfStr prefixTable
   bare_unit = oneOfStr baseUnitTable
 
