@@ -1,14 +1,15 @@
 module Nummy.Metrology.Unit (
-  Unit, Quantity, Prefix, Modifier
+  Unit, Quantity(..), Prefix, Modifier
 , dimlessUnit, conversion_ratio, complex_conversion, canonical_unit
 , applyPrefix, applyModifier
-, mkQu, quIn, ofDim
+, mkQu, quIn, dimOfUnit, dimOfQu
 , (#*), (#/)
 , (%+), (%-), (%*), (%/)
 ) where
 
 import Protolude hiding (Prefix)
 import Data.String (String)
+import GHC.Show (Show)
 import GHC.Err (error)
 
 import Nummy.Metrology.Dimension
@@ -16,12 +17,24 @@ import Nummy.Metrology.Dimension
 
 type Prefix = Value
 type Modifier = Value
-type Quantity = (Dimension, Value) -- (Dimension, conversion to SI)
-type Unit = Value -> Quantity      -- s -> (a, s)  thats a State monad !!
+newtype Quantity = Quantity (Dimension, Value) deriving (Show, Eq) -- (Dimension, conversion to SI)
+instance Print Quantity where
+  hPutStr h (Quantity (d, v)) = do
+    hPutStr h (show $ fromRational v :: Text)
+    hPutStr h (" " :: Text)
+    hPutStr h d
+  hPutStrLn h a = hPutStr h a >> hPutStrLn h ("" :: Text)
 
+newtype Unit = Unit (Value -> Quantity)        -- s -> (a, s)  thats a State monad !!
+instance Print Unit where
+  hPutStr h (Unit u) = hPutStr h (u 1)
+  hPutStrLn h a = hPutStr h a >> hPutStrLn h ("" :: Text)
+
+instance Eq Unit where
+  u1 == u2 = 1 `mkQu` u1 == 1 `mkQu` u2
 
 dimlessUnit :: Unit
-dimlessUnit = \v -> (baseDim Dimensionless, v)
+dimlessUnit = Unit $ \v -> Quantity (dimless, v)
 
 canonical_unit :: Dimension -> Unit
 canonical_unit dim = conversion_ratio dim 1
@@ -30,27 +43,30 @@ conversion_ratio :: Dimension -> Value -> Unit
 conversion_ratio dim r = complex_conversion dim (*r)
 
 complex_conversion :: Dimension -> (Value -> Value) -> Unit
-complex_conversion dim f = \v -> (dim, f v)
+complex_conversion dim f = Unit $ \v -> Quantity (dim, f v)
 
-ofDim :: Unit -> Dimension
-ofDim u = fst $ u 1
+dimOfUnit :: Unit -> Dimension
+dimOfUnit (Unit u) = dimOfQu $ u 1
+
+dimOfQu :: Quantity -> Dimension
+dimOfQu (Quantity (d, v)) = d
 
 -- Unit and Quantity manipulation
 
 applyPrefix :: Prefix -> Unit -> Unit
-applyPrefix p u = \v -> second (*p) (u v)
+applyPrefix p (Unit u) = Unit $ \v -> (u v) %* (p `mkQu` dimlessUnit)
 
 applyModifier :: Modifier -> Value -> Value
 applyModifier m v = v * m
 
 mkQu :: Value -> Unit -> Quantity
-mkQu v u = u v   -- haha
+mkQu v (Unit u) = u v   -- haha
 
 quIn :: Quantity -> Unit -> Maybe Quantity
-quIn (d, v) u =
-  let (du, v') = u v
+quIn (Quantity (d, v)) (Unit u) =
+  let Quantity (du, v') = u v
   in if d /= du then Nothing
-  else Just (d, v')
+  else Just $ Quantity (d, v')
 
 
 -- Unit operators
@@ -65,40 +81,40 @@ infixl 8 #^
 
 infixl 7 #*
 (#*) :: Unit -> Unit -> Unit
-u1 #* u2 =
+(Unit u1) #* (Unit u2) = Unit $
   \v ->
-    let (d1, v1) = u1 v
-        (d2, v2) = u2 1
-    in (d1 |*| d2, v1 * v2)
+    let Quantity (d1, v1) = u1 v
+        Quantity (d2, v2) = u2 1
+    in Quantity (d1 |*| d2, v1 * v2)
 
 
 infixl 7 #/
 (#/) :: Unit -> Unit -> Unit
-u1 #/ u2 =
+(Unit u1) #/ (Unit u2) = Unit $
   \v ->
-    let (d1, v1) = u1 v
-        (d2, v2) = u2 1
-    in (d1 |/| d2, v1 / v2)
+    let Quantity (d1, v1) = u1 v
+        Quantity (d2, v2) = u2 1
+    in Quantity (d1 |/| d2, v1 / v2)
 
 
 -- Quantity operators
 
 infixl 7 %*
 (%*) :: Quantity -> Quantity -> Quantity
-u1 %* u2 = ubimap (ubimap ((|*|), (*)) u1) u2 where
+(Quantity u1) %* (Quantity u2) = Quantity $ ubimap (ubimap ((|*|), (*)) u1) u2 where
   ubimap = uncurry bimap
 
 infixl 7 %/
 (%/) :: Quantity -> Quantity -> Quantity
-u1 %/ u2 = ubimap (ubimap ((|/|), (/)) u1) u2 where
+(Quantity u1) %/ (Quantity u2) = Quantity $ ubimap (ubimap ((|/|), (/)) u1) u2 where
   ubimap = uncurry bimap
 
 infix 6 %+
 (%+) :: Quantity -> Quantity -> Maybe Quantity
-(d1, v1) %+ (d2, v2) = if d1 /= d2 then Nothing
-                       else Just (d1, v1 + v2)
+(Quantity (d1, v1)) %+ (Quantity (d2, v2)) = if d1 /= d2 then Nothing
+                                             else Just $ Quantity (d1, v1 + v2)
 
 infix 6 %-
 (%-) :: Quantity -> Quantity -> Maybe Quantity
-(d1, v1) %- (d2, v2) = if d1 /= d2 then Nothing
-                       else Just (d1, v1 - v2)
+(Quantity (d1, v1)) %- (Quantity (d2, v2)) = if d1 /= d2 then Nothing
+                                             else Just $ Quantity (d1, v1 - v2)

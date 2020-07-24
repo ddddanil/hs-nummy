@@ -1,33 +1,58 @@
 module Nummy.Metrology.Dimension (
-  Value, Label, Dimension(..), BaseDim(..)
-, baseDim, isBaseUnit, isDimless, isNone
+  Value, Label, Dimension, BaseDim(..)
+, baseDim, dimless
+, isBaseUnit, isDimless
 , (|*|), (|/|), (|^|)
 ) where
 
 import Protolude hiding (Prefix)
 import Data.String (String)
-import Data.List (lookup, foldl1)
+import Data.List (lookup, partition, foldl1)
 
 
 -- Types
 
 type Value = Rational
 type Label = String
-newtype Dimension = Dimension [(BaseDim, Value)] deriving Eq
 
-data BaseDim = Dimensionless | Length | Mass | Time | Current | Temp deriving (Eq, Ord)
+data BaseDim = Length | Mass | Time | Current | Temp deriving (Eq, Ord, Show)
+instance Print BaseDim where
+  hPutStr h Length  = hPutStr h ("m" :: Text)
+  hPutStr h Mass    = hPutStr h ("kg" :: Text)
+  hPutStr h Time    = hPutStr h ("s" :: Text)
+  hPutStr h Current = hPutStr h ("A" :: Text)
+  hPutStr h Temp    = hPutStr h ("K" :: Text)
+  hPutStrLn h a = hPutStr h a >> hPutStrLn h ("" :: Text)
 
+newtype Dimension = Dimension { factors :: [(BaseDim, Value)] } deriving (Show)
+
+instance Print Dimension where
+  hPutStr h (Dimension dim) = do
+    let (num, den) =  partition ((> 0) . snd) dim
+    let print_term (d, p) = do {
+      hPutStr h d;
+      when (abs p /= 1) $ hPutStr h ("^" ++ show (fromRational $ abs p :: Double));
+    }
+    when (num == []) $ hPutStr h ("1" :: Text)
+    _ <- mapM print_term num
+    unless (den == []) $ hPutStr h ("/" :: Text)
+    _ <- mapM print_term den
+    return ()
+  hPutStrLn h a = hPutStr h a >> hPutStrLn h ("" :: Text)
+
+instance Eq Dimension where
+  d1 == d2 = f d1 == f d2 where f = factors . sanitizeDimension
 
 -- Working with dims
 
 baseDim :: BaseDim -> Dimension
 baseDim b = Dimension [(b, 1)]
 
-isNone :: Dimension -> Bool
-isNone (Dimension d ) = d == []
+dimless :: Dimension
+dimless = Dimension []
 
 isDimless :: Dimension -> Bool
-isDimless (Dimension d ) = d == [(Dimensionless, 1)]
+isDimless (Dimension d ) = d == []
 
 isBaseUnit :: Dimension -> Bool
 isBaseUnit (Dimension [(d, 1)]) = True
@@ -35,8 +60,8 @@ isBaseUnit _ = False
 
 -- Remove components with power 0 and merge same base dimensions
 sanitizeDimension :: Dimension -> Dimension
-sanitizeDimension (Dimension dim) = combineDimensions (+) (Dimension []) . Dimension . filter (\d -> power d && has_dim d ) $ dim
-  where power = (/= 0) . snd; has_dim = (/= Dimensionless) . fst
+sanitizeDimension (Dimension dim) = combineDimensions (+) (Dimension []) . Dimension . filter (\d -> power d ) $ dim
+  where power = (/= 0) . snd
 
 combineDimensions :: (Value -> Value -> Value) -> Dimension -> Dimension -> Dimension
 combineDimensions op (Dimension d1) (Dimension d2) = Dimension $ sort . map (second $ foldl1 op) . groupAssoc $ d1 ++ d2

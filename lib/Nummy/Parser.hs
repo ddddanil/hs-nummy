@@ -6,7 +6,7 @@ import Text.Parsec as P hiding ( (<|>) )
 import Text.Parsec.String as P.String
 
 import Nummy.Parser.Units
-import Nummy.Metrology.Show
+import Nummy.Metrology.Unit
 
 parse_all :: Parser a -> Parser a
 parse_all p = do
@@ -14,5 +14,5 @@ parse_all p = do
   _ <- eof
   return x
 
-parse_nummy :: Parser String
-parse_nummy = showQu <$> parse_all quantity
+parse_nummy :: Parser Quantity
+parse_nummy = parse_all quantity

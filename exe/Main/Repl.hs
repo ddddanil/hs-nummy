@@ -1,18 +1,19 @@
 module Main.Repl (repl) where
 
 import Protolude
--- import Control.Monad.Trans (lift)
--- import Control.Monad.Trans.State.Strict
 import Data.Text as T
 import Data.Bifoldable ( bifold )
 import System.IO (hSetEcho, hReady, hGetChar, hPutChar, hSetBuffering, BufferMode (NoBuffering) )
 import System.Console.ANSI
+import Text.Parsec (ParseError)
 
-type ReplAction e s = s -> Either e s
-data ReplState = ReplState { line :: Text, action :: ReplAction [Char] Text } -- deriving (Eq, Show)
+import Nummy.Metrology.Unit
+
+type ReplAction = [Char] -> Either ParseError Quantity
+data ReplState = ReplState { line :: Text, action :: ReplAction } -- deriving (Eq, Show)
 type ReplStateM a = StateT ReplState IO a
 
-repl :: ReplAction [Char] Text -> IO ()
+repl :: ReplAction -> IO ()
 repl action = do
   hSetBuffering stdin NoBuffering
   hSetBuffering stdout NoBuffering
@@ -23,7 +24,7 @@ repl action = do
 readRepl :: ReplStateM ()
 readRepl = do
   st <- get
-  echoLine $ pretty (action st (line st))
+  echoLine
   -- echoLine $ show (c, line st)
   lift getKey >>= transform
   where
@@ -41,7 +42,7 @@ transform c = do
   case c of
     "\n" -> do
       lift $ hPutChar stdout '\n'
-      lift . print =<< gets (\st -> action st $ line st)
+      lift . print =<< gets (\st -> action st $ unpack $ line st)
       modify $ \st -> st { line = "" }
     "\ESC[C" -> lift $ cursorForward 1
     "\ESC[D" -> lift $ cursorBackward 1
@@ -60,17 +61,17 @@ getKey = Protolude.reverse <$> getKey' ""
           more <- hReady stdin
           (if more then getKey' else return) (char:chars)
 
-echoLine :: Text -> ReplStateM ()
-echoLine s = do
+echoLine :: ReplStateM ()
+echoLine = do
   st <- get
+  let q = action st (unpack $ line st)
   Just (_, w) <- lift getTerminalSize
-
-  let printJustifyRight s = setCursorColumn (w - T.length s) >> putStr s
 
   lift $ do
     saveCursor
     clearLine
     setCursorColumn 0
     putStr $ line st
-    printJustifyRight $ T.take (w -  T.length (line st)) s
+    setCursorColumn 140
+    when (isRight q) $ let Right qu = q in putStr qu
     restoreCursor

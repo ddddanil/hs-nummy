@@ -88,7 +88,7 @@ quantity = try wideQu <|> try slimQu <|> dimlessQu <?> "quantity" where
     v <- try modifiedValue <|> rawValue
     _ <- space
     u <- unit
-    guard . not . isDimless . ofDim $ u
+    guard . not . isDimless . dimOfUnit $ u
     return $ mkQu v u
   slimQu = do
     v <- rawValue

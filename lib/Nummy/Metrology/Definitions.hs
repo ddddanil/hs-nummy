@@ -73,7 +73,7 @@ lookupUnit md unit =
     Nothing -> snd <$> headMay has_unit
   where
     matches_unit = elem unit . fst
-    matches_dimension dim = (==dim) . ofDim . snd
+    matches_dimension dim = (==dim) . dimOfUnit . snd
 
 lookupPrefix :: Label -> Maybe Prefix
 lookupPrefix p = snd <$> find (elem p . fst) prefix_table
