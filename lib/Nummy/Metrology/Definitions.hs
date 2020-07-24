@@ -1,7 +1,7 @@
 module Nummy.Metrology.Definitions (
   baseUnitTable, prefixTable, modifierTable
-, lookupUnit
-, length, mass, time
+, lookupUnit, lookupPrefix, lookupModifier
+, length, mass, time, current, temp
 ) where
 
 import Protolude hiding (length, Prefix)
@@ -16,44 +16,70 @@ import Nummy.Metrology.Unit
 
 symbol_table :: [ ([Label], Unit) ]  -- (Synonyms, )
 symbol_table =
+  -- -- Dimless tokens
+  -- [ (["1"],                   dimlessUnit                                       )
   -- Length
-  [ (["m", "meter", "metre"], (length, 1))
-  , (["ft", "foot", "feet"], (length, 0.3048))
-  , (["mi", "mile"], (length, 1609.34))
+  [ (["m", "meter", "metre"], canonical_unit   length                           )
+  , (["ft", "foot", "feet"],  conversion_ratio length 0.3048                    )
+  , (["mi", "mile"],          conversion_ratio length 1609.34                   )
   -- Mass
-  , (["g", "gram", "gramm"], (mass, 1%1000))
-  , (["lbs", "pound"], (mass, 0.453592))
+  , (["g", "gram"],           conversion_ratio mass 0.001                       )
+  , (["lbs", "pound"],        conversion_ratio mass 0.453592                    )
   -- Time
-  , (["s", "sec", "second"], (time, 1))
-  , (["m", "min", "minute"], (time, 60))
-  , (["h", "hour"], (time, 3600))
-  -- Prefixes   km   ns
-  , (["k", "kilo"], (baseDim Prefix, 1000))
-  , (["m", "milli"], (baseDim Prefix, 1 % 1000))
-  -- Number modifiers     1k  2m       Always one lowercase letter
-  , (["k"], (baseDim Modifier, 1000))
-  , (["m"], (baseDim Modifier, 1000000))
+  , (["s", "sec", "second"],  canonical_unit   time                             )
+  , (["m", "min", "minute"],  conversion_ratio time 60                          )
+  , (["h", "hour"],           conversion_ratio time 3600                        )
+  -- Current
+  , (["A", "Amp", "amp"],     canonical_unit current                            )
+  -- Temp
+  , (["K", "Kelvin"],         canonical_unit     temp                           )
+  , (["C", "Celsius"],        complex_conversion temp (+273.15)                 )
+  , (["F", "Fahrenheit"],     complex_conversion temp (\t -> 5%9 * (t + 459.67)))
   ]
 
+prefix_table :: [ ([Label], Prefix) ]
+prefix_table =
+  [ (["k", "kilo"],  1000    )
+  , (["m", "milli"], 1 % 1000)
+  ]
+
+modifier_table :: [ ([Label], Modifier)]
+modifier_table =
+  -- Always one lowercase letter
+  [ (["k"], 1000    )
+  , (["m"], 1000000 )
+  ]
+
+unitTable :: [Label]
+unitTable = concat . map fst $ symbol_table
+
 baseUnitTable :: [Label]
-baseUnitTable = concat . map fst . filter not_base $ symbol_table where
-  not_base = isBaseUnit . fst . snd
+baseUnitTable = concat . map fst $ symbol_table
 
 prefixTable :: [Label]
-prefixTable = concat . map fst . filter is_prefix $ symbol_table where
-  is_prefix = isPrefix . fst . snd
+prefixTable = concat . map fst $ prefix_table
 
 modifierTable :: [Label]
-modifierTable = concat . map fst . filter is_prefix $ symbol_table where
-  is_prefix = isModifier . fst . snd
+modifierTable = concat . map fst $ modifier_table
+
+
+-- Lookups
 
 lookupUnit :: Maybe Dimension -> Label -> Maybe Unit
-lookupUnit md unit = case md of
-  Just dim -> snd <$> (find (matches_dimension dim) . filter matches_unit) symbol_table
-  Nothing -> snd <$> find matches_unit symbol_table
+lookupUnit md unit =
+  let has_unit = filter matches_unit symbol_table
+  in case md of
+    Just dim -> snd <$> find (matches_dimension dim) has_unit
+    Nothing -> snd <$> headMay has_unit
   where
     matches_unit = elem unit . fst
-    matches_dimension dim = (==dim) . fst . snd
+    matches_dimension dim = (==dim) . ofDim . snd
+
+lookupPrefix :: Label -> Maybe Prefix
+lookupPrefix p = snd <$> find (elem p . fst) prefix_table
+
+lookupModifier :: Label -> Maybe Modifier
+lookupModifier m = snd <$> find (elem m . fst) modifier_table
 
 
 -- Base dim definitions
@@ -61,3 +87,5 @@ lookupUnit md unit = case md of
 length = baseDim Length
 mass = baseDim Mass
 time = baseDim Time
+current = baseDim Current
+temp = baseDim Temp

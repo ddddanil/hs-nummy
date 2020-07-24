@@ -14,6 +14,8 @@ instance Show BaseDim where
   show Length = "m"
   show Mass = "kg"
   show Time = "s"
+  show Current = "A"
+  show Temp = "K"
   show _ = ""
 
 instance Show Dimension where
@@ -26,7 +28,7 @@ showDim dim
   where
     showDim' (Dimension d) = combineLines . bimap showLine showLine . partition positive_pow $ d
     positive_pow = (> 0) . snd
-    showLine = unwords . map (\(d, p) -> show d ++ if abs p /= 1 then "^" ++ show (fromRational p :: Double) else "")
+    showLine = unwords . map (\(d, p) -> show d ++ if abs p /= 1 then "^" ++ show (fromRational $ abs p :: Double) else "")
     combineLines ("", den) = "1/" ++ den
     combineLines (num, "") = num
     combineLines (num, den) = num ++ "/" ++ den

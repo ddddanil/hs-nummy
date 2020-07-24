@@ -1,6 +1,6 @@
 module Nummy.Metrology.Dimension (
   Value, Label, Dimension(..), BaseDim(..)
-, baseDim, isPrefix, isModifier, isBaseUnit, isDimless, isNone
+, baseDim, isBaseUnit, isDimless, isNone
 , (|*|), (|/|), (|^|)
 ) where
 
@@ -14,7 +14,7 @@ type Value = Rational
 type Label = String
 newtype Dimension = Dimension [(BaseDim, Value)] deriving Eq
 
-data BaseDim = Dimensionless | Length | Mass | Time | Prefix | Modifier deriving (Eq, Ord)
+data BaseDim = Dimensionless | Length | Mass | Time | Current | Temp deriving (Eq, Ord)
 
 
 -- Working with dims
@@ -28,22 +28,14 @@ isNone (Dimension d ) = d == []
 isDimless :: Dimension -> Bool
 isDimless (Dimension d ) = d == [(Dimensionless, 1)]
 
-isPrefix :: Dimension -> Bool
-isPrefix (Dimension d ) = d == [(Prefix, 1)]
-
-isModifier :: Dimension -> Bool
-isModifier (Dimension d ) = d == [(Modifier, 1)]
-
 isBaseUnit :: Dimension -> Bool
-isBaseUnit (Dimension [(d, 1)]) = d /= Prefix && d /= Modifier
+isBaseUnit (Dimension [(d, 1)]) = True
 isBaseUnit _ = False
 
--- Remove prefixes, modifiers, with power 0 and merge same base dimensions
+-- Remove components with power 0 and merge same base dimensions
 sanitizeDimension :: Dimension -> Dimension
-sanitizeDimension (Dimension dim) = combineDimensions (+) (Dimension []) . Dimension . filter (\d -> not(prefix d || modifier d || noPower d) ) $ dim where
-  prefix = (== Prefix) . fst
-  modifier = (== Modifier) . fst
-  noPower = (== 0) . snd
+sanitizeDimension (Dimension dim) = combineDimensions (+) (Dimension []) . Dimension . filter (\d -> not $ noPower d ) $ dim
+  where noPower = (== 0) . snd
 
 combineDimensions :: (Value -> Value -> Value) -> Dimension -> Dimension -> Dimension
 combineDimensions op (Dimension d1) (Dimension d2) = Dimension $ unfoldr merge_same . sortOn fst $ d1 ++ d2  -- works bc sort is stable
@@ -68,5 +60,3 @@ infixl 7 |*|
 infixl 7 |/|
 (|/|) :: Dimension -> Dimension -> Dimension
 d1 |/| (Dimension d2) = sanitizeDimension . combineDimensions (+) d1 $ Dimension $ map (second negate) d2
-
-

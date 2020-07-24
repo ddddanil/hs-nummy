@@ -15,70 +15,64 @@ import Nummy.Metrology.Definitions hiding (length, mass, time)
 import Nummy.Metrology.Dimension as Dimension
 import Nummy.Metrology.Unit
 
+
+-- Combinators
+
 oneOfStr :: [[Char]] -> Parser [Char]
 oneOfStr ss = choice $ map (try . string) . sortBy (flip compare `on` length) $ ss
 
+parseMaybe :: Maybe a -> Parser a
+parseMaybe Nothing = parserFail "Could not unpack Maybe"
+parseMaybe (Just x) = return x
 
--- Dimension
+parseBaseUnit = oneOfStr baseUnitTable >>= \u -> parseMaybe (lookupUnit Nothing u) <?> "Could not look up a unit"
+parsePrefix = oneOfStr prefixTable >>= \p -> parseMaybe (lookupPrefix p) <?> "Could not look up a prefix"
+parseModifier = oneOfStr modifierTable >>= \m -> parseMaybe (lookupModifier m) <?> "Could not look up a modifier"
+
+
+-- Unit parser
 
 baseUnit :: Parser Unit
 baseUnit = P.option dimlessUnit $ choice
   [ try $ do {
-      p <- getPrefix <$> prefix;
-      u <- getUnit <$> bare_unit;
+      p <- parsePrefix;
+      u <- parseBaseUnit;
       return $ applyPrefix p u;
     }
-  , try $ do {
-      u <- bare_unit;
-      return $ getUnit u;
-    }
+  , parseBaseUnit
   ]
-  where
-  getUnit = fromJust . lookupUnit Nothing
-  getPrefix = fromJust . lookupUnit (Just $ baseDim Dimension.Prefix)
-  prefix = oneOfStr prefixTable
-  bare_unit = oneOfStr baseUnitTable
 
-
+-- add pow ^ later
 fullUnitOpTable :: (Monad m) => OperatorTable String () m Unit
 fullUnitOpTable =
-  [ [ Infix (char '^' >> return pow_op ) AssocLeft ]
-  , [ Infix (char ' ' >> return (#*) ) AssocLeft ]
+  [ [ Infix (char ' ' >> return (#*) ) AssocLeft ]
   , [ Infix (char '/' >> return (#/) ) AssocLeft ]
   , [ Infix (char '*' >> return (#*) ) AssocLeft ]
   ]
-  where pow_op = (fromJust.) . (#^)
 
 shortUnitOpTable :: (Monad m) => OperatorTable String () m Unit
 shortUnitOpTable =
-  [ [ Infix (char '^' >> return pow_op ) AssocLeft ]
-  , [ Infix (char '*' >> return (#*) ) AssocLeft ]
+  [ [ Infix (char '*' >> return (#*) ) AssocLeft ]
   , [ Infix (char '/' >> return (#/) ) AssocLeft ]
   ]
-  where pow_op = (fromJust.) . (#^)
 
 unitExpr :: OperatorTable String () Identity Unit -> Parser Unit
-unitExpr table = buildExpressionParser table $
-            choice [ try baseUnit, try dimlessQu ]
-        where dimlessQu = rawValue >>= \v -> return $ mkQu v dimlessUnit
-
+unitExpr table = buildExpressionParser table baseUnit
+            -- choice [ try baseUnit, try dimlessQu ]
+        -- where dimlessQu = rawValue >>= \v -> return $ mkQu v dimlessUnit
 
 unit :: Parser Unit
 unit = try (brackets $ unitExpr fullUnitOpTable) <|> try (unitExpr shortUnitOpTable) where
-  brackets = between (char '(') (char ')')
+  brackets = between (char '(' >> spaces) (spaces >> char ')')
 
--- Quantity
+
+-- Quantity parser
 
 modifiedValue :: Parser Value
 modifiedValue = do
-  n <- floating2 False :: Parser Double
-  let rn = toRational n
-  maym <- optionMaybe modifier
-  case maym of
-    Nothing -> return rn
-    Just m -> let m' = fromJust $ lookupUnit (Just $ baseDim Modifier) m
-              in return $ applyModifier m' rn
-  where modifier = oneOfStr modifierTable
+  n <- rawValue
+  m <- parseModifier
+  return $ applyModifier m n
 
 rawValue :: Parser Value
 rawValue = do
@@ -86,14 +80,17 @@ rawValue = do
   return $ toRational n
 
 quantity :: Parser Quantity
-quantity = choice [try wideQu, slimQu] where
+quantity = choice [try wideQu, try slimQu, dimlessQu] where
   wideQu = do
     v <- modifiedValue
     _ <- space
     u <- unit
-    guard . not . isDimless . fst $ u
+    guard . not . isDimless . ofDim $ u
     return $ mkQu v u
   slimQu = do
     v <- rawValue
     u <- unit
     return $ mkQu v u
+  dimlessQu = do
+    v <- modifiedValue
+    return $ mkQu v dimlessUnit
