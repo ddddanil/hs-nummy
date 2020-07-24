@@ -6,6 +6,8 @@ import Data.List (partition)
 import Data.Bifoldable (bifoldl1)
 
 import Nummy.Metrology.Definitions
+import Nummy.Metrology.Dimension
+import Nummy.Metrology.Unit
 
 showDim :: Dimension -> String
 showDim d = bifoldl1 (\a b -> a ++ "/" ++ b) . bimap showLine showLine . partition positive_pow $ d where

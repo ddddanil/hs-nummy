@@ -12,6 +12,8 @@ import Text.Parsec.String as P.String
 import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
 
 import Nummy.Metrology.Definitions
+import Nummy.Metrology.Dimension
+import Nummy.Metrology.Unit
 
 oneOfStr :: [[Char]] -> Parser [Char]
 oneOfStr ss = choice $ map (try . string) ss

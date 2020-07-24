@@ -1,26 +1,14 @@
 module Nummy.Metrology.Definitions (
-  Value, Unit, Dimension, Quantity
-, (|*|), (|/|), (#*), (#/), (#+), (#-)
-, baseUnitTable, prefixTable, modifierTable
+  baseUnitTable, prefixTable, modifierTable
 , lookupUnit
-, applyPrefix, applyModifier
-, mkQu, quIn
--- , sanitizeDimension
--- , combineDimensions
 ) where
 
 import Protolude
 import Data.String (String)
 import Data.List (lookup)
-import GHC.Err (error)
 
--- General synonyms
-type Value = Rational
-type Label = String
-type Dimension = [(Label, Value)]
-type Unit = (Dimension, Value)  -- (Dimension, conversion to SI)
-type Quantity = (Dimension, Value)
-
+import Nummy.Metrology.Dimension
+import Nummy.Metrology.Unit
 
 -- Table and its parts
 
@@ -77,66 +65,4 @@ lookupUnit md unit = case md of
   where
     matches_unit = elem unit . fst
     matches_dimension dim = (==dim) . fst . snd
-
-
--- Unit and Dimension manipulation
-
-applyPrefix :: Unit -> Unit -> Unit
-applyPrefix ([("Prefix", 1)], p) (d, value) = (d, p * value)
-applyPrefix (_, _) _ = error "You must apply a prefix"
-
-applyModifier :: Unit -> Value -> Value
-applyModifier m v = v * snd m
-
-mkQu :: Value -> Unit -> Quantity
-mkQu v (d, u) = (d, v * u)
-
--- Remove prefixes, modifiers, with power 0 and merge same base dimensions
-sanitizeDimension :: Dimension -> Dimension
-sanitizeDimension = combineDimensions (+) [] . filter (\d -> not(prefix d || modifier d || noPower d) ) where
-  prefix = (== "Prefix") . fst
-  modifier = (== "Modifier") . fst
-  noPower = (== 0) . snd
-
-combineDimensions :: (Value -> Value -> Value) -> Dimension -> Dimension -> Dimension
-combineDimensions op d1 d2 = unfoldr merge_same . sortOn fst $ d1 ++ d2  -- works bc sort is stable
-  where
-    merge_same ((d1,x):(d2,y):rest)
-      | d1 == d2 = Just ((d1, op x y), rest)
-      | otherwise = Just ((d1, x), (d2,y):rest)
-    merge_same ((d,x):rest) = Just ((d,x), rest)
-    merge_same _ = Nothing
-
-infixl 7 |*|
-(|*|) :: Dimension -> Dimension -> Dimension
-(|*|) = (sanitizeDimension.) . combineDimensions (+)
-
-infixl 7 |/|
-(|/|) :: Dimension -> Dimension -> Dimension
-d1 |/| d2 = sanitizeDimension . combineDimensions (+) d1 $ map (second negate) d2
-
-
-infixl 7 #*
-(#*) :: Unit -> Unit -> Unit
-u1 #* u2 = ubimap (ubimap ((|*|), (*)) u1) u2 where
-  ubimap = uncurry bimap
-
-infixl 7 #/
-(#/) :: Unit -> Unit -> Unit
-u1 #/ u2 = ubimap (ubimap ((|/|), (/)) u1) u2 where
-  ubimap = uncurry bimap
-
-infix 6 #+
-(#+) :: Unit -> Unit -> Maybe Unit
-(d1, v1) #+ (d2, v2) = if d1 /= d2 then Nothing
-                       else Just (d1, v1 + v2)
-
-infix 6 #-
-(#-) :: Unit -> Unit -> Maybe Unit
-(d1, v1) #- (d2, v2) = if d1 /= d2 then Nothing
-                       else Just (d1, v1 - v2)
-
-quIn :: Quantity -> Unit -> Maybe Quantity
-quIn (d1, v1) (d2, v2) = if d1 /= d2 then Nothing
-                         else Just (d1, v1 / v2)
 
