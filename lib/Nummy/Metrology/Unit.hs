@@ -1,11 +1,12 @@
 module Nummy.Metrology.Unit (
   Unit, Quantity
+, dimlessUnit
 , applyPrefix, applyModifier
 , mkQu, quIn
 , (#*), (#/), (#+), (#-)
 ) where
 
-import Protolude
+import Protolude hiding (Prefix)
 import Data.String (String)
 import GHC.Err (error)
 
@@ -15,11 +16,14 @@ type Unit = (Dimension, Value)  -- (Dimension, conversion to SI)
 type Quantity = (Dimension, Value)
 
 
--- Unit and QUantity manipulation
+dimlessUnit :: Unit
+dimlessUnit = (baseDim Dimensionless, 1)
+
+-- Unit and Quantity manipulation
 
 applyPrefix :: Unit -> Unit -> Unit
-applyPrefix ([("Prefix", 1)], p) (d, value) = (d, p * value)
-applyPrefix (_, _) _ = error "You must apply a prefix"
+applyPrefix (dp, p) (d, value) = if dp == baseDim Prefix then (d, p * value)
+                                 else error "You must apply a prefix"
 
 applyModifier :: Unit -> Value -> Value
 applyModifier m v = v * snd m

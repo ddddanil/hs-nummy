@@ -14,4 +14,4 @@ smartRepl = repl $ bimap show pack . parse parse_nummy "" . unpack
 dumbRepl = interact $ either (pack . show) pack . parse parse_nummy "" . unpack
 
 main :: IO ()
-main = dumbRepl
+main = smartRepl

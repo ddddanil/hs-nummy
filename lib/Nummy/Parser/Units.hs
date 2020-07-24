@@ -16,12 +16,12 @@ import Nummy.Metrology.Dimension
 import Nummy.Metrology.Unit
 
 oneOfStr :: [[Char]] -> Parser [Char]
-oneOfStr ss = choice $ map (try . string) ss
+oneOfStr ss = choice $ map (try . string) . sortBy (flip compare `on` length) $ ss
 
 -- Dimension
 
 baseUnit :: Parser Unit
-baseUnit = choice
+baseUnit = P.option dimlessUnit $ choice
   [ try $ do {
       p <- getUnit <$> prefix;
       u <- getUnit <$> bare_unit;
@@ -63,20 +63,31 @@ unit = try (brackets fullUnit) <|> try shortUnit where
 
 -- Quantity
 
-numericalQu :: Parser Value
-numericalQu = do
+modifiedValue :: Parser Value
+modifiedValue = do
   n <- floating2 False :: Parser Double
   let rn = toRational n
   maym <- optionMaybe modifier
   case maym of
     Nothing -> return rn
-    Just m -> let m' = fromJust $ lookupUnit (Just [("Modifier", 1)]) m
+    Just m -> let m' = fromJust $ lookupUnit (Just $ baseDim Modifier) m
               in return $ applyModifier m' rn
   where modifier = oneOfStr modifierTable
 
+rawValue :: Parser Value
+rawValue = do
+  n <- floating2 False :: Parser Double
+  return $ toRational n
+
 quantity :: Parser Quantity
-quantity = do
-  v <- numericalQu
-  _ <- space
-  u <- unit
-  return $ mkQu v u
+quantity = choice [try wideQu, slimQu] where
+  wideQu = do
+    v <- modifiedValue
+    _ <- space
+    u <- unit
+    guard . not . isDimless . fst $ u
+    return $ mkQu v u
+  slimQu = do
+    v <- rawValue
+    u <- unit
+    return $ mkQu v u
