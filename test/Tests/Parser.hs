@@ -31,7 +31,7 @@ assert Fail    a b = a /= b @? "assert not equal\n" ++ (show . PP.pretty $ a) ++
 -- Parser
 
 getParse :: Parser a -> String -> Either ParseError a
-getParse p s = runParser (parse_all p) "" "" s
+getParse p s = runParser (parse_all p) Nothing "" s
 
 checkParse :: (Eq a, PP.Pretty a) => Parser a -> TestType -> String -> a -> Assertion
 checkParse p t s x =

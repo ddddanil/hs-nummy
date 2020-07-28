@@ -1,5 +1,6 @@
 module Nummy.Parser.Base (
   Parser, OpTable
+, putDim, guardDim
 , oneOfStr, parenthesis
 , parseMaybe
 , parseBaseUnit, parseModifier, parsePrefix
@@ -20,8 +21,19 @@ import Nummy.Metrology.Dimension as D
 import Nummy.Metrology.Quantity as Q
 import Nummy.Metrology.Unit as U
 
-type Parser = Parsec String String
-type OpTable a = OperatorTable String String Identity a
+type Parser = Parsec String (Maybe Dimension)
+type OpTable a = OperatorTable String (Maybe Dimension) Identity a
+
+
+-- State manipulators
+
+putDim :: Dimension -> Parser ()
+putDim d = putState $ Just d
+
+guardDim :: Dimension -> Parser ()
+guardDim d = do
+  curr <- getState
+  guard (curr == Just d)
 
 
 -- Combinators

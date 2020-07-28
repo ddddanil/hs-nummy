@@ -15,7 +15,7 @@ main = runInputT defaultSettings loop where
     case minput of
       Nothing -> return ()
       Just input -> do
-        case runParser parse_nummy "" "" input of
+        case parse_nummy input of
           Left err -> outputStrLn $ show err
           Right qu -> outputStrLn $ show (PP.pretty qu)
         loop

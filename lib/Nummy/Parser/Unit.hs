@@ -1,6 +1,4 @@
-module Nummy.Parser.Unit (
-  unit, quantity
-) where
+module Nummy.Parser.Unit (unit) where
 
 import Protolude hiding (Prefix, Infix, try)
 import Data.String (String)
@@ -75,20 +73,3 @@ unit :: Parser Unit
 unit = try (parenthesis $ unitExpr fullUnitOpTable) <|> try (unitExpr shortUnitOpTable) <?> "unit"
 
 
--- Quantity parser
-
-quantity :: Parser Quantity
-quantity = try wideQu <|> try slimQu <|> try dimlessQu <?> "quantity" where
-  wideQu = do
-    v <- try modifiedValue <|> rawValue
-    _ <- space
-    u <- unit
-    guard . not . U.isDimless $ u
-    return $ mkQu v u
-  slimQu = do
-    v <- rawValue
-    u <- unit
-    return $ mkQu v u
-  dimlessQu = do
-    v <- try modifiedValue <|> rawValue
-    return $ mkQu v dimlessUnit

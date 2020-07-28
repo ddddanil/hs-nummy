@@ -21,6 +21,7 @@ library
       , extra
       , protolude
       , syb
+      , mtl
       , wl-pprint
       , parsec
       , parsec-numbers

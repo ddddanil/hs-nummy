@@ -12,6 +12,7 @@ import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Parser.Base
 import Nummy.Parser.Unit
+import Nummy.Parser.Expr
 import Nummy.Metrology.Unit
 import Nummy.Metrology.Quantity
 
@@ -21,5 +22,5 @@ parse_all p = do
   _ <- eof
   return x
 
-parse_nummy :: Parser String
-parse_nummy = show . PP.pretty <$> parse_all quantity -- plug
+parse_nummy :: String -> Either ParseError String
+parse_nummy = second (show . PP.pretty) <$> runParser (parse_all expression) Nothing ""
