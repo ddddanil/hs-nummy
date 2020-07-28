@@ -11,6 +11,7 @@ import Text.Parsec.String
 import Nummy.Parser.Units
 import Nummy.Parser
 import Nummy.Metrology.Dimension
+import Nummy.Metrology.Quantity
 import Nummy.Metrology.Unit
 
 data TestType = Fail | Succeed deriving (Show, Eq, Ord)
