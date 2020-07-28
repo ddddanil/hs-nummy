@@ -1,10 +1,16 @@
-module Nummy.Parser (parse_nummy, parse_all) where
+module Nummy.Parser (
+  Parser
+, parse_nummy
+, unit, quantity
+, parse_all
+) where
 
 import GHC.Base (String)
 import Protolude
 import Text.Parsec as P hiding ( (<|>) )
-import Text.Parsec.String as P.String
+import qualified Text.PrettyPrint.Leijen as PP
 
+import Nummy.Parser.Base
 import Nummy.Parser.Unit
 import Nummy.Metrology.Unit
 import Nummy.Metrology.Quantity
@@ -15,5 +21,5 @@ parse_all p = do
   _ <- eof
   return x
 
-parse_nummy :: Parser Quantity
-parse_nummy = parse_all quantity
+parse_nummy :: Parser String
+parse_nummy = show . PP.pretty <$> parse_all quantity -- plug

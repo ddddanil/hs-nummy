@@ -4,94 +4,78 @@ module Nummy.Parser.Unit (
 
 import Protolude hiding (Prefix, Infix, try)
 import Data.String (String)
-import Data.Maybe (fromJust)
 import Data.Ratio (approxRational)
 import Text.Parsec as P hiding ( (<|>) )
 import Text.Parsec.Char as P.Char
 import Text.Parsec.Expr as P.Expr
-import Text.Parsec.String as P.String
-import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
+import qualified Text.PrettyPrint.Leijen as PP
 
-import Nummy.Metrology.Definitions hiding (length, mass, time)
+import Nummy.Parser.Base
 import Nummy.Metrology.Dimension as D
 import Nummy.Metrology.Quantity as Q
 import Nummy.Metrology.Unit as U
 
 
--- Combinators
+-- Unit operations
 
-oneOfStr :: [[Char]] -> Parser [Char]
-oneOfStr ss = choice $ map (try . string) . sortBy (flip compare `on` length) $ ss
+unitOpPow :: Parser (Unit -> Unit)
+unitOpPow = do
+  _ <- char '^'
+  p <- try rawValue
+  return $ \u -> u #^ p
 
-parseMaybe :: Maybe a -> Parser a
-parseMaybe Nothing = parserFail "Could not unpack Maybe"
-parseMaybe (Just x) = return x
+unitOpMult :: Parser (Unit -> Unit -> Unit)
+unitOpMult = char '*' >> return (#*)
 
-parseBaseUnit = (oneOfStr baseUnitTable <?> "known unit symbol") >>= \u -> parseMaybe (lookupUnit Nothing u) <?> "known unit symbol"
-parsePrefix = (oneOfStr prefixTable <?> "known prefix") >>= \p -> parseMaybe (lookupPrefix p) <?> "known prefix"
-parseModifier = (oneOfStr modifierTable <?> "known modifier") >>= \m -> parseMaybe (lookupModifier m) <?> "known modifier"
+unitOpDiv :: Parser (Unit -> Unit -> Unit)
+unitOpDiv = char '/' >> return (#/)
 
-parenthesis = between (char '(' >> spaces >> notFollowedBy space) (spaces >> char ')')
+unitOpInverse :: Parser (Unit -> Unit)
+unitOpInverse = do
+  _ <- string "1/"
+  return $ \u -> (dimlessUnit #/ u)
+
+unitOpCombine :: Parser (Unit -> Unit -> Unit)
+unitOpCombine = char ' ' >> lookAhead baseUnit >> return (#*)
 
 
--- Unit parser
+-- Op Tables
+
+fullUnitOpTable :: OpTable Unit
+fullUnitOpTable =
+  [ [ Postfix unitOpPow ]
+  , [ Infix (try unitOpCombine) AssocLeft ]
+  , [ Infix unitOpDiv AssocLeft ]
+  , [ Infix unitOpMult AssocLeft ]
+  , [ Prefix unitOpInverse ]
+  ]
+
+shortUnitOpTable :: OpTable Unit
+shortUnitOpTable =
+  [ [ Postfix unitOpPow ]
+  , [ Infix unitOpMult AssocLeft ]
+  , [ Infix unitOpDiv AssocLeft ]
+  , [ Prefix unitOpInverse ]
+  ]
+
+
+-- Unit parsers
+
+unitExpr :: OpTable Unit -> Parser Unit
+unitExpr table = buildExpressionParser table baseUnit
 
 baseUnit :: Parser Unit
-baseUnit = choice
-  [ try $ do {
-      p <- parsePrefix;
-      u <- parseBaseUnit;
-      return $ applyPrefix p u;
-    }
-  , parseBaseUnit
-  , parseDimlessCoeff
-  ]
-
-parseDimlessCoeff :: Parser Unit
-parseDimlessCoeff = do
-  v <- rawValue
-  return $ dimlessCoeff v
-
--- add pow ^ later
-fullUnitOpTable :: OperatorTable String () Identity Unit
-fullUnitOpTable =
-  [ [ Infix (char '^' >> lookAhead parseDimlessCoeff >> return pow) AssocLeft ]
-  , [ Infix (char ' ' >> notFollowedBy space >> return (#*) ) AssocRight ]
-  , [ Infix (char '/' >> return (#/) ) AssocLeft ]
-  , [ Infix (char '*' >> return (#*) ) AssocLeft ]
-  ]
-  where
-    pow :: Unit -> Unit -> Unit
-    pow u1 u2 = fromJust $ (u1 #!^ u2)
-
-shortUnitOpTable :: (Monad m) => OperatorTable String () m Unit
-shortUnitOpTable =
-  [ [ Infix (char '*' >> return (#*) ) AssocLeft ]
-  , [ Infix (char '/' >> return (#/) ) AssocLeft ]
-  ]
-
-unitExpr :: OperatorTable String () Identity Unit -> Parser Unit
-unitExpr table = buildExpressionParser table baseUnit
-            -- choice [ try baseUnit, try dimlessQu ]
-        -- where dimlessQu = rawValue >>= \v -> return $ mkQu v dimlessUnit
+baseUnit = try prefixed <|> try parseBaseUnit <?> "base unit" where
+  prefixed = do
+    p <- parsePrefix
+    u <- parseBaseUnit
+    return $ applyPrefix p u
 
 unit :: Parser Unit
 unit = try (parenthesis $ unitExpr fullUnitOpTable) <|> try (unitExpr shortUnitOpTable) <?> "unit"
 
 
 -- Quantity parser
-
-modifiedValue :: Parser Value
-modifiedValue = do
-  n <- rawValue
-  m <- parseModifier
-  return $ applyModifier m n
-
-rawValue :: Parser Value
-rawValue = do
-  n <- floating2 False :: Parser Double
-  return $ approxRational n epsilon
-  where epsilon = 0.000001
 
 quantity :: Parser Quantity
 quantity = try wideQu <|> try slimQu <|> try dimlessQu <?> "quantity" where

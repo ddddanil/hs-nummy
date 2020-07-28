@@ -5,11 +5,14 @@ version:       0.1
 library
     exposed-modules:
         Nummy.Parser
-      , Nummy.Parser.Unit
       , Nummy.Metrology.Definitions
       , Nummy.Metrology.Dimension
       , Nummy.Metrology.Quantity
       , Nummy.Metrology.Unit
+    other-modules:
+        Nummy.Parser.Base
+      , Nummy.Parser.Expr
+      , Nummy.Parser.Unit
     hs-source-dirs:     lib
     default-language:   Haskell2010
     default-extensions: NoImplicitPrelude, OverloadedStrings

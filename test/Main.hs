@@ -30,12 +30,12 @@ testUnits =
     , checkParseUnit Succeed "K" $ unit' (Def.temp, 1)
     ]
   , testGroup "Syntax"
-    [ checkParseUnit Fail  ""               $ unit' (dimless, 1)
+    [ checkParseUnit Fail  ""                  $ unit' (dimless, 1)
     -- optional parenthesis
-    , checkParseUnit Succeed  "(m)"         $ unit' (Def.length, 1)
+    , checkParseUnit Succeed  "(m)"            $ unit' (Def.length, 1)
+    , checkParseUnit Succeed  "( m )"          $ unit' (Def.length, 1)
+    , checkParseUnit Succeed  "(    m       )" $ unit' (Def.length, 1)
     -- illegal spaces
-    , checkParseUnit Fail  "( m )"          $ unit' (Def.length, 1)
-    , checkParseUnit Fail  "(    m       )" $ unit' (Def.length, 1)
     , checkParseUnit Fail  " m"             $ unit' (Def.length, 1)
     , checkParseUnit Fail  "m "             $ unit' (Def.length, 1)
     , checkParseUnit Fail  " m "            $ unit' (Def.length, 1)
@@ -54,7 +54,7 @@ testUnits =
     [ checkParseUnit Succeed  "m/s"  $ unit' (Def.length |/| Def.time, 1)
     , checkParseUnit Succeed  "km/h" $ unit' (Def.length |/| Def.time, 5 % 18)
     , checkParseUnit Succeed  "1/s"  $ unit' (dimless |/| Def.time, 1)
-    , checkParseUnit Succeed  "2/km" $ unit' (dimless |/| Def.time, 2/1000)      -- Whats wrong with this thing
+    , checkParseUnit Fail     "2/km" $ unit' (dimless |/| Def.time, 2/1000)
     ]
   , testGroup "Multiplication"
     -- Commutative prefixes

@@ -11,11 +11,9 @@ import Test.Tasty       (TestTree, defaultMain, testGroup, localOption, Timeout(
 import Test.Tasty.HUnit (testCase, (@?=), (@=?), (@?), Assertion, assertFailure)
 import Test.Tasty.ExpectedFailure (expectFail, expectFailBecause)
 import Text.Parsec hiding (parseTest)
-import Text.Parsec.String
 import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Parser
-import Nummy.Parser.Unit
 import Nummy.Metrology.Dimension
 import Nummy.Metrology.Quantity
 import Nummy.Metrology.Unit
@@ -33,7 +31,7 @@ assert Fail    a b = a /= b @? "assert not equal\n" ++ (show . PP.pretty $ a) ++
 -- Parser
 
 getParse :: Parser a -> String -> Either ParseError a
-getParse p s = parse (parse_all p) "" s
+getParse p s = runParser (parse_all p) "" "" s
 
 checkParse :: (Eq a, PP.Pretty a) => Parser a -> TestType -> String -> a -> Assertion
 checkParse p t s x =
