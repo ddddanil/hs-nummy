@@ -16,15 +16,16 @@ import Nummy.Metrology.Unit
 
 symbol_table :: [ ([Label], Unit) ]  -- (Synonyms, )
 symbol_table =
-  -- -- Dimless tokens
-  -- [ (["1"],                   dimlessUnit                                       )
   -- Length
   [ (["m", "meter", "metre"], canonical_unit   length                           )
-  , (["ft", "foot", "feet"],  conversion_ratio length 0.3048                    )
-  , (["mi", "mile"],          conversion_ratio length 1609.34                   )
+  , (["in", "inch"],          conversion_ratio length 0.00254                   )
+  , (["ft", "foot", "feet"],  conversion_ratio length (0.00254 * 12)            ) -- 1 ft = 12 in
+  , (["yd", "yard"],          conversion_ratio length (0.00254 * 36)            ) -- 1 yd = 3 ft = 36 in
+  , (["mi", "mile"],          conversion_ratio length (0.00254 * 12 * 5280)     ) -- 1 mi = 5280 ft
   -- Mass
   , (["g", "gram"],           conversion_ratio mass 0.001                       )
-  , (["lbs", "pound"],        conversion_ratio mass 0.453592                    )
+  , (["lbs", "pound"],        conversion_ratio mass 0.45359237                  )
+  , (["oz", "ounce"],         conversion_ratio mass (0.45359237 / 16)           )
   -- Time
   , (["s", "sec", "second"],  canonical_unit   time                             )
   , (["m", "min", "minute"],  conversion_ratio time 60                          )
@@ -33,8 +34,13 @@ symbol_table =
   , (["A", "Amp", "amp"],     canonical_unit current                            )
   -- Temp
   , (["K", "Kelvin"],         canonical_unit     temp                           )
-  , (["C", "Celsius"],        complex_conversion temp (+273.15)                 )
-  , (["F", "Fahrenheit"],     complex_conversion temp (\t -> 5%9 * (t + 459.67)))
+  , (["C", "Celsius"],        complex_conversion temp (+273.15) (\t -> t - 273.15))
+  , (["F", "Fahrenheit"],     complex_conversion temp (\t -> 5%9 * (t + 459.67))
+                                                      (\t -> 9%5 * t - 459.67)  )
+  , (["R", "Rankine"],        conversion_ratio   temp (5%9)                     )
+  -- Temp differences
+  , (["dK", "dC"],            canonical_unit     temp                           )
+  , (["dF", "dR"],            conversion_ratio   temp (5%9)                     )
   ]
 
 prefix_table :: [ ([Label], Prefix) ]

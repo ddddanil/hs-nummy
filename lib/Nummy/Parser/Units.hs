@@ -13,9 +13,9 @@ import Text.Parsec.String as P.String
 import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
 
 import Nummy.Metrology.Definitions hiding (length, mass, time)
-import Nummy.Metrology.Dimension as Dimension
-import Nummy.Metrology.Quantity
-import Nummy.Metrology.Unit
+import Nummy.Metrology.Dimension as D
+import Nummy.Metrology.Quantity as Q
+import Nummy.Metrology.Unit as U
 
 
 -- Combinators
@@ -99,7 +99,7 @@ quantity = try wideQu <|> try slimQu <|> dimlessQu <?> "quantity" where
     v <- try modifiedValue <|> rawValue
     _ <- space
     u <- unit
-    guard . not . isDimless . dimOfUnit $ u
+    guard . not . U.isDimless $ u
     return $ mkQu v u
   slimQu = do
     v <- rawValue

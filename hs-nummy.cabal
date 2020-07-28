@@ -15,6 +15,7 @@ library
     default-extensions: NoImplicitPrelude, OverloadedStrings
     build-depends:
         base
+      , extra
       , protolude
       , syb
       , wl-pprint

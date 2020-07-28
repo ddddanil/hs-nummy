@@ -1,43 +1,55 @@
 module Nummy.Metrology.Quantity (
   Quantity(..)
 , dimOfQu
+, mkQu, quIn
 , (%+), (%-), (%*), (%/), (%^), (%!^)
 ) where
 
 import Protolude
 import qualified Text.PrettyPrint.Leijen as PP
 
-import Nummy.Metrology.Dimension
-
+import Nummy.Metrology.Dimension as D
+import Nummy.Metrology.Unit as U
 
 -- Type
 
-newtype Quantity = Quantity (Dimension, Value) deriving (Show, Eq) -- (Dimension, conversion to SI)
+newtype Quantity = Quantity (Value, Unit)
 
 instance PP.Pretty Quantity where
-  pretty (Quantity (d, v)) =
+  pretty (Quantity (v, u)) =
     PP.pretty (fromRational v :: Double)
-    <> if not $ isDimless d
-      then PP.char ' ' <> PP.pretty d
+    <> if not $ U.isDimless u
+      then PP.char ' ' <> PP.pretty (dimOfUnit u)
       else PP.empty
+
+instance Eq Quantity where
+  Quantity (v1, u1) == Quantity (v2, u2) =
+    (convert u1 u2) v1 == v2
 
 
 dimOfQu :: Quantity -> Dimension
-dimOfQu (Quantity (d, v)) = d
+dimOfQu (Quantity (d, u)) = dimOfUnit u
 
+quIn :: Quantity -> Unit -> Maybe Quantity
+quIn (Quantity (v, u)) u' =
+  if dimOfUnit u /= dimOfUnit u' then Nothing
+  else Just . Quantity $ ((convert u u') v, u')
+
+mkQu :: Value -> Unit -> Quantity
+mkQu = curry Quantity
 
 -- Quantity operators
 
 infixl 8 %!^
 (%!^) :: Quantity -> Quantity -> Maybe Quantity
-q %!^ (Quantity (d, v)) =
-  if isDimless d
+q %!^ Quantity (v, u) =
+  if U.isDimless u
   then Just (q %^ v)
   else Nothing
 
 infixl 8 %^
 (%^) :: Quantity -> Value -> Quantity
-(Quantity (d1, v1)) %^ p = Quantity $ (d1 |^| p, pow v1 p)
+Quantity (v, u) %^ p = Quantity $ (pow v p, u #^ p)
   where
     pow :: Value -> Value -> Value
     pow v p =
@@ -47,20 +59,29 @@ infixl 8 %^
 
 infixl 7 %*
 (%*) :: Quantity -> Quantity -> Quantity
-(Quantity u1) %* (Quantity u2) = Quantity $ ubimap (ubimap ((|*|), (*)) u1) u2 where
-  ubimap = uncurry bimap
+Quantity (v1, u1) %* Quantity (v2, u2) =
+  Quantity $
+    ( v1 * v2
+    , u1 #* u2
+    )
 
 infixl 7 %/
 (%/) :: Quantity -> Quantity -> Quantity
-(Quantity u1) %/ (Quantity u2) = Quantity $ ubimap (ubimap ((|/|), (/)) u1) u2 where
-  ubimap = uncurry bimap
+Quantity (v1, u1) %/ Quantity (v2, u2) =
+  Quantity $
+    ( v1 / v2
+    , u1 #/ u2
+    )
 
 infix 6 %+
 (%+) :: Quantity -> Quantity -> Maybe Quantity
-(Quantity (d1, v1)) %+ (Quantity (d2, v2)) = if d1 /= d2 then Nothing
-                                             else Just $ Quantity (d1, v1 + v2)
+Quantity (v1, u1) %+ Quantity (v2, u2) =
+  if dimOfUnit u1 /= dimOfUnit u2 then Nothing
+  else Just . Quantity $ (v1 + (convert u2 u1) v2, u1)
 
 infix 6 %-
 (%-) :: Quantity -> Quantity -> Maybe Quantity
-(Quantity (d1, v1)) %- (Quantity (d2, v2)) = if d1 /= d2 then Nothing
-                                             else Just $ Quantity (d1, v1 - v2)
+Quantity (v1, u1) %- Quantity (v2, u2) =
+  if dimOfUnit u1 /= dimOfUnit u2 then Nothing
+  else Just . Quantity $ (v1 - (convert u2 u1) v2, u1)
+
