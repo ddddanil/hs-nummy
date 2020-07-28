@@ -1,4 +1,4 @@
-module Nummy.Parser.Units (
+module Nummy.Parser.Unit (
   unit, quantity
 ) where
 
@@ -94,7 +94,7 @@ rawValue = do
   where epsilon = 0.000001
 
 quantity :: Parser Quantity
-quantity = try wideQu <|> try slimQu <|> dimlessQu <?> "quantity" where
+quantity = try wideQu <|> try slimQu <|> try dimlessQu <?> "quantity" where
   wideQu = do
     v <- try modifiedValue <|> rawValue
     _ <- space

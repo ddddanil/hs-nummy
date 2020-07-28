@@ -5,7 +5,7 @@ import Protolude
 import Text.Parsec as P hiding ( (<|>) )
 import Text.Parsec.String as P.String
 
-import Nummy.Parser.Units
+import Nummy.Parser.Unit
 import Nummy.Metrology.Unit
 import Nummy.Metrology.Quantity
 

@@ -14,8 +14,8 @@ import Text.Parsec hiding (parseTest)
 import Text.Parsec.String
 import qualified Text.PrettyPrint.Leijen as PP
 
-import Nummy.Parser.Units
 import Nummy.Parser
+import Nummy.Parser.Unit
 import Nummy.Metrology.Dimension
 import Nummy.Metrology.Quantity
 import Nummy.Metrology.Unit

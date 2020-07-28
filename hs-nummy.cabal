@@ -5,7 +5,7 @@ version:       0.1
 library
     exposed-modules:
         Nummy.Parser
-      , Nummy.Parser.Units
+      , Nummy.Parser.Unit
       , Nummy.Metrology.Definitions
       , Nummy.Metrology.Dimension
       , Nummy.Metrology.Quantity

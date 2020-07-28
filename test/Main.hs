@@ -8,7 +8,6 @@ import Test.Tasty.ExpectedFailure (expectFail, expectFailBecause)
 import Text.Parsec hiding (parseTest)
 import Text.Parsec.String
 
-import Nummy.Parser.Units
 import Nummy.Metrology.Definitions as Def (length, time, mass, current, temp)
 import Nummy.Metrology.Dimension
 import Nummy.Metrology.Unit
