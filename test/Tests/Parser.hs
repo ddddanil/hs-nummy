@@ -12,6 +12,7 @@ import Test.Tasty.HUnit (testCase, (@?=), (@=?), (@?), Assertion, assertFailure)
 import Test.Tasty.ExpectedFailure (expectFail, expectFailBecause)
 import Text.Parsec hiding (parseTest)
 import Text.Parsec.String
+import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Parser.Units
 import Nummy.Parser
@@ -24,9 +25,9 @@ import Nummy.Metrology.Unit
 
 data TestType = Fail | Succeed deriving (Show, Eq, Ord)
 
-assert :: (Eq a) => TestType -> a -> a -> Assertion
-assert Succeed a b = a == b @? "assert equal"
-assert Fail    a b = a /= b @? "assert not equal"
+assert :: (Eq a, PP.Pretty a) => TestType -> a -> a -> Assertion
+assert Succeed a b = a == b @? "assert equal\n" ++ (show . PP.pretty $ a) ++ " == " ++ (show . PP.pretty $ b)
+assert Fail    a b = a /= b @? "assert not equal\n" ++ (show . PP.pretty $ a) ++ " /= " ++ (show . PP.pretty $ b)
 
 
 -- Parser
@@ -34,7 +35,7 @@ assert Fail    a b = a /= b @? "assert not equal"
 getParse :: Parser a -> String -> Either ParseError a
 getParse p s = parse (parse_all p) "" s
 
-checkParse :: (Eq a) => Parser a -> TestType -> String -> a -> Assertion
+checkParse :: (Eq a, PP.Pretty a) => Parser a -> TestType -> String -> a -> Assertion
 checkParse p t s x =
   case getParse p s of
     Left err ->

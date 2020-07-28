@@ -26,7 +26,7 @@ newtype Unit = Unit (Value -> Value, Value -> Value, Dimension)
 -- conversion functions  ^ - unit -> SI   ^ - SI -> Unit
 
 instance PP.Pretty Unit where
-  pretty (Unit u) = PP.pretty (thd3 u)
+  pretty (Unit u) = PP.pretty (fromRational $ fst3 u 1 :: Double) PP.<+> PP.pretty (thd3 u)
 
 instance Eq Unit where
   (Unit u1) == (Unit u2) =

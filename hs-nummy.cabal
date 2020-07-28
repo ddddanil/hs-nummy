@@ -54,4 +54,5 @@ test-suite tests
     , tasty
     , tasty-hunit
     , tasty-expected-failure
+    , wl-pprint
     , hs-nummy
