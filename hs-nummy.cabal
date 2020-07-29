@@ -13,12 +13,13 @@ library
         Nummy.Parser.Base
       , Nummy.Parser.Expr
       , Nummy.Parser.Unit
+      , Nummy.Metrology.Base
     hs-source-dirs:     lib
     default-language:   Haskell2010
     default-extensions: NoImplicitPrelude, OverloadedStrings
     build-depends:
         base
-      , extra
+      , extra           == 1.7.4
       , protolude
       , syb
       , mtl

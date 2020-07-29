@@ -1,11 +1,12 @@
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE FlexibleInstances #-}
 module Nummy.Metrology.Unit (
-  Unit,  Prefix, Modifier
-, dimlessUnit, dimlessCoeff, conversion_ratio, complex_conversion, canonical_unit
-, applyPrefix, applyModifier
-, dimOfUnit
-, convert
-, Nummy.Metrology.Unit.isDimless
-, (#^), (#!^), (#*), (#/)
+  Unit(..)
+, BaseUnit
+, type (-|), (-|)
+, type (#^), (#^)
+, type (#*), (#*)
+, type (#/), (#/)
 ) where
 
 import Protolude hiding (Prefix)
@@ -13,103 +14,106 @@ import Data.String (String)
 import Data.Tuple.Extra hiding (first, second)
 import qualified Text.PrettyPrint.Leijen as PP
 
+import Nummy.Metrology.Base
 import Nummy.Metrology.Dimension as D
 
 
-type Prefix = Value
-type Modifier = Value
+-- Class
+
+class (Eq a, PP.Pretty a) => Unit a where
+  toSi :: a -> Value -> Value
+  fromSi :: a -> Value -> Value
+  dimension :: a -> Dimension
 
 
--- Type
+-- Base instance
 
-newtype Unit = Unit (Value -> Value, Value -> Value, Dimension)
--- conversion functions  ^ - unit -> SI   ^ - SI -> Unit
+newtype BaseUnit = BaseUnit (Value -> Value, Value -> Value, Dimension, Label)
 
-instance PP.Pretty Unit where
-  pretty (Unit u) = PP.pretty (fromRational $ fst3 u 1 :: Double) PP.<+> PP.pretty (thd3 u)
+instance Eq BaseUnit where
+  BaseUnit (f1, g1, d1, l1) == BaseUnit (f2, g2, d2, l2) =
+    f1 1 == f2 1 && g1 1 == g2 1 && d1 == d2 && l1 == l2
 
-instance Eq Unit where
-  (Unit u1) == (Unit u2) =
-    fst3 u1 1 == fst3 u2 1 &&
-    snd3 u1 1 == snd3 u2 1 &&
-    thd3 u1   == thd3 u2
+instance PP.Pretty BaseUnit where
+  pretty (BaseUnit (_, _, _, l)) = PP.text l
 
-isDimless :: Unit -> Bool
-isDimless (Unit (_, _, d)) = d == dimless
-
-dimlessUnit :: Unit
-dimlessUnit = Unit $ (\v -> v, \v -> v, dimless)
-
--- rename
-dimlessCoeff :: Value -> Unit
-dimlessCoeff c = conversion_ratio dimless c
-
-canonical_unit :: Dimension -> Unit
-canonical_unit dim = conversion_ratio dim 1
-
-conversion_ratio :: Dimension -> Value -> Unit
-conversion_ratio dim r = complex_conversion dim (*r) (/r)
-
-complex_conversion :: Dimension -> (Value -> Value) -> (Value -> Value) -> Unit
-complex_conversion dim f g = Unit $ (f, g, dim)
-
-dimOfUnit :: Unit -> Dimension
-dimOfUnit (Unit u) = thd3 u
+instance Unit BaseUnit where
+  toSi (BaseUnit (f, _, _, _)) = f
+  fromSi (BaseUnit (_, g, _, _)) = g
+  dimension (BaseUnit (_, _, d, _)) = d
 
 
--- Unit manipulation
+-- Prefix instance
 
-applyPrefix :: Prefix -> Unit -> Unit
-applyPrefix p (Unit u) = Unit $ ((*p) . (fst3 u), (/p) . (snd3 u), thd3 u)
+infixr 8 -|
+data (-|) p u = Prefix p u deriving Eq
+(-|) = Prefix
 
-applyModifier :: Modifier -> Value -> Value
-applyModifier m v = v * m
+instance (PP.Pretty a) => PP.Pretty (Prefix -| a) where
+  pretty (Prefix (_, pl) x) = PP.text pl <> PP.pretty x
 
--- convert the value into SI and back into another unit
-convert :: Unit -> Unit -> (Value -> Value)
-convert (Unit u1) (Unit u2) = (snd3 u2) . (fst3 u1)
+instance (Unit a) => Unit (Prefix -| a) where
+  toSi   (Prefix (p, _) x) = \v -> p * toSi x v
+  fromSi (Prefix (p, _) x) = \v -> fromSi x v / p
+  dimension (Prefix _ x) = dimension x
 
 
--- Unit operators
-
-infix 8 #!^
-(#!^) :: Unit -> Unit -> Maybe Unit
-u1 #!^ (Unit (i, o, d)) =
-  let v = i 1
-  in if D.isDimless d
-     then Just (u1 #^ v)
-     else Nothing
+-- Power instance
 
 infixl 8 #^
-(#^) :: Unit -> Value -> Unit
-(Unit (o, i, d)) #^ p =
-  Unit $
-    ( \v -> v * (pow (o 1) p)
-    , \v -> v * (pow (i 1) (1/p))
-    , d |^| p
-    )
-  where
-    pow :: Value -> Value -> Value
-    pow v p =
-      if denominator p == 1
-      then v ^ (numerator p)
-      else toRational $ fromRational v ** fromRational p
+data (#^) u p = Power u p deriving Eq
+(#^) = Power
+
+instance (PP.Pretty a) => PP.Pretty (a #^ Value) where
+  pretty (Power u p) = PP.pretty u <> pretty_power p where
+    pretty_power :: Value -> PP.Doc
+    pretty_power 1 = PP.empty
+    pretty_power 2 = PP.char '²'
+    pretty_power 3 = PP.char '³'
+    pretty_power x = PP.char '^' <> PP.pretty x
+
+instance (Unit a) => Unit (a #^ Value) where
+  toSi (Power u p) = \v -> v * (toSi u 1 ^^^ p)
+  fromSi (Power u p) = \v -> v * (fromSi u 1 ^^^ p)
+  dimension (Power u p) = dimension u |^| p
+
+-- Multiplication instance
 
 infixl 7 #*
-(#*) :: Unit -> Unit -> Unit
-(Unit (o1, i1, d1)) #* (Unit (o2, i2, d2)) =
-  Unit $
-    ( \v -> v * (o1 1) * (o2 1)
-    , \v -> v * (i1 1) * (i2 1)
-    , d1 |*| d2
-    )
+data (#*) u1 u2 = Mult u1 u2 deriving Eq
+(#*) = Mult
+
+instance (PP.Pretty a, PP.Pretty b) => PP.Pretty (a #* b) where
+  pretty (Mult u1 u2) = PP.pretty u1 PP.<+> PP.pretty u2
+
+instance (Unit a, Unit b) => Unit (a #* b) where
+  toSi (Mult u1 u2) = toSi u1 . toSi u2
+  fromSi (Mult u1 u2) = fromSi u1 . fromSi u2
+  dimension (Mult u1 u2) = dimension u1 |*| dimension u2
+
+
+-- Division instance
 
 infixl 7 #/
-(#/) :: Unit -> Unit -> Unit
-(Unit (o1, i1, d1)) #/ (Unit (o2, i2, d2)) =
-  Unit $
-    ( \v -> v * (o1 1) / (o2 1)
-    , \v -> v * (i1 1) / (i2 1)
-    , d1 |/| d2
-    )
+data (#/) u1 u2 = Div u1 u2 deriving Eq
+(#/) = Div
 
+instance (PP.Pretty a, PP.Pretty b) => PP.Pretty (a #/ b) where
+  pretty (Div u1 u2) = PP.pretty u1 <> PP.char '/' <> PP.pretty u2
+
+instance (Unit a, Unit b) => Unit (a #/ b) where
+  toSi (Div u1 u2) = \v -> v * (toSi u1 1 / toSi u2 1)
+  fromSi (Div u1 u2) = \v -> v * (fromSi u1 1 / fromSi u2 1)
+  dimension (Div u1 u2) = dimension u1 |/| dimension u2
+
+
+-- Basic constructors
+
+complex_conversion :: Dimension -> Label -> (Value -> Value) -> (Value -> Value) -> BaseUnit
+complex_conversion d l f g = BaseUnit $ (f, g, d, l)
+
+conversion_ratio :: Dimension -> Label -> Value -> BaseUnit
+conversion_ratio d l r = complex_conversion d l (*r) (/r)
+
+canonical_unit :: Dimension -> Label -> BaseUnit
+canonical_unit d l = conversion_ratio d l 1

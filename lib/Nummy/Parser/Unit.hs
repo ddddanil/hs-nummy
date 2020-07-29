@@ -67,7 +67,7 @@ baseUnit = try prefixed <|> try parseBaseUnit <?> "base unit" where
   prefixed = do
     p <- parsePrefix
     u <- parseBaseUnit
-    return $ applyPrefix p u
+    return $ U.applyPrefix p u
 
 unit :: Parser Unit
 unit = try (parenthesis $ unitExpr fullUnitOpTable) <|> try (unitExpr shortUnitOpTable) <?> "unit"

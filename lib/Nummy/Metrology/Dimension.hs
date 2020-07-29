@@ -1,8 +1,9 @@
 module Nummy.Metrology.Dimension (
-  Value, Label, Dimension, BaseDim(..)
+  Dimension, BaseDim(..)
 , baseDim, dimless
 , isBaseUnit, isDimless
 , (|*|), (|/|), (|^|)
+, Nummy.Metrology.Dimension.length, mass, time, current, temp
 ) where
 
 import Protolude hiding (Prefix)
@@ -10,11 +11,9 @@ import Data.String (String)
 import Data.List (lookup, partition, foldl1)
 import qualified Text.PrettyPrint.Leijen as PP
 
+import Nummy.Metrology.Base
 
 -- Types
-
-type Value = Rational
-type Label = String
 
 data BaseDim = Length | Mass | Time | Current | Temp deriving (Eq, Ord, Show)
 instance PP.Pretty BaseDim where
@@ -28,6 +27,9 @@ newtype Dimension = Dimension { factors :: [(BaseDim, Value)] } deriving (Show)
 
 instance PP.Pretty Dimension where
   pretty (Dimension dim) =
+    if null dim
+    then PP.empty
+    else
     if show num_line == ("" :: Text)
     then PP.char '1'
     else num_line
@@ -37,7 +39,7 @@ instance PP.Pretty Dimension where
     else PP.char '/' <> den_line
     where
       (num, den) = partition ((> 0) . snd) dim
-      print_term (d, p) = PP.pretty d <> if abs p /= 1 then PP.char '^' <> PP.pretty (fromRational (abs p) :: Double) else PP.empty
+      print_term (d, p) = PP.pretty d <> if abs p /= 1 then PP.char '^' <> PP.pretty p else PP.empty
       num_line = PP.hsep $ map print_term num
       den_line = PP.hsep $ map print_term den
 
@@ -89,3 +91,12 @@ infixl 7 |*|
 infixl 7 |/|
 (|/|) :: Dimension -> Dimension -> Dimension
 d1 |/| (Dimension d2) = sanitizeDimension . combineDimensions (+) d1 $ Dimension $ map (second negate) d2
+
+
+-- Base dim definitions
+
+length = baseDim Length
+mass = baseDim Mass
+time = baseDim Time
+current = baseDim Current
+temp = baseDim Temp

@@ -1,7 +1,6 @@
 module Nummy.Metrology.Definitions (
   baseUnitTable, prefixTable, modifierTable
 , lookupUnit, lookupPrefix, lookupModifier
-, length, mass, time, current, temp
 ) where
 
 import Protolude hiding (length, Prefix)
@@ -17,36 +16,36 @@ import Nummy.Metrology.Unit
 symbol_table :: [ ([Label], Unit) ]  -- (Synonyms, )
 symbol_table =
   -- Length
-  [ (["m", "meter", "metre"], canonical_unit   length                           )
-  , (["in", "inch"],          conversion_ratio length 0.00254                   )
-  , (["ft", "foot", "feet"],  conversion_ratio length (0.00254 * 12)            ) -- 1 ft = 12 in
-  , (["yd", "yard"],          conversion_ratio length (0.00254 * 36)            ) -- 1 yd = 3 ft = 36 in
-  , (["mi", "mile"],          conversion_ratio length (0.00254 * 12 * 5280)     ) -- 1 mi = 5280 ft
+  [ (["m", "meter", "metre"], canonical_unit   "m"  length                           )
+  , (["in", "inch"],          conversion_ratio "in" length 0.00254                   )
+  , (["ft", "foot", "feet"],  conversion_ratio "ft" length (0.00254 * 12)            ) -- 1 ft = 12 in
+  , (["yd", "yard"],          conversion_ratio "yd" length (0.00254 * 36)            ) -- 1 yd = 3 ft = 36 in
+  , (["mi", "mile"],          conversion_ratio "mi" length (0.00254 * 12 * 5280)     ) -- 1 mi = 5280 ft
   -- Mass
-  , (["g", "gram"],           conversion_ratio mass 0.001                       )
-  , (["lbs", "pound"],        conversion_ratio mass 0.45359237                  )
-  , (["oz", "ounce"],         conversion_ratio mass (0.45359237 / 16)           )
+  , (["g", "gram"],           conversion_ratio "g"   mass 0.001                       )
+  , (["lbs", "pound"],        conversion_ratio "lbs" mass 0.45359237                  )
+  , (["oz", "ounce"],         conversion_ratio "oz"  mass (0.45359237 / 16)           )
   -- Time
-  , (["s", "sec", "second"],  canonical_unit   time                             )
-  , (["m", "min", "minute"],  conversion_ratio time 60                          )
-  , (["h", "hour"],           conversion_ratio time 3600                        )
+  , (["s", "sec", "second"],  canonical_unit   "s"   time                             )
+  , (["m", "min", "minute"],  conversion_ratio "min" time 60                          )
+  , (["h", "hour"],           conversion_ratio "h"   time 3600                        )
   -- Current
-  , (["A", "Amp", "amp"],     canonical_unit current                            )
+  , (["A", "Amp", "amp"],     canonical_unit   "A"   current                            )
   -- Temp
-  , (["K", "Kelvin"],         canonical_unit     temp                           )
-  , (["C", "Celsius"],        complex_conversion temp (+273.15) (\t -> t - 273.15))
-  , (["F", "Fahrenheit"],     complex_conversion temp (\t -> 5%9 * (t + 459.67))
+  , (["K", "Kelvin"],         canonical_unit     "K"  temp                           )
+  , (["C", "Celsius"],        complex_conversion "°C" temp (+273.15) (\t -> t - 273.15))
+  , (["F", "Fahrenheit"],     complex_conversion "°F" temp (\t -> 5%9 * (t + 459.67))
                                                       (\t -> 9%5 * t - 459.67)  )
-  , (["R", "Rankine"],        conversion_ratio   temp (5%9)                     )
+  , (["R", "Rankine"],        conversion_ratio   "R"  temp (5%9)                     )
   -- Temp differences
-  , (["dK", "dC"],            canonical_unit     temp                           )
-  , (["dF", "dR"],            conversion_ratio   temp (5%9)                     )
+  , (["dK", "dC"],            canonical_unit     "K" temp                           )
+  , (["dF", "dR"],            conversion_ratio   "R" temp (5%9)                     )
   ]
 
 prefix_table :: [ ([Label], Prefix) ]
 prefix_table =
-  [ (["k", "kilo"],  1000    )
-  , (["m", "milli"], 1 % 1000)
+  [ (["k", "kilo"],  (1000, "k")    )
+  , (["m", "milli"], (1 % 1000, "m"))
   ]
 
 modifier_table :: [ ([Label], Modifier)]
@@ -87,11 +86,3 @@ lookupPrefix p = snd <$> find (elem p . fst) prefix_table
 lookupModifier :: Label -> Maybe Modifier
 lookupModifier m = snd <$> find (elem m . fst) modifier_table
 
-
--- Base dim definitions
-
-length = baseDim Length
-mass = baseDim Mass
-time = baseDim Time
-current = baseDim Current
-temp = baseDim Temp
