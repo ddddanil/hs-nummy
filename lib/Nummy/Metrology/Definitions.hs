@@ -7,45 +7,46 @@ import Protolude hiding (length, Prefix)
 import Data.String (String)
 import Data.List (lookup)
 
+import Nummy.Metrology.Base
 import Nummy.Metrology.Dimension
 import Nummy.Metrology.Unit
 
 
 -- Table and its parts
 
-symbol_table :: [ ([Label], Unit) ]  -- (Synonyms, )
-symbol_table =
+base_unit_table :: [ ([Label], BaseUnit) ]  -- (Synonyms, Unit)
+base_unit_table =
   -- Length
-  [ (["m", "meter", "metre"], canonical_unit   "m"  length                           )
-  , (["in", "inch"],          conversion_ratio "in" length 0.00254                   )
-  , (["ft", "foot", "feet"],  conversion_ratio "ft" length (0.00254 * 12)            ) -- 1 ft = 12 in
-  , (["yd", "yard"],          conversion_ratio "yd" length (0.00254 * 36)            ) -- 1 yd = 3 ft = 36 in
-  , (["mi", "mile"],          conversion_ratio "mi" length (0.00254 * 12 * 5280)     ) -- 1 mi = 5280 ft
+  [ (["m", "meter", "metre"], canonical_unit   length "m"                            )
+  , (["in", "inch"],          conversion_ratio length "in" 0.00254                   )
+  , (["ft", "foot", "feet"],  conversion_ratio length "ft" (0.00254 * 12)            ) -- 1 ft = 12 in
+  , (["yd", "yard"],          conversion_ratio length "yd" (0.00254 * 36)            ) -- 1 yd = 3 ft = 36 in
+  , (["mi", "mile"],          conversion_ratio length "mi" (0.00254 * 12 * 5280)     ) -- 1 mi = 5280 ft
   -- Mass
-  , (["g", "gram"],           conversion_ratio "g"   mass 0.001                       )
-  , (["lbs", "pound"],        conversion_ratio "lbs" mass 0.45359237                  )
-  , (["oz", "ounce"],         conversion_ratio "oz"  mass (0.45359237 / 16)           )
+  , (["g", "gram"],           conversion_ratio mass "g"   0.001                      )
+  , (["lbs", "pound"],        conversion_ratio mass "lbs" 0.45359237                 )
+  , (["oz", "ounce"],         conversion_ratio mass "oz"  (0.45359237 / 16)          )
   -- Time
-  , (["s", "sec", "second"],  canonical_unit   "s"   time                             )
-  , (["m", "min", "minute"],  conversion_ratio "min" time 60                          )
-  , (["h", "hour"],           conversion_ratio "h"   time 3600                        )
+  , (["s", "sec", "second"],  canonical_unit   time "s"                              )
+  , (["m", "min", "minute"],  conversion_ratio time "min" 60                         )
+  , (["h", "hour"],           conversion_ratio time "h"   3600                       )
   -- Current
-  , (["A", "Amp", "amp"],     canonical_unit   "A"   current                            )
+  , (["A", "Amp", "amp"],     canonical_unit   current "A"                           )
   -- Temp
-  , (["K", "Kelvin"],         canonical_unit     "K"  temp                           )
-  , (["C", "Celsius"],        complex_conversion "°C" temp (+273.15) (\t -> t - 273.15))
-  , (["F", "Fahrenheit"],     complex_conversion "°F" temp (\t -> 5%9 * (t + 459.67))
-                                                      (\t -> 9%5 * t - 459.67)  )
-  , (["R", "Rankine"],        conversion_ratio   "R"  temp (5%9)                     )
+  , (["K", "Kelvin"],         canonical_unit     temp "K"                            )
+  , (["C", "Celsius"],        complex_conversion temp "°C" (+273.15) (\t -> t - 273.15 :: Value))
+  , (["F", "Fahrenheit"],     complex_conversion temp "°F" (\t -> 5 * (t + 459.67) / 9 :: Value)
+                                                           (\t -> 9 * t / 5 - 459.67 :: Value)  )
+  , (["R", "Rankine"],        conversion_ratio   temp "R"  (5/9)                     )
   -- Temp differences
-  , (["dK", "dC"],            canonical_unit     "K" temp                           )
-  , (["dF", "dR"],            conversion_ratio   "R" temp (5%9)                     )
+  , (["dK", "dC"],            canonical_unit     temp "K"                            )
+  , (["dF", "dR"],            conversion_ratio   temp "R"  (5/9)                     )
   ]
 
 prefix_table :: [ ([Label], Prefix) ]
 prefix_table =
   [ (["k", "kilo"],  (1000, "k")    )
-  , (["m", "milli"], (1 % 1000, "m"))
+  , (["m", "milli"], (1/1000, "m"))
   ]
 
 modifier_table :: [ ([Label], Modifier)]
@@ -55,11 +56,8 @@ modifier_table =
   , (["m"], 1000000 )
   ]
 
-unitTable :: [Label]
-unitTable = concat . map fst $ symbol_table
-
 baseUnitTable :: [Label]
-baseUnitTable = concat . map fst $ symbol_table
+baseUnitTable = concat . map fst $ base_unit_table
 
 prefixTable :: [Label]
 prefixTable = concat . map fst $ prefix_table
@@ -70,15 +68,15 @@ modifierTable = concat . map fst $ modifier_table
 
 -- Lookups
 
-lookupUnit :: Maybe Dimension -> Label -> Maybe Unit
+lookupUnit :: Maybe Dimension -> Label -> Maybe BaseUnit
 lookupUnit md unit =
-  let has_unit = filter matches_unit symbol_table
+  let has_unit = filter matches_unit base_unit_table
   in case md of
     Just dim -> snd <$> find (matches_dimension dim) has_unit
     Nothing -> snd <$> headMay has_unit
   where
     matches_unit = elem unit . fst
-    matches_dimension dim = (==dim) . dimOfUnit . snd
+    matches_dimension dim = (==dim) . dimension . snd
 
 lookupPrefix :: Label -> Maybe Prefix
 lookupPrefix p = snd <$> find (elem p . fst) prefix_table

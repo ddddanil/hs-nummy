@@ -7,6 +7,7 @@ module Nummy.Metrology.Unit (
 , type (#^), (#^)
 , type (#*), (#*)
 , type (#/), (#/)
+, complex_conversion, conversion_ratio, canonical_unit
 ) where
 
 import Protolude hiding (Prefix)

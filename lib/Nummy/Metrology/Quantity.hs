@@ -1,64 +1,51 @@
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DatatypeContexts #-}
 module Nummy.Metrology.Quantity (
   Quantity(..)
 , dimOfQu
 , mkQu, quIn
-, (%+), (%-), (%*), (%/), (%^), (%!^)
+, (%+), (%-), (%*), (%/), (%^)
 ) where
 
 import Protolude
 import qualified Text.PrettyPrint.Leijen as PP
 
+import Nummy.Metrology.Base
 import Nummy.Metrology.Dimension as D
 import Nummy.Metrology.Unit as U
 
 -- Type
 
-newtype Quantity = Quantity (Value, Unit)
+newtype (Unit a) => Quantity a = Quantity (Value, a)
 
-instance PP.Pretty Quantity where
-  pretty (Quantity (v, u)) =
-    PP.pretty (fromRational v :: Double)
-    <> if not $ U.isDimless u
-      then PP.char ' ' <> PP.pretty (dimOfUnit u)
-      else PP.empty
+instance (PP.Pretty a, Unit a) => PP.Pretty (Quantity a) where
+  pretty (Quantity (v, u)) = PP.pretty v PP.<+> PP.pretty u
 
-instance Eq Quantity where
+instance (Unit a) => Eq (Quantity a) where
   Quantity (v1, u1) == Quantity (v2, u2) =
-    (convert u1 u2) v1 == v2
+    (toSi u1) v1 == (toSi u2) v2
 
 
-dimOfQu :: Quantity -> Dimension
-dimOfQu (Quantity (d, u)) = dimOfUnit u
+dimOfQu :: (Unit a) => Quantity a -> Dimension
+dimOfQu (Quantity (d, u)) = dimension u
 
-quIn :: Quantity -> Unit -> Maybe Quantity
+quIn :: (Unit a) => Quantity a -> a -> Maybe (Quantity a)
 quIn (Quantity (v, u)) u' =
-  if dimOfUnit u /= dimOfUnit u' then Nothing
-  else Just . Quantity $ ((convert u u') v, u')
+  if dimension u /= dimension u' then Nothing
+  else Just . Quantity $ (fromSi u' . toSi u $ v, u')
 
-mkQu :: Value -> Unit -> Quantity
+mkQu :: (Unit a) => Value -> a -> Quantity a
 mkQu = curry Quantity
+
 
 -- Quantity operators
 
-infixl 8 %!^
-(%!^) :: Quantity -> Quantity -> Maybe Quantity
-q %!^ Quantity (v, u) =
-  if U.isDimless u
-  then Just (q %^ v)
-  else Nothing
-
 infixl 8 %^
-(%^) :: Quantity -> Value -> Quantity
-Quantity (v, u) %^ p = Quantity $ (pow v p, u #^ p)
-  where
-    pow :: Value -> Value -> Value
-    pow v p =
-      if denominator p == 1
-      then v ^ (numerator p)
-      else toRational $ fromRational v ** fromRational p
+(%^) :: (Unit a) => Quantity a -> Value -> Quantity (a #^ Value)
+Quantity (v, u) %^ p = Quantity $ (v ^^^ p, u #^ p)
 
 infixl 7 %*
-(%*) :: Quantity -> Quantity -> Quantity
+(%*) :: (Unit a, Unit b) => Quantity a -> Quantity b -> Quantity (a #* b)
 Quantity (v1, u1) %* Quantity (v2, u2) =
   Quantity $
     ( v1 * v2
@@ -66,7 +53,7 @@ Quantity (v1, u1) %* Quantity (v2, u2) =
     )
 
 infixl 7 %/
-(%/) :: Quantity -> Quantity -> Quantity
+(%/) :: (Unit a, Unit b) => Quantity a -> Quantity b -> Quantity (a #/ b)
 Quantity (v1, u1) %/ Quantity (v2, u2) =
   Quantity $
     ( v1 / v2
@@ -74,14 +61,14 @@ Quantity (v1, u1) %/ Quantity (v2, u2) =
     )
 
 infix 6 %+
-(%+) :: Quantity -> Quantity -> Maybe Quantity
+(%+) :: (Unit a, Unit b) => Quantity a -> Quantity b -> Maybe (Quantity a)
 Quantity (v1, u1) %+ Quantity (v2, u2) =
-  if dimOfUnit u1 /= dimOfUnit u2 then Nothing
-  else Just . Quantity $ (v1 + (convert u2 u1) v2, u1)
+  if dimension u1 /= dimension u2 then Nothing
+  else Just . Quantity $ (fromSi u1 $ toSi u1 v1 + toSi u2 v2, u1)
 
 infix 6 %-
-(%-) :: Quantity -> Quantity -> Maybe Quantity
+(%-) :: (Unit a, Unit b) => Quantity a -> Quantity b -> Maybe (Quantity a)
 Quantity (v1, u1) %- Quantity (v2, u2) =
-  if dimOfUnit u1 /= dimOfUnit u2 then Nothing
-  else Just . Quantity $ (v1 - (convert u2 u1) v2, u1)
+  if dimension u1 /= dimension u2 then Nothing
+  else Just . Quantity $ (fromSi u1 $ toSi u1 v1 - toSi u2 v2, u1)
 

@@ -2,6 +2,7 @@
 module Nummy.Metrology.Base (
   Prefix, Modifier, Label
 , Value(..), valueF, (^^^)
+, applyModifier
 ) where
 
 import Protolude hiding (Prefix)
@@ -11,13 +12,17 @@ import qualified Text.PrettyPrint.Leijen as PP
 
 
 type Prefix = (Value, Label)
-type Modifier = Value
 type Label = String
 
 
+type Modifier = Value
+
+applyModifier :: Modifier -> Value -> Value
+applyModifier m v = v * m
+
 -- Value type
 
-newtype Value = Value { value :: Rational } deriving (Eq, Show, Ord, Num, Fractional, Real, RealFrac)
+newtype Value = Value { value :: Rational } deriving (Eq, Show, Ord, Num, Fractional, Real, RealFrac, Read)
 
 instance PP.Pretty Value where
   pretty (Value v) =
