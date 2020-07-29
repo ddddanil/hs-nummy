@@ -14,7 +14,7 @@ import Nummy.Metrology.Unit
 
 -- Table and its parts
 
-base_unit_table :: [ ([Label], BaseUnit) ]  -- (Synonyms, Unit)
+base_unit_table :: [ ([Label], Unit) ]  -- (Synonyms, Unit)
 base_unit_table =
   -- Length
   [ (["m", "meter", "metre"], canonical_unit   length "m"                            )
@@ -68,7 +68,7 @@ modifierTable = concat . map fst $ modifier_table
 
 -- Lookups
 
-lookupUnit :: Maybe Dimension -> Label -> Maybe BaseUnit
+lookupUnit :: Maybe Dimension -> Label -> Maybe Unit
 lookupUnit md unit =
   let has_unit = filter matches_unit base_unit_table
   in case md of
