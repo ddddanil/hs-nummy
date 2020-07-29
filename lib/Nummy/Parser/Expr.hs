@@ -15,10 +15,7 @@ import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Parser.Base
 import Nummy.Parser.Unit
-import Nummy.Metrology.Definitions hiding (length, mass, time)
-import Nummy.Metrology.Dimension as D
-import Nummy.Metrology.Quantity as Q
-import Nummy.Metrology.Unit as U
+import Nummy.Metrology as M hiding (length)
 
 
 -- Quantity operations

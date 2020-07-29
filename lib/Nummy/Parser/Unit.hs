@@ -9,9 +9,7 @@ import Text.Parsec.Expr as P.Expr
 import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Parser.Base
-import Nummy.Metrology.Dimension as D
-import Nummy.Metrology.Quantity as Q
-import Nummy.Metrology.Unit as U
+import Nummy.Metrology as M hiding (length)
 
 
 -- Unit operations
@@ -67,7 +65,7 @@ baseUnit = try prefixed <|> try parseBaseUnit <?> "base unit" where
   prefixed = do
     p <- parsePrefix
     u <- parseBaseUnit
-    return $ U.applyPrefix p u
+    return $ p -| u
 
 unit :: Parser Unit
 unit = try (parenthesis $ unitExpr fullUnitOpTable) <|> try (unitExpr shortUnitOpTable) <?> "unit"

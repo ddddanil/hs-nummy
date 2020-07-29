@@ -16,10 +16,7 @@ import Text.Parsec.Char as P.Char
 import Text.Parsec.Expr as P.Expr
 import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
 
-import Nummy.Metrology.Definitions hiding (length)
-import Nummy.Metrology.Dimension as D
-import Nummy.Metrology.Quantity as Q
-import Nummy.Metrology.Unit as U
+import Nummy.Metrology as M hiding (length)
 
 type Parser = Parsec String (Maybe Dimension)
 type OpTable a = OperatorTable String (Maybe Dimension) Identity a
@@ -51,7 +48,7 @@ parenthesis = between (char '(' >> spaces >> notFollowedBy space) (spaces >> cha
 
 -- Parsers
 
-parseBaseUnit :: Parser Unit
+parseBaseUnit :: Parser BaseUnit
 parseBaseUnit = (oneOfStr baseUnitTable <?> "known unit symbol") >>= \u -> parseMaybe (lookupUnit Nothing u) <?> "known unit symbol"
 
 parsePrefix :: Parser Prefix
@@ -69,6 +66,5 @@ modifiedValue = do
 rawValue :: Parser Value
 rawValue = do
   n <- floating2 False :: Parser Double
-  return $ approxRational n epsilon
-  where epsilon = 0.000001
+  return $ valueF n
 
