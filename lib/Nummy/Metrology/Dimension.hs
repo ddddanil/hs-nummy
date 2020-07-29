@@ -1,7 +1,7 @@
 module Nummy.Metrology.Dimension (
   Dimension, BaseDim(..)
 , baseDim, dimless
-, isBaseUnit, isDimless
+, isBaseUnit, dimIsDimless
 , (|*|), (|/|), (|^|)
 , Nummy.Metrology.Dimension.length, mass, time, current, temp
 ) where
@@ -54,8 +54,8 @@ baseDim b = Dimension [(b, 1)]
 dimless :: Dimension
 dimless = Dimension []
 
-isDimless :: Dimension -> Bool
-isDimless (Dimension d ) = d == []
+dimIsDimless :: Dimension -> Bool
+dimIsDimless (Dimension d ) = d == []
 
 isBaseUnit :: Dimension -> Bool
 isBaseUnit (Dimension [(d, 1)]) = True

@@ -29,7 +29,7 @@ unitOpDiv = char '/' >> return (#/)
 unitOpInverse :: Parser (Unit -> Unit)
 unitOpInverse = do
   _ <- string "1/"
-  return $ \u -> (dimlessUnit #/ u)
+  return $ \u -> (dimless_unit #/ u)
 
 unitOpCombine :: Parser (Unit -> Unit -> Unit)
 unitOpCombine = char ' ' >> lookAhead baseUnit >> return (#*)

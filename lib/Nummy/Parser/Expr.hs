@@ -43,7 +43,7 @@ quOpDif = do
 quOpNegate :: Parser (Quantity -> Quantity)
 quOpNegate = do
   _ <- char '-'
-  return $ \q -> (mkQu (-1) dimlessUnit) %* q
+  return $ \q -> (mkQu (-1) dimless_unit) %* q
 
 quOpIn :: Parser (Quantity -> Quantity)
 quOpIn = do
@@ -51,7 +51,7 @@ quOpIn = do
   _ <- string "in" <|> string "into" <|> string "of"
   _ <- space >> spaces
   u <- unit
-  guardDim (dimOfUnit u) <?> "Specifier must be of same dimension"
+  guardDim (dimension u) <?> "Specifier must be of same dimension"
   return $ \q -> fromJust (quIn q u)
 
 
@@ -72,7 +72,7 @@ quantity = try wideQu <|> try slimQu <|> try dimlessQu <?> "quantity" where
     v <- try modifiedValue <|> rawValue
     _ <- space
     u <- unit
-    guard . not . U.isDimless $ u
+    guard . not . unitIsDimless $ u
     return $ mkQu v u
   slimQu = do
     v <- rawValue
@@ -80,7 +80,7 @@ quantity = try wideQu <|> try slimQu <|> try dimlessQu <?> "quantity" where
     return $ mkQu v u
   dimlessQu = do
     v <- try modifiedValue <|> rawValue
-    return $ mkQu v dimlessUnit
+    return $ mkQu v dimless_unit
 
 
 parseQuantity :: Parser Quantity

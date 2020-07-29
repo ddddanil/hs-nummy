@@ -9,7 +9,8 @@ module Nummy.Metrology.Unit (
 , type (#^), (#^)
 , type (#*), (#*)
 , type (#/), (#/)
-, complex_conversion, conversion_ratio, canonical_unit
+, complex_conversion, conversion_ratio, canonical_unit, dimless_unit
+, unitIsDimless
 ) where
 
 import Protolude hiding (Prefix)
@@ -21,17 +22,18 @@ import Nummy.Metrology.Base
 import Nummy.Metrology.Dimension as D
 
 
+-- Class
+
+class (PP.Pretty a) => CUnit a where
+  toSi :: a -> Value -> Value
+  fromSi :: a -> Value -> Value
+  dimension :: a -> Dimension
+
+
 -- General wrapper
 
 data Unit where
   Unit :: CUnit a => a -> Unit
-
-instance Eq Unit where
-  Unit (BaseUnit u1)  == Unit (BaseUnit u2)  = BaseUnit u1  == BaseUnit u2
-  Unit (Prefix p1 u1) == Unit (Prefix p2 u2) = Prefix p1 u2 == Prefix p2 u2
-  Unit (Mult u1 u2)   == Unit (Mult u3 u4)   = Mult u1 u2   == Mult u3 u4
-  Unit (Div u1 u2)    == Unit (Div u3 u4)    = Div u1 u2    == Div u3 u4
-  Unit (_) == Unit (_) = False
 
 instance PP.Pretty Unit where
   pretty (Unit u) = PP.pretty u
@@ -41,12 +43,21 @@ instance CUnit Unit where
   fromSi (Unit u) = fromSi u
   dimension (Unit u) = dimension u
 
--- Class
 
-class (Eq a, PP.Pretty a) => CUnit a where
-  toSi :: a -> Value -> Value
-  fromSi :: a -> Value -> Value
-  dimension :: a -> Dimension
+-- Dimless instance
+
+data Dimless = Dimless Value
+
+instance PP.Pretty Dimless where
+  pretty (Dimless v) =
+    if v == 1
+      then PP.empty
+      else PP.pretty v
+
+instance CUnit Dimless where
+  toSi (Dimless x) = \v -> v * x
+  fromSi (Dimless x) = \v -> v / x
+  dimension (Dimless _) = dimless
 
 
 -- Base instance
@@ -102,6 +113,7 @@ instance (CUnit a) => CUnit (a #^ Value) where
   fromSi (Power u p) = \v -> v * (fromSi u 1 ^^^ p)
   dimension (Power u p) = dimension u |^| p
 
+
 -- Multiplication instance
 
 infixl 7 #*
@@ -144,3 +156,12 @@ conversion_ratio d l r = complex_conversion d l (*r) (/r)
 
 canonical_unit :: Dimension -> Label -> Unit
 canonical_unit d l = conversion_ratio d l 1
+
+dimless_unit :: Unit
+dimless_unit = Unit $ Dimless 1
+
+
+-- Helpers
+
+unitIsDimless :: Unit -> Bool
+unitIsDimless u = dimension u == dimless

@@ -48,7 +48,7 @@ parenthesis = between (char '(' >> spaces >> notFollowedBy space) (spaces >> cha
 
 -- Parsers
 
-parseBaseUnit :: Parser BaseUnit
+parseBaseUnit :: Parser Unit
 parseBaseUnit = (oneOfStr baseUnitTable <?> "known unit symbol") >>= \u -> parseMaybe (lookupUnit Nothing u) <?> "known unit symbol"
 
 parsePrefix :: Parser Prefix

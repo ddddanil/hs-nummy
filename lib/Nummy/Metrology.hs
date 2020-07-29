@@ -11,11 +11,13 @@ module Nummy.Metrology (
 , (D.|*|)
 , (D.|/|)
 -- Unit
-, U.Unit(..), U.BaseUnit
+, U.Unit(..), U.CUnit(..)
+, U.BaseUnit
 , type (U.-|), (U.-|)
 , type (U.#^), (U.#^)
 , type (U.#*), (U.#*)
 , type (U.#/), (U.#/)
+, U.unitIsDimless
 -- Quantity
 , Qu.Quantity(..)
 , Qu.dimOfQu, Qu.mkQu, Qu.quIn
@@ -23,6 +25,7 @@ module Nummy.Metrology (
 -- Definitions
 , Def.baseUnitTable, Def.prefixTable, Def.modifierTable
 , Def.lookupUnit, Def.lookupPrefix, Def.lookupModifier
+, U.dimless_unit
 , D.length, D.time, D.mass, D.current, D.temp
 ) where
 
