@@ -1,7 +1,7 @@
 module Tests.Dimensions (testDimensions) where
 
-import Protolude hiding (length, force)
-import Data.String (String)
+import Nummy.Prelude hiding (length, force)
+
 import Test.Tasty  (TestTree, testGroup, localOption)
 
 import Nummy.Metrology (Quantity(..), Unit, Dimension, Prefix

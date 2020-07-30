@@ -10,9 +10,7 @@ module Nummy.Metrology.Unit (
 , complex_conversion, conversion_ratio, canonical_unit, dimless_unit
 ) where
 
-import Protolude hiding (Prefix)
-import Data.String (String)
-import Data.Tuple.Extra hiding (first, second)
+import Nummy.Prelude hiding (Prefix)
 import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Metrology.Base as B

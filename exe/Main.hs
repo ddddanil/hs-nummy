@@ -1,7 +1,7 @@
 module Main where
 
-import Protolude
-import qualified Text.PrettyPrint.Leijen as PP
+import Nummy.Prelude
+import Text.Megaparsec
 import System.Console.Haskeline
 
 import Nummy.Parser (parse_nummy)
@@ -14,7 +14,7 @@ main = runInputT defaultSettings loop where
     case minput of
       Nothing -> return ()
       Just input -> do
-        case parse_nummy input of
-          Left err -> outputStrLn $ show err
-          Right qu -> outputStrLn $ show (PP.pretty qu)
+        case parse parse_nummy "<input>" input of
+          Left err -> outputStrLn $ errorBundlePretty err
+          Right res -> outputStrLn res
         loop

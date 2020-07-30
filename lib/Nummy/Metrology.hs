@@ -12,7 +12,7 @@ module Nummy.Metrology (
   B.Label
 , B.Prefix
 -- * Value
-, B.Value, B.valueF, (B.^^^)
+, B.Value, B.valueF, B.valueI, (B.^^^)
 -- * Dimension
 , D.Dimension
 -- ** Operators on dimensions

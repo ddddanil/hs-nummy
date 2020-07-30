@@ -1,7 +1,7 @@
 module Tests.Units (testUnits) where
 
-import Protolude hiding (second, bit)
-import Data.String (String)
+import Nummy.Prelude hiding (second, bit)
+
 import Test.Tasty  (TestTree, testGroup, localOption)
 
 import Nummy.Metrology (Quantity(..), Unit, Dimension, Prefix
@@ -28,19 +28,11 @@ testUnits =
     ]
   , testGroup "Syntax"
     [ checkParseUnit Fail  ""                  (dimless)
-    -- optional parenthesis
-    , checkParseUnit Succeed  "(m)"            (meter)
-    , checkParseUnit Succeed  "( m )"          (meter)
-    , checkParseUnit Succeed  "(    m       )" (meter)
     -- illegal spaces
     , checkParseUnit Fail  " m"             (meter)
     , checkParseUnit Fail  "m "             (meter)
     , checkParseUnit Fail  " m "            (meter)
     , checkParseUnit Fail  "   m   "        (meter)
-    , checkParseUnit Fail  " (m)"           (meter)
-    , checkParseUnit Fail  "(m) "           (meter)
-    , checkParseUnit Fail  " (m) "          (meter)
-    , checkParseUnit Fail  "  (m)    "      (meter)
     ]
   , testGroup "Prefixes"
     [ checkParseUnit Succeed  "mm" (milli -| meter)
@@ -59,16 +51,16 @@ testUnits =
     , checkParseUnit Succeed  "1/s"  (hertz)
     , checkParseUnit Fail     "2/km" (dimless #/ second)
     -- Simplification
-    , checkParseUnit Succeed  "(m s/m)" (second)
+    , checkParseUnit Succeed  "m s/m" (second)
     ]
   , testGroup "Multiplication"
     -- Commutative prefixes
     [ checkParseUnit Succeed  "m*kg" (meter #* kilo -| gram)
     , checkParseUnit Succeed  "km*g" (kilo -| meter #* gram)
     -- Commutative units
-    , checkParseUnit Succeed  "(m s)" (meter #* second)
-    , checkParseUnit Succeed  "(s m)" (meter #* second)
-    , checkParseUnit Succeed  "(m s)" (second #* meter)
+    , checkParseUnit Succeed  "m s" (meter #* second)
+    , checkParseUnit Succeed  "s m" (meter #* second)
+    , checkParseUnit Succeed  "m s" (second #* meter)
     -- Same dimension
     , checkParseUnit Succeed  "m*m"   (meter #* meter)
     , checkParseUnit Succeed  "km*m"  (kilo -| meter #* meter)
@@ -77,8 +69,8 @@ testUnits =
     , checkParseUnit Fail     "m s"   (meter #* second)
     ]
   , testGroup "Powers"
-    [ checkParseUnit Succeed  "(m^2)"  (meter #^ 2)
-    , checkParseUnit Succeed  "(km^2)" (kilo -| meter #^ 2)
+    [ checkParseUnit Succeed  "m^2"  (meter #^ 2)
+    , checkParseUnit Succeed  "km^2" (kilo -| meter #^ 2)
     -- Simplification
     , checkParseUnit Succeed  "m^2/m"  (meter)
     , checkParseUnit Succeed  "m/m"    (dimless)

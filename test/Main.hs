@@ -1,6 +1,6 @@
 module Main where
 
-import Protolude
+import Nummy.Prelude
 import Test.Tasty       (TestTree, defaultMain, testGroup)
 
 import Tests.Dimensions

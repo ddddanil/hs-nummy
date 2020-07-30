@@ -1,77 +1,72 @@
-module Nummy.Parser.Unit (unit) where
+module Nummy.Parser.Unit (
+  unit
+) where
 
-import Protolude hiding (Prefix, Infix, try)
-import Data.String (String)
-import Data.Ratio (approxRational)
-import Text.Parsec as P hiding ( (<|>) )
-import Text.Parsec.Char as P.Char
-import Text.Parsec.Expr as P.Expr
-import qualified Text.PrettyPrint.Leijen as PP
+import Nummy.Prelude hiding (many, Prefix, try)
+import Text.Megaparsec
+import Text.Megaparsec.Char
+import Control.Monad.Combinators.Expr
 
 import Nummy.Parser.Base
-import Nummy.Metrology as M
+import Nummy.Metrology
+import Nummy.Metrology.Definitions (comboTable)
 import Nummy.Metrology.Definitions.Unit (dimless)
 
 
--- Unit operations
+-- Term
 
-unitOpPow :: Parser (Unit -> Unit)
-unitOpPow = do
+pBaseUnit :: Parser Unit
+pBaseUnit = choice (map parserify comboTable) <?> "base unit" where
+  parserify :: (Label, Unit) -> Parser Unit
+  parserify (s, u) = do
+    _ <- string s
+    notFollowedBy alphaNumChar
+    return u
+
+
+-- Operators
+
+pOpUnitPow :: Parser (Unit -> Unit)
+pOpUnitPow = do
   _ <- char '^'
-  p <- parseValue
-  return $ \u -> u #^ p
+  v <- pValue
+  return $ \u -> u #^ v
 
-unitOpMult :: Parser (Unit -> Unit -> Unit)
-unitOpMult = char '*' >> return (#*)
+pOpUnitMultC :: Parser (Unit -> Unit -> Unit)
+pOpUnitMultC = do
+  _ <- char '*'
+  return (#*)
 
-unitOpDiv :: Parser (Unit -> Unit -> Unit)
-unitOpDiv = char '/' >> return (#/)
+pOpUnitMultS :: Parser (Unit -> Unit -> Unit)
+pOpUnitMultS = try $ do
+  _ <- char ' '
+  lookAhead pBaseUnit
+  return (#*)
 
-unitOpInverse :: Parser (Unit -> Unit)
-unitOpInverse = do
+pOpUnitDiv :: Parser (Unit -> Unit -> Unit)
+pOpUnitDiv = do
+  _ <- char '/'
+  return (#/)
+
+pOpUnitInv :: Parser (Unit -> Unit)
+pOpUnitInv = do
   _ <- string "1/"
-  return $ \u -> (dimless #/ u)
-
-unitOpCombine :: Parser (Unit -> Unit -> Unit)
-unitOpCombine = char ' ' >> lookAhead baseUnit >> return (#*)
+  return $ ((#/) (dimless))
 
 
--- Op Tables
+-- Operator table
 
-fullUnitOpTable :: OpTable Unit
-fullUnitOpTable =
-  [ [ Postfix unitOpPow ]
-  , [ Infix (try unitOpCombine) AssocLeft ]
-  , [ Infix unitOpDiv AssocLeft ]
-  , [ Infix unitOpMult AssocLeft ]
-  , [ Prefix unitOpInverse ]
-  ]
-
-shortUnitOpTable :: OpTable Unit
-shortUnitOpTable =
-  [ [ Postfix unitOpPow ]
-  , [ Infix unitOpMult AssocLeft ]
-  , [ Infix unitOpDiv AssocLeft ]
-  , [ Prefix unitOpInverse ]
+opUnitTable :: [[Operator Parser Unit]]
+opUnitTable =
+  [ [ Postfix pOpUnitPow   ]
+  , [ InfixL  pOpUnitMultS ]
+  , [ Prefix  pOpUnitInv   ]
+  , [ InfixL  pOpUnitDiv   ]
+  , [ InfixL  pOpUnitMultC ]
   ]
 
 
--- Unit parsers
+-- Expression builder
 
-unitExpr :: OpTable Unit -> Parser Unit
-unitExpr table = buildExpressionParser table baseUnit
-
-baseUnit :: Parser Unit
-baseUnit = choice baseUnitParsers <?> "base unit"
-
-shortUnit :: Parser Unit
-shortUnit = unitExpr shortUnitOpTable
-
-longUnit :: Parser Unit
-longUnit = unitExpr fullUnitOpTable
-
--- | Tries a full unit expression inside parenthesis and defaults to a short expression
 unit :: Parser Unit
-unit = try (parenthesis longUnit) <|> try (shortUnit <* notFollowedBy alphaNum) <?> "unit"
-
-
+unit = makeExprParser pBaseUnit opUnitTable

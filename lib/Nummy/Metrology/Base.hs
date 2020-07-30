@@ -1,11 +1,10 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Nummy.Metrology.Base (
   Prefix(..), Label
-, Value(..), valueF, (^^^)
+, Value(..), valueF, valueI, (^^^)
 ) where
 
-import Protolude hiding (Prefix)
-import Data.String (String)
+import Nummy.Prelude hiding (Prefix)
 import Data.Ratio (approxRational)
 import qualified Text.PrettyPrint.Leijen as PP
 
@@ -49,3 +48,6 @@ infixr 8 ^^^
 valueF :: (RealFrac f) => f -> Value
 valueF f = Value $ approxRational f epsilon
   where epsilon = 0.000001
+
+valueI :: Integer -> Value
+valueI x = Value $ x % 1

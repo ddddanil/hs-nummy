@@ -6,7 +6,7 @@ module Nummy.Metrology.Quantity (
 , (%+), (%-), (%*), (%/), (%^)
 ) where
 
-import Protolude
+import Nummy.Prelude
 import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Metrology.Base

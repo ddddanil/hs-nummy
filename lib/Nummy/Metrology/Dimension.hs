@@ -5,9 +5,7 @@ module Nummy.Metrology.Dimension (
 , (|*|), (|/|), (|^|)
 ) where
 
-import Protolude hiding (Prefix)
-import Data.String (String)
-import Data.List (lookup, partition, foldl1)
+import Nummy.Prelude hiding (Prefix)
 import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Metrology.Base

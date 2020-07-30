@@ -20,9 +20,7 @@ module Nummy.Metrology.Definitions (
 , module D.P
 ) where
 
-import Protolude hiding (Prefix)
-import Data.String (String)
-import Data.List as L(lookup)
+import Nummy.Prelude hiding (Prefix)
 
 import Nummy.Metrology.Base as B
 import Nummy.Metrology.Dimension as D

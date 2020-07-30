@@ -1,10 +1,11 @@
 cabal-version: 2.2
 name:          hs-nummy
-version:       0.2
+version:       0.3
 
 library
     exposed-modules:
-        Nummy.Parser
+        Nummy.Prelude
+      , Nummy.Parser
       , Nummy.Metrology
       , Nummy.Metrology.Definitions
       , Nummy.Metrology.Definitions.Dimension
@@ -26,11 +27,11 @@ library
         base
       , extra           == 1.7.4
       , protolude
-      , syb
       , mtl
+      , transformers
       , wl-pprint
-      , parsec
-      , parsec-numbers
+      , megaparsec
+      , parser-combinators
 
 executable nummy
     main-is:            Main.hs
@@ -39,15 +40,10 @@ executable nummy
     default-extensions: NoImplicitPrelude, OverloadedStrings
     build-depends:
         base
-      , text
-      , mtl
-      , transformers
-      , syb
-      , protolude
       , ansi-terminal
       , wl-pprint
+      , megaparsec
       , haskeline
-      , parsec
       , hs-nummy
 
 test-suite tests
@@ -65,8 +61,7 @@ test-suite tests
   default-extensions: NoImplicitPrelude, OverloadedStrings
   build-depends:
       base
-    , protolude
-    , parsec
+    , megaparsec
     , tasty
     , tasty-hunit
     , tasty-expected-failure

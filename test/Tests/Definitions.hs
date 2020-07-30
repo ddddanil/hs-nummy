@@ -3,9 +3,9 @@ module Tests.Definitions (
 , short_timeout, average_timeout, long_timeout
 ) where
 
-import Protolude hiding (length, second)
+import Nummy.Prelude hiding (length, second)
 import Data.Maybe (fromJust)
-import Data.String (String)
+
 import Test.Tasty (Timeout(Timeout))
 import Test.Tasty.HUnit (Assertion, (@?))
 import qualified Text.PrettyPrint.Leijen as PP

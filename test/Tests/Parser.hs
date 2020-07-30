@@ -3,12 +3,12 @@ module Tests.Parser (
 , checkParseUnit, checkParseQu, checkParseExpr
 ) where
 
-import Protolude
-import Data.String (String)
+import Nummy.Prelude
+
 import Test.Tasty       (TestTree, defaultMain, testGroup, localOption, Timeout(Timeout))
 import Test.Tasty.HUnit (testCase, (@?=), (@=?), (@?), Assertion, assertFailure)
 import Test.Tasty.ExpectedFailure (expectFail, expectFailBecause)
-import Text.Parsec hiding (parseTest)
+import Text.Megaparsec
 import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Parser
@@ -18,15 +18,15 @@ import Tests.Definitions
 
 -- Parser
 
-getParse :: Parser a -> String -> Either ParseError a
-getParse p s = runParser (parse_all p) Nothing "" s
+getParse :: Parser a -> String -> Either (ParseErrorBundle String Void) a
+getParse p s = parse (p <* eof) "<test>" s
 
 checkParse :: (Eq a, PP.Pretty a) => Parser a -> TestType -> String -> a -> Assertion
 checkParse p t s x =
   case getParse p s of
     Left err ->
       if t == Succeed
-      then assertFailure ("failed to parse " ++ show err)
+      then assertFailure (errorBundlePretty err)
       else True @? "Expected parse failure"
     Right y -> assert t x y
 
@@ -49,4 +49,4 @@ checkParseQu :: TestType -> String -> Quantity -> TestTree
 checkParseQu t s q = testCase (show s) $ checkParse quantity t s q
 
 checkParseExpr :: TestType -> String -> Quantity -> TestTree
-checkParseExpr t s q = testCase (show s) $ checkParse expression t s q
+checkParseExpr t s q = testCase (show s) $ checkParse line t s q

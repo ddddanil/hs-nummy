@@ -1,98 +1,112 @@
 module Nummy.Parser.Expr (
   quantity
 , expression
+, line
 ) where
 
-import Protolude hiding (Prefix, Infix, try, optional)
+import Nummy.Prelude hiding (many, Prefix, try)
+import Data.Bifoldable (bimsum)
 import Data.Maybe (fromJust)
-import Text.Parsec as P hiding ( (<|>) )
-import Text.Parsec.Expr as P.Expr
+import Text.Megaparsec
+import Text.Megaparsec.Char
+import Control.Monad.Fail
+import Control.Monad.Combinators.Expr
 
 import Nummy.Parser.Base
 import Nummy.Parser.Unit
-import Nummy.Metrology as M
+import Nummy.Metrology
+import Nummy.Metrology.Definitions (comboTable)
 import Nummy.Metrology.Definitions.Unit (dimless)
 
 
--- Quantity operations
+-- Term
 
-quOpMult :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
-quOpMult = spaces >> char '*' >> spaces >> return (\a b -> (%*) <$> a <*> b)
+quantity :: Parser Quantity
+quantity = do
+  v <- pValue
+  u <- optional . try $ do
+    _ <- optional spaceChar
+    parenthesis unit <|> unit
+  _ <- space
+  return $ maybe (v %# dimless) ((%#) v) u
 
-quOpDiv :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
-quOpDiv = spaces >> char '/' >> spaces >> return (\a b -> (%/) <$> a <*> b)
 
-quOpSum :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
-quOpSum = do
-  _ <- spaces >> char '+' >> spaces
-  return $ \a b -> concatMaybe ( (%+) <$> a <*> b )
+-- Operators
 
-quOpDif :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
-quOpDif = do
-  _ <- spaces >> char '-' >> spaces
-  return $ \a b -> concatMaybe ( (%-) <$> a <*> b )
+pOpQuPow :: Parser (Maybe Quantity -> Maybe Quantity)
+pOpQuPow = do
+  _ <- char '^'
+  _ <- space
+  p <- pValue
+  return $ fmap (%^ p)
 
-quOpNegate :: Parser (Maybe Quantity -> Maybe Quantity)
-quOpNegate = do
+pOpQuNeg :: Parser (Maybe Quantity -> Maybe Quantity)
+pOpQuNeg = do
   _ <- char '-'
-  return $ fmap $ \q -> ((-1) %# dimless) %* q
+  return $ fmap (%* (-1) %# dimless)
 
-quOpIn :: Parser (Maybe Quantity -> Maybe Quantity)
-quOpIn = do
-  _ <- string "in" <|> string "into" <|> string "to"
-  _ <- space >> spaces
-  u <- unit
-  return $ \a -> a >>= (%<| u)
+pOpQuMul :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
+pOpQuMul = do
+  _ <- char '*'
+  _ <- space
+  return $ \a b -> (%*) <$> a <*> b
+
+pOpQuDiv :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
+pOpQuDiv = do
+  _ <- char '/'
+  _ <- space
+  return $ \a b -> (%/) <$> a <*> b
+
+pOpQuAdd :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
+pOpQuAdd = do
+  _ <- char '+'
+  _ <- space
+  return $ \a b -> concatMaybe $ (%+) <$> a <*> b
+
+pOpQuSub :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
+pOpQuSub = do
+  _ <- char '-'
+  _ <- space
+  return $ \a b -> concatMaybe $ (%-) <$> a <*> b
 
 
-quOpTable :: OpTable (Maybe Quantity)
-quOpTable =
-  [ [ Prefix (try quOpNegate) ]
-  , [ Infix (try quOpMult) AssocLeft ]
-  , [ Infix (try quOpDiv) AssocLeft ]
-  , [ Infix (try quOpSum) AssocLeft ,  Infix (try quOpDif) AssocLeft ]
+-- Operator table
+
+opQuTable :: [[Operator Parser (Maybe Quantity)]]
+opQuTable =
+  [ [ Prefix  pOpQuNeg ]
+  , [ Postfix pOpQuPow ]
+  , [ InfixL  pOpQuMul ]
+  , [ InfixL  pOpQuDiv ]
+  , [ InfixL  pOpQuSub, InfixL pOpQuAdd ]
   ]
 
 
--- Quantity parsers
+-- Expression builder
 
--- | Parses either a marked quantity or a scalar value
---
--- Examples:
---
--- @
--- 5
--- 10m
--- 4 m
--- 9m/s
--- 3 (kg m/s^2)
--- @
-quantity :: Parser Quantity
-quantity = try marked <|> try scalar <?> "quantity" where
-  marked = do
-    v <- parseValue
-    _ <- optional space
-    u <- unit
-    guard . not . (== dimless) $ u
-    notFollowedBy alphaNum
-    return $ v %# u
-  scalar = do
-    v <- parseValue
-    return $ v %# dimless
+expression :: Parser (Maybe Quantity)
+expression = makeExprParser (Just <$> quantity) opQuTable
 
 
-exprParser :: Parser (Maybe Quantity)
-exprParser = buildExpressionParser quOpTable (Just <$> quantity)
+-- Line parser
 
--- | Parses an expression and attempts to convert it into an optional specifier
-expression :: Parser Quantity
-expression = do
-  _ <- spaces
-  mq <- exprParser
-  when (isNothing mq) $ parserFail "Dimensions are not consistent"
-  conv <- optionMaybe quOpIn
-  _ <- spaces
-  let mres = concatMaybe $ conv <*> pure mq
-  case mres <|> mq of
-    Just q -> return q
-    Nothing -> parserFail "Specifier dimension is not consistent"
+pFormat :: Parser (Quantity -> Maybe Quantity)
+pFormat = do
+  _ <- char '|'
+  _ <- space
+  u <- unit
+  return $ (%<| u)
+
+
+line :: Parser Quantity
+line = do
+  _ <- space
+  mqu <- expression
+  when (isNothing mqu) $ fail "Expression dimensions are not consistent"
+  mform <- optional pFormat
+  case mform of
+    Just form -> do
+      let res = mqu >>= form
+      when (isNothing res) $ fail "Specifier dimension is not consistent"
+      return $ fromJust res
+    Nothing -> return $ fromJust mqu

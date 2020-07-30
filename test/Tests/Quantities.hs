@@ -1,7 +1,7 @@
 module Tests.Quantities (testQuantities) where
 
-import Protolude hiding (second)
-import Data.String (String)
+import Nummy.Prelude hiding (second)
+
 import Test.Tasty  (TestTree, testGroup, localOption)
 
 import Nummy.Metrology (Quantity(..), Unit, Dimension, Prefix

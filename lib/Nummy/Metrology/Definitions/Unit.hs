@@ -1,7 +1,7 @@
 {-# OPTIONS_HADDOCK hide #-}
 module Nummy.Metrology.Definitions.Unit where
 
-import Protolude ((*), (/), (+), (-))
+import Nummy.Prelude ((*), (/), (+), (-))
 import Nummy.Metrology.Definitions.Dimension
 import Nummy.Metrology.Base
 import Nummy.Metrology.Unit as U
