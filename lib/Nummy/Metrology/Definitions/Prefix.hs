@@ -1,3 +1,4 @@
+{-# OPTIONS_HADDOCK hide #-}
 module Nummy.Metrology.Definitions.Prefix where
 
 import Protolude ((*), (/), (+), (-), Integer, (^^), ($))
@@ -6,8 +7,7 @@ import Nummy.Metrology.Base
 exp :: Integer -> Value
 exp e = 10 ^^ e
 
--- = Prefixes
--- == Above one
+-- *** Above one
 
 yotta = Prefix (exp 24, "Y")
 
@@ -29,7 +29,7 @@ hecto = Prefix (exp 2,  "h")
 
 deca  = Prefix (exp 1, "da")
 
--- == Below one
+-- *** Below one
 
 deci  = Prefix (exp (-1), "d")
 

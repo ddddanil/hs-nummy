@@ -1,3 +1,4 @@
+{-# OPTIONS_HADDOCK hide #-}
 module Nummy.Metrology.Definitions.Tables where
 
 import Protolude ((*), (/), (+), (-))

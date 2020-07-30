@@ -1,15 +1,22 @@
+{-|
+Module        : Nummy.Metrology.Definitions
+Description   : Definitions for dimensions, units and prefixes
+Maintainer    : ddddanil@vivaldi.net
+Stability     : experimental
+-}
+
 module Nummy.Metrology.Definitions (
 -- * Definitions
 --
--- *** Symbol tables
+-- ** Symbol tables
   unitTable, prefixTable, comboTable
--- *** Lookups
+-- ** Lookups
 , lookupUnit, lookupPrefix
--- *** Dimensions
+-- ** Dimensions
 , module D.D
--- *** Units
+-- ** Units
 , module D.U
--- *** Prefixes
+-- ** Prefixes
 , module D.P
 ) where
 
@@ -23,7 +30,7 @@ import Nummy.Metrology.Unit as U
 import Nummy.Metrology.Definitions.Tables as D.T
 import qualified Nummy.Metrology.Definitions.Dimension as D.D
 import qualified Nummy.Metrology.Definitions.Unit as D.U
-import qualified Nummy.Metrology.Definitions.Prefix as D.P hiding (exp)
+import qualified Nummy.Metrology.Definitions.Prefix as D.P
 
 
 expandSynonyms :: [([Label], a)] -> [(Label, a)]

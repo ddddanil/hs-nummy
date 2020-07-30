@@ -1,10 +1,10 @@
+{-# OPTIONS_HADDOCK hide #-}
 module Nummy.Metrology.Definitions.Dimension where
 
 import Nummy.Metrology.Dimension as D
 
 
--- = Dimension definitions
--- == Base dimensions
+-- *** Base dimensions
 
 dimless = D.dimless
 
@@ -21,7 +21,7 @@ temp = baseDim Temp
 info = baseDim Information
 
 
--- == Derived dimensions
+-- *** Derived dimensions
 
 area = length |^| 2
 

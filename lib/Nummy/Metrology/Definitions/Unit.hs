@@ -1,3 +1,4 @@
+{-# OPTIONS_HADDOCK hide #-}
 module Nummy.Metrology.Definitions.Unit where
 
 import Protolude ((*), (/), (+), (-))
@@ -6,14 +7,14 @@ import Nummy.Metrology.Base
 import Nummy.Metrology.Unit as U
 
 
--- = Base units
+-- *** Base units
 --
 -- [source](https://en.wikipedia.org/wiki/SI_derived_unit)
 
-
+-- | Unit of a scalar value
 dimless = U.dimless_unit
 
--- == Length units
+-- **** Length units
 
 meter = canonical_unit   length "m"
 
@@ -26,7 +27,7 @@ yard = conversion_ratio length "yd" (0.0254 * 36)              -- 1 yd = 3 ft = 
 mile = conversion_ratio length "mi" (0.0254 * 12 * 5280)       -- 1 mi = 5280 ft
 
 
--- == Mass units
+-- **** Mass units
 
 gram = conversion_ratio mass "g"   0.001
 
@@ -35,7 +36,7 @@ pound = conversion_ratio mass "lbs" 0.45359237
 ounce = conversion_ratio mass "oz"  (0.45359237 / 16)
 
 
--- == Time units
+-- **** Time units
 
 second = canonical_unit   time "s"
 
@@ -44,12 +45,12 @@ minute = conversion_ratio time "min" 60
 hour = conversion_ratio time "h"   3600
 
 
--- == Electrical current units
+-- **** Electrical current units
 
 ampere = canonical_unit   current "A"
 
 
--- == Temperature units
+-- **** Temperature units
 
 kelvin = canonical_unit     temp "K"
 
@@ -61,14 +62,14 @@ fahrenheit = complex_conversion temp "°F" (\t -> 5 * (t + 459.67) / 9 :: Value)
 rankine = conversion_ratio   temp "R"  (5/9)
 
 
--- == Information units
+-- **** Information units
 
 bit = canonical_unit info "bit"
 
 byte = conversion_ratio info "byte" 8
 
 
--- = Derived units
+-- *** Derived units
 
 -- | Force
 newton = canonical_unit force "N"
