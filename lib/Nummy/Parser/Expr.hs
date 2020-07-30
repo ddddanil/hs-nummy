@@ -90,6 +90,7 @@ expression :: Parser Quantity
 expression = do
   _ <- spaces
   q <- exprParser
+  putDim $ dimOfQu q
   conv <- optionMaybe quOpIn
   _ <- spaces
   return $ maybe q ((&) q) conv

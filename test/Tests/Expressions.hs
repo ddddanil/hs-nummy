@@ -34,6 +34,6 @@ testExpressions =
   , testGroup "Multiplication and division"
     [ checkParseExpr Succeed "2 m * 3 kg"   $ qu' (6, meter #* kilo -| gram)
     , checkParseExpr Succeed "10 m / 5 s"   $ qu' (2, meter #/ second)
-    , checkParseExpr Succeed "72m / 10s in km/h" $ qu' (2, kilo -| meter #/ hour)
+    , checkParseExpr Succeed "10m / 2s in km/h" $ qu' (18, kilo -| meter #/ hour)
     ]
   ]
