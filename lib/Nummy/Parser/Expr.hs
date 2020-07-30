@@ -10,7 +10,8 @@ import Text.Parsec.Expr as P.Expr
 
 import Nummy.Parser.Base
 import Nummy.Parser.Unit
-import Nummy.Metrology as M hiding (length)
+import Nummy.Metrology as M
+import Nummy.Metrology.Definitions (dimless_unit)
 
 
 -- Quantity operations

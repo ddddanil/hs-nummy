@@ -35,15 +35,6 @@ module Nummy.Metrology (
 , Qu.dimOfQu, (Qu.%#), (Qu.%<|)
 -- ** Operators on quantities
 , (Qu.%^), (Qu.%*), (Qu.%/), (Qu.%+), (Qu.%-)
--- * Definitions
---
--- *** Symbol tables
-, Def.unitTable, Def.prefixTable
--- *** Lookups
-, Def.lookupUnit, Def.lookupPrefix
--- *** Base dimensions
-, D.length, D.time, D.mass, D.current, D.temp, D.dimless
-, U.dimless_unit
 ) where
 
 import qualified Nummy.Metrology.Base as B

@@ -4,8 +4,9 @@ import Protolude hiding (length)
 import Data.String (String)
 import Test.Tasty  (TestTree, testGroup, localOption)
 
-import Nummy.Metrology ((|^|), (|*|), (|/|), dimless, length, time, mass, current, temp)
-import Tests.Definitions as Def
+import Nummy.Metrology ((|^|), (|*|), (|/|))
+import Tests.Definitions
+import Nummy.Metrology.Definitions as Def
 import Tests.Parser (checkDim)
 
 

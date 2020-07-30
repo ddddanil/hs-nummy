@@ -4,8 +4,9 @@ import Protolude hiding (second)
 import Data.String (String)
 import Test.Tasty  (TestTree, testGroup, localOption)
 
-import Nummy.Metrology ((-|), (#^), (#*), (#/), dimless_unit, (%#), (%<|), (%^), (%*), (%/), (%+), (%-), Quantity(..))
-import Tests.Definitions as Def
+import Nummy.Metrology ((-|), (#^), (#*), (#/), (%#), (%<|), (%^), (%*), (%/), (%+), (%-), Quantity(..))
+import Tests.Definitions
+import Nummy.Metrology.Definitions as Def
 import Tests.Parser (checkQu, checkParseQu)
 
 

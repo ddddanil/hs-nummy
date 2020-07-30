@@ -16,7 +16,8 @@ import Text.Parsec.Char as P.Char
 import Text.Parsec.Expr as P.Expr
 import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
 
-import Nummy.Metrology as M hiding (length)
+import Nummy.Metrology as M
+import Nummy.Metrology.Definitions (unitTable, prefixTable, lookupUnit, lookupPrefix)
 
 
 -- | Parsec parser operating on 'String's and having an optional 'Dimension' as user state

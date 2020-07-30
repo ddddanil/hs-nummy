@@ -9,7 +9,8 @@ import Text.Parsec.Expr as P.Expr
 import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Parser.Base
-import Nummy.Metrology as M hiding (length)
+import Nummy.Metrology as M
+import Nummy.Metrology.Definitions (dimless_unit)
 
 
 -- Unit operations

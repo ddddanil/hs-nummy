@@ -3,7 +3,6 @@ module Nummy.Metrology.Dimension (
 , baseDim, dimless
 , isBaseUnit, dimIsDimless
 , (|*|), (|/|), (|^|)
-, Nummy.Metrology.Dimension.length, mass, time, current, temp
 ) where
 
 import Protolude hiding (Prefix)
@@ -17,13 +16,14 @@ import Nummy.Metrology.Base
 -- | Base dimensions
 --
 -- [wiki](https://en.wikipedia.org/wiki/International_System_of_Units#Base_units)
-data BaseDim = Length | Mass | Time | Current | Temp deriving (Eq, Ord, Show)
+data BaseDim = Length | Mass | Time | Current | Temp | Information deriving (Eq, Ord, Show)
 instance PP.Pretty BaseDim where
-  pretty Length  = PP.text "m"
-  pretty Mass    = PP.text "kg"
-  pretty Time    = PP.text "s"
-  pretty Current = PP.text "A"
-  pretty Temp    = PP.text "K"
+  pretty Length      = PP.text "m"
+  pretty Mass        = PP.text "kg"
+  pretty Time        = PP.text "s"
+  pretty Current     = PP.text "A"
+  pretty Temp        = PP.text "K"
+  pretty Information = PP.text "bit"
 
 
 -- | A dimension represents a product of several base dimensions raised to some power
@@ -103,20 +103,3 @@ infixl 7 |/|
 (|/|) :: Dimension -> Dimension -> Dimension
 d1 |/| (Dimension d2) = sanitizeDimension . combineDimensions (+) d1 $ Dimension $ map (second negate) d2
 
-
--- Base dim definitions
-
--- | Length dimension
-length = baseDim Length
-
--- | Mass dimension
-mass = baseDim Mass
-
--- | Time dimension
-time = baseDim Time
-
--- | Electrical current dimension
-current = baseDim Current
-
--- | Temperature dimension
-temp = baseDim Temp
