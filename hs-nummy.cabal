@@ -48,7 +48,12 @@ executable nummy
 
 test-suite tests
   main-is:            Main.hs
-  other-modules:      Tests.Parser
+  other-modules:
+        Tests.Parser
+      , Tests.Definitions
+      , Tests.Dimensions
+      , Tests.Units
+      , Tests.Quantities
   hs-source-dirs:     test
   default-language:   Haskell2010
   type:               exitcode-stdio-1.0

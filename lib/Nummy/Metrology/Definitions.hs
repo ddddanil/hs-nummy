@@ -18,10 +18,10 @@ base_unit_table :: [ ([Label], Unit) ]  -- (Synonyms, Unit)
 base_unit_table =
   -- Length
   [ (["m", "meter", "metre"], canonical_unit   length "m"                            )
-  , (["in", "inch"],          conversion_ratio length "in" 0.00254                   )
-  , (["ft", "foot", "feet"],  conversion_ratio length "ft" (0.00254 * 12)            ) -- 1 ft = 12 in
-  , (["yd", "yard"],          conversion_ratio length "yd" (0.00254 * 36)            ) -- 1 yd = 3 ft = 36 in
-  , (["mi", "mile"],          conversion_ratio length "mi" (0.00254 * 12 * 5280)     ) -- 1 mi = 5280 ft
+  , (["in", "inch"],          conversion_ratio length "in" 0.0254                   )
+  , (["ft", "foot", "feet"],  conversion_ratio length "ft" (0.0254 * 12)            ) -- 1 ft = 12 in
+  , (["yd", "yard"],          conversion_ratio length "yd" (0.0254 * 36)            ) -- 1 yd = 3 ft = 36 in
+  , (["mi", "mile"],          conversion_ratio length "mi" (0.0254 * 12 * 5280)     ) -- 1 mi = 5280 ft
   -- Mass
   , (["g", "gram"],           conversion_ratio mass "g"   0.001                      )
   , (["lbs", "pound"],        conversion_ratio mass "lbs" 0.45359237                 )

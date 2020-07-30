@@ -83,7 +83,7 @@ instance CUnit BaseUnit where
 
 -- Prefix instance
 
-infixr 8 -|
+infixr 9 -|
 data (-|) p u = Prefix p u deriving Eq
 (-|) :: Prefix -> Unit -> Unit
 p -| (Unit u) = Unit $ Prefix p u

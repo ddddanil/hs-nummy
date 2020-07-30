@@ -1,7 +1,5 @@
 module Tests.Parser (
-  TestType(..)
-, unit', qu'
-, checkDim, checkUnit, checkQu
+  checkDim, checkUnit, checkQu
 , checkParseUnit, checkParseQu
 ) where
 
@@ -14,18 +12,8 @@ import Text.Parsec hiding (parseTest)
 import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Parser
-import Nummy.Metrology.Dimension
-import Nummy.Metrology.Quantity
-import Nummy.Metrology.Unit
-
-
--- TestType
-
-data TestType = Fail | Succeed deriving (Show, Eq, Ord)
-
-assert :: (Eq a, PP.Pretty a) => TestType -> a -> a -> Assertion
-assert Succeed a b = a == b @? "assert equal\n" ++ (show . PP.pretty $ a) ++ " == " ++ (show . PP.pretty $ b)
-assert Fail    a b = a /= b @? "assert not equal\n" ++ (show . PP.pretty $ a) ++ " /= " ++ (show . PP.pretty $ b)
+import Nummy.Metrology
+import Tests.Definitions
 
 
 -- Parser
@@ -41,15 +29,6 @@ checkParse p t s x =
       then assertFailure ("failed to parse " ++ show err)
       else True @? "Expected parse failure"
     Right y -> assert t x y
-
-
--- Constructors
-
-unit' :: (Dimension, Value) -> Unit
-unit' (d, v) = conversion_ratio d v
-
-qu' :: (Dimension, Value) -> Quantity
-qu' (d, v) = mkQu v (canonical_unit d)
 
 
 -- check functions

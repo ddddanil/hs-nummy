@@ -25,7 +25,7 @@ module Nummy.Metrology (
 , Def.baseUnitTable, Def.prefixTable, Def.modifierTable
 , Def.lookupUnit, Def.lookupPrefix, Def.lookupModifier
 , U.dimless_unit
-, D.length, D.time, D.mass, D.current, D.temp
+, D.length, D.time, D.mass, D.current, D.temp, D.dimless
 ) where
 
 import qualified Nummy.Metrology.Base as B
