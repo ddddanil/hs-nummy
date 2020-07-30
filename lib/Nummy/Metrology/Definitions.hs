@@ -1,6 +1,6 @@
 module Nummy.Metrology.Definitions (
-  baseUnitTable, prefixTable, modifierTable
-, lookupUnit, lookupPrefix, lookupModifier
+  baseUnitTable, prefixTable
+, lookupUnit, lookupPrefix
 ) where
 
 import Protolude hiding (length, Prefix)
@@ -49,21 +49,11 @@ prefix_table =
   , (["m", "milli"], (1/1000, "m"))
   ]
 
-modifier_table :: [ ([Label], Modifier)]
-modifier_table =
-  -- Always one lowercase letter
-  [ (["k"], 1000    )
-  , (["m"], 1000000 )
-  ]
-
 baseUnitTable :: [Label]
 baseUnitTable = concat . map fst $ base_unit_table
 
 prefixTable :: [Label]
 prefixTable = concat . map fst $ prefix_table
-
-modifierTable :: [Label]
-modifierTable = concat . map fst $ modifier_table
 
 
 -- Lookups
@@ -80,7 +70,3 @@ lookupUnit md unit =
 
 lookupPrefix :: Label -> Maybe Prefix
 lookupPrefix p = snd <$> find (elem p . fst) prefix_table
-
-lookupModifier :: Label -> Maybe Modifier
-lookupModifier m = snd <$> find (elem m . fst) modifier_table
-

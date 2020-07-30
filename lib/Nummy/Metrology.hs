@@ -2,7 +2,6 @@
 module Nummy.Metrology (
 -- Types
   B.Label, B.Prefix
-, B.Modifier, B.applyModifier
 -- Value
 , B.Value, B.valueF
 -- Dimension
@@ -22,8 +21,8 @@ module Nummy.Metrology (
 , Qu.dimOfQu, Qu.mkQu, Qu.quIn
 , (Qu.%^), (Qu.%*), (Qu.%/), (Qu.%+), (Qu.%-)
 -- Definitions
-, Def.baseUnitTable, Def.prefixTable, Def.modifierTable
-, Def.lookupUnit, Def.lookupPrefix, Def.lookupModifier
+, Def.baseUnitTable, Def.prefixTable
+, Def.lookupUnit, Def.lookupPrefix
 , U.dimless_unit
 , D.length, D.time, D.mass, D.current, D.temp, D.dimless
 ) where

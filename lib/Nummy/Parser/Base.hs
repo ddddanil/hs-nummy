@@ -3,8 +3,8 @@ module Nummy.Parser.Base (
 , putDim, guardDim
 , oneOfStr, parenthesis
 , parseMaybe
-, parseBaseUnit, parseModifier, parsePrefix
-, rawValue, modifiedValue
+, parseBaseUnit, parsePrefix
+, parseValue
 ) where
 
 import Protolude hiding (Prefix, Infix, try)
@@ -49,22 +49,17 @@ parenthesis = between (char '(' >> spaces >> notFollowedBy space) (spaces >> cha
 -- Parsers
 
 parseBaseUnit :: Parser Unit
-parseBaseUnit = (oneOfStr baseUnitTable <?> "known unit symbol") >>= \u -> parseMaybe (lookupUnit Nothing u) <?> "known unit symbol"
+parseBaseUnit = do
+  base <- oneOfStr baseUnitTable <?> "known unit symbol"
+  _ <- notFollowedBy alphaNum
+  parseMaybe (lookupUnit Nothing base) <?> "known unit symbol"
 
 parsePrefix :: Parser Prefix
 parsePrefix = (oneOfStr prefixTable <?> "known prefix") >>= \p -> parseMaybe (lookupPrefix p) <?> "known prefix"
 
-parseModifier :: Parser Modifier
-parseModifier = (oneOfStr modifierTable <?> "known modifier") >>= \m -> parseMaybe (lookupModifier m) <?> "known modifier"
 
-modifiedValue :: Parser Value
-modifiedValue = do
-  n <- rawValue
-  m <- parseModifier
-  return $ applyModifier m n
-
-rawValue :: Parser Value
-rawValue = do
+parseValue :: Parser Value
+parseValue = do
   n <- floating2 False :: Parser Double
   return $ valueF n
 

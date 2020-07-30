@@ -56,7 +56,6 @@ quOpTable =
   , [ Infix (try quOpMult) AssocLeft ]
   , [ Infix (try quOpDiv) AssocLeft ]
   , [ Infix (try quOpSum) AssocLeft ,  Infix (try quOpDif) AssocLeft ]
-  , [ Postfix (try quOpIn) ]
   ]
 
 -- Quantity parsers
@@ -64,17 +63,17 @@ quOpTable =
 quantity :: Parser Quantity
 quantity = try wideQu <|> try slimQu <|> try dimlessQu <?> "quantity" where
   wideQu = do
-    v <- try modifiedValue <|> rawValue
+    v <- parseValue
     _ <- space
     u <- unit
     guard . not . unitIsDimless $ u
     return $ mkQu v u
   slimQu = do
-    v <- rawValue
+    v <- parseValue
     u <- unit
     return $ mkQu v u
   dimlessQu = do
-    v <- try modifiedValue <|> rawValue
+    v <- parseValue
     return $ mkQu v dimless_unit
 
 
@@ -84,5 +83,13 @@ parseQuantity = do
   putDim $ dimOfQu q
   return q
 
+exprParser :: Parser Quantity
+exprParser = buildExpressionParser quOpTable parseQuantity
+
 expression :: Parser Quantity
-expression = buildExpressionParser quOpTable parseQuantity
+expression = do
+  _ <- spaces
+  q <- exprParser
+  conv <- optionMaybe quOpIn
+  _ <- spaces
+  return $ maybe q ((&) q) conv

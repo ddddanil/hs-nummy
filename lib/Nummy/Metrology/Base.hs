@@ -1,8 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Nummy.Metrology.Base (
-  Prefix, Modifier, Label
+  Prefix, Label
 , Value(..), valueF, (^^^)
-, applyModifier
 ) where
 
 import Protolude hiding (Prefix)
@@ -14,11 +13,6 @@ import qualified Text.PrettyPrint.Leijen as PP
 type Prefix = (Value, Label)
 type Label = String
 
-
-type Modifier = Value
-
-applyModifier :: Modifier -> Value -> Value
-applyModifier m v = v * m
 
 -- Value type
 

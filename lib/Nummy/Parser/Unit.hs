@@ -17,7 +17,7 @@ import Nummy.Metrology as M hiding (length)
 unitOpPow :: Parser (Unit -> Unit)
 unitOpPow = do
   _ <- char '^'
-  p <- try rawValue
+  p <- parseValue
   return $ \u -> u #^ p
 
 unitOpMult :: Parser (Unit -> Unit -> Unit)
