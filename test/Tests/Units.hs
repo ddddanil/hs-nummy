@@ -1,6 +1,6 @@
 module Tests.Units (testUnits) where
 
-import Protolude hiding (second)
+import Protolude hiding (second, bit)
 import Data.String (String)
 import Test.Tasty  (TestTree, testGroup, localOption)
 
@@ -24,6 +24,7 @@ testUnits =
     , checkParseUnit Succeed "g" (gram)
     , checkParseUnit Succeed "A" (ampere)
     , checkParseUnit Succeed "K" (kelvin)
+    , checkParseUnit Succeed "bit" (bit)
     ]
   , testGroup "Syntax"
     [ checkParseUnit Fail  ""                  (dimless)
@@ -45,11 +46,17 @@ testUnits =
     [ checkParseUnit Succeed  "mm" (milli -| meter)
     , checkParseUnit Succeed  "ms" (milli -| second)
     , checkParseUnit Succeed  "kg" (kilo -| gram)
+    , checkParseUnit Succeed  "daPa" (deca -| pascal)
+    , checkParseUnit Succeed  "Tbyte" (tera -| byte)
+    , checkParseUnit Succeed  "meganewton" (mega -| newton)
+    , checkParseUnit Succeed  "mum" (micro -| meter)
+    , checkParseUnit Succeed  "ng" (nano -| gram)
     ]
   , testGroup "Division"
     [ checkParseUnit Succeed  "m/s"  (meter #/ second)
     , checkParseUnit Succeed  "km/h" (kilo -| meter #/ hour)
     , checkParseUnit Succeed  "1/s"  (dimless #/ second)
+    , checkParseUnit Succeed  "1/s"  (hertz)
     , checkParseUnit Fail     "2/km" (dimless #/ second)
     -- Simplification
     , checkParseUnit Succeed  "(m s/m)" (second)
@@ -65,6 +72,7 @@ testUnits =
     -- Same dimension
     , checkParseUnit Succeed  "m*m"   (meter #* meter)
     , checkParseUnit Succeed  "km*m"  (kilo -| meter #* meter)
+    , checkParseUnit Succeed  "km*m"  (meter #* kilo -| meter)
     -- Illegal wide notation
     , checkParseUnit Fail     "m s"   (meter #* second)
     ]
@@ -73,5 +81,6 @@ testUnits =
     , checkParseUnit Succeed  "(km^2)" (kilo -| meter #^ 2)
     -- Simplification
     , checkParseUnit Succeed  "m^2/m"  (meter)
+    , checkParseUnit Succeed  "m/m"    (dimless)
     ]
   ]

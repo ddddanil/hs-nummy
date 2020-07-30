@@ -1,6 +1,6 @@
 module Tests.Expressions (testExpressions) where
 
-import Protolude hiding (second)
+import Protolude hiding (second, bit)
 import Data.String (String)
 import Test.Tasty  (TestTree, testGroup, localOption)
 
@@ -24,6 +24,10 @@ testExpressions =
     , checkParseExpr Succeed "1in in m" (0.0254 %# meter)
     , checkParseExpr Succeed "3 km^2 in m^2" (3000000 %# meter #^ 2)
     , checkParseExpr Succeed "7.2 km/h in m/s" (2 %# meter #/ second)
+    , checkParseExpr Succeed "3 kbit/min in bit/s" (50 %# bit #/ second)
+    , checkParseExpr Succeed "7 nm * 1000000 to mm"   (7 %# milli -| meter)
+    , checkParseExpr Succeed "7 nm * 1000000 into mm"   (7 %# milli -| meter)
+    , checkParseExpr Succeed "7 nm * 1000000 in mm"   (7 %# milli -| meter)
     ]
   , testGroup "Addition and subtraction"
     -- Dimless
