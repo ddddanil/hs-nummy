@@ -11,8 +11,7 @@ module Nummy.Metrology (
 , (D.|*|)
 , (D.|/|)
 -- Unit
-, U.Unit(..), U.CUnit(..)
-, U.BaseUnit
+, U.Unit, U.CUnit(..)
 , type (U.-|), (U.-|)
 , type (U.#^), (U.#^)
 , type (U.#*), (U.#*)

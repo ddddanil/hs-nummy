@@ -1,10 +1,8 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE GADTs #-}
 module Nummy.Metrology.Unit (
-  Unit(..), CUnit(..)
-, BaseUnit
+  Unit, CUnit(..)
 , type (-|), (-|)
 , type (#^), (#^)
 , type (#*), (#*)
@@ -24,7 +22,7 @@ import Nummy.Metrology.Dimension as D
 
 -- Class
 
-class (PP.Pretty a) => CUnit a where
+class (Eq a, PP.Pretty a) => CUnit a where
   toSi :: a -> Value -> Value
   fromSi :: a -> Value -> Value
   dimension :: a -> Dimension
@@ -38,6 +36,12 @@ data Unit where
 instance PP.Pretty Unit where
   pretty (Unit u) = PP.pretty u
 
+instance Eq Unit where
+  (Unit u1) == (Unit u2) =
+    toSi u1 1 == toSi u2 1 &&
+    fromSi u1 1 == fromSi u2 1 &&
+    dimension u1 == dimension u2
+
 instance CUnit Unit where
   toSi (Unit u) = toSi u
   fromSi (Unit u) = fromSi u
@@ -46,7 +50,7 @@ instance CUnit Unit where
 
 -- Dimless instance
 
-data Dimless = Dimless Value
+data Dimless = Dimless Value deriving Eq
 
 instance PP.Pretty Dimless where
   pretty (Dimless v) =
