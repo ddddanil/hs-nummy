@@ -43,6 +43,8 @@ testUnits =
     , checkParseUnit Succeed  "km/h" (kilo -| meter #/ hour)
     , checkParseUnit Succeed  "1/s"  (dimless_unit #/ second)
     , checkParseUnit Fail     "2/km" (dimless_unit #/ second)
+    -- Simplification
+    , checkParseUnit Succeed  "(m s/m)" (second)
     ]
   , testGroup "Multiplication"
     -- Commutative prefixes
@@ -55,9 +57,13 @@ testUnits =
     -- Same dimension
     , checkParseUnit Succeed  "m*m"   (meter #* meter)
     , checkParseUnit Succeed  "km*m"  (kilo -| meter #* meter)
+    -- Illegal wide notation
+    , checkParseUnit Fail     "m s"   (meter #* second)
     ]
   , testGroup "Powers"
     [ checkParseUnit Succeed  "(m^2)"  (meter #^ 2)
     , checkParseUnit Succeed  "(km^2)" (kilo -| meter #^ 2)
+    -- Simplification
+    , checkParseUnit Succeed  "m^2/m"  (meter)
     ]
   ]

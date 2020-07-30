@@ -1,7 +1,7 @@
 module Nummy.Parser (
   Parser
 , parse_nummy
-, unit, quantity
+, unit, quantity, expression
 , parse_all
 ) where
 

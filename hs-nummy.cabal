@@ -54,6 +54,7 @@ test-suite tests
       , Tests.Dimensions
       , Tests.Units
       , Tests.Quantities
+      , Tests.Expressions
   hs-source-dirs:     test
   default-language:   Haskell2010
   type:               exitcode-stdio-1.0

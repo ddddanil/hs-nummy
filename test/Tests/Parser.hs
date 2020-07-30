@@ -1,6 +1,6 @@
 module Tests.Parser (
   checkDim, checkUnit, checkQu
-, checkParseUnit, checkParseQu
+, checkParseUnit, checkParseQu, checkParseExpr
 ) where
 
 import Protolude
@@ -47,3 +47,6 @@ checkParseUnit t s u = testCase (show s) $ checkParse unit t s u
 
 checkParseQu :: TestType -> String -> Quantity -> TestTree
 checkParseQu t s q = testCase (show s) $ checkParse quantity t s q
+
+checkParseExpr :: TestType -> String -> Quantity -> TestTree
+checkParseExpr t s q = testCase (show s) $ checkParse expression t s q

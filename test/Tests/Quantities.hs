@@ -23,12 +23,13 @@ testQuantities =
     , checkParseQu Succeed "8(m)"  $ qu' (8, meter)
     , checkParseQu Succeed "7 (m)" $ qu' (7, meter)
     ]
-  , testGroup "Modifiers"
+  , testGroup "Modifiers and prefixes"
     -- Dimensionless
     [ checkParseQu Succeed "6k"     $ qu' (6000, dimless_unit)
     -- Commutativity of modifiers and prefixes
     , checkParseQu Succeed "3k m"   $ qu' (3000, meter)
     , checkParseQu Succeed "4 km"   $ qu' (4000, meter)
+    , checkParseQu Succeed "12 km"  $ qu' (12, kilo -| meter)
     , checkParseQu Succeed "11k km" $ qu' (11000000, meter)
     , checkParseQu Succeed "9k mm"  $ qu' (9, meter)
     , checkParseQu Succeed "2m mg"  $ qu' (2, kilo -| gram)
