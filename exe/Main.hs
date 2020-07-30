@@ -1,11 +1,10 @@
 module Main where
 
 import Protolude
-import Text.Parsec (parse, runParser)
 import qualified Text.PrettyPrint.Leijen as PP
 import System.Console.Haskeline
 
-import Nummy.Parser (parse_nummy, Parser)
+import Nummy.Parser (parse_nummy)
 
 
 main :: IO ()

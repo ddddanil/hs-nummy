@@ -22,11 +22,12 @@ instance PP.Pretty Quantity where
 
 instance Eq Quantity where
   Quantity (v1, u1) == Quantity (v2, u2) =
-    (toSi u1) v1 == (toSi u2) v2
+    (toSi u1) v1 == (toSi u2) v2 &&
+    dimension u1 == dimension u2
 
 
 dimOfQu :: Quantity -> Dimension
-dimOfQu (Quantity (d, u)) = dimension u
+dimOfQu (Quantity (_, u)) = dimension u
 
 quIn :: Quantity -> Unit -> Maybe Quantity
 quIn (Quantity (v, u)) u' =

@@ -13,7 +13,6 @@ import qualified Text.PrettyPrint.Leijen as PP
 import Nummy.Parser.Base
 import Nummy.Parser.Unit
 import Nummy.Parser.Expr
-import Nummy.Metrology as M hiding (length)
 
 parse_all :: Parser a -> Parser a
 parse_all p = do
