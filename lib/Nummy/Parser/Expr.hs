@@ -11,7 +11,7 @@ import Text.Parsec.Expr as P.Expr
 import Nummy.Parser.Base
 import Nummy.Parser.Unit
 import Nummy.Metrology as M
-import Nummy.Metrology.Definitions (dimless_unit)
+import Nummy.Metrology.Definitions.Unit (dimless)
 
 
 -- Quantity operations
@@ -39,7 +39,7 @@ quOpDif = do
 quOpNegate :: Parser (Quantity -> Quantity)
 quOpNegate = do
   _ <- char '-'
-  return $ \q -> ((-1) %# dimless_unit) %* q
+  return $ \q -> ((-1) %# dimless) %* q
 
 quOpIn :: Parser (Quantity -> Quantity)
 quOpIn = do
@@ -79,11 +79,11 @@ quantity = try marked <|> try scalar <?> "quantity" where
     v <- parseValue
     _ <- optional space
     u <- unit
-    guard . not . (== dimless_unit) $ u
+    guard . not . (== dimless) $ u
     return $ v %# u
   scalar = do
     v <- parseValue
-    return $ v %# dimless_unit
+    return $ v %# dimless
 
 
 parseQuantity :: Parser Quantity

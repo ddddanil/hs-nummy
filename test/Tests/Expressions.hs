@@ -4,14 +4,21 @@ import Protolude hiding (second)
 import Data.String (String)
 import Test.Tasty  (TestTree, testGroup, localOption)
 
-import Nummy.Metrology ((-|), (#^), (#*), (#/), (%#), (%<|), (%^), (%*), (%/), (%+), (%-), Quantity(..))
+import Nummy.Metrology (Quantity(..), Unit, Dimension, Prefix
+                       , (|^|), (|*|), (|/|)
+                       , (-|), (#^), (#*), (#/)
+                       , (%#), (%<|), (%^), (%*), (%/), (%+), (%-)
+                       )
+import Nummy.Metrology.Definitions
+import Nummy.Metrology.Definitions.Unit
+import Nummy.Metrology.Definitions.Prefix
 import Tests.Definitions
-import Nummy.Metrology.Definitions as Def
 import Tests.Parser (checkQu, checkParseExpr)
 
 
 testExpressions =
-  localOption average_timeout $ testGroup "Expressions"
+  -- localOption average_timeout $
+  testGroup "Expressions"
   [ testGroup "Conversions"
     [ checkParseExpr Succeed "1in in mm" (25.4 %# milli -| meter)
     , checkParseExpr Succeed "1in in m" (0.0254 %# meter)
@@ -20,8 +27,8 @@ testExpressions =
     ]
   , testGroup "Addition and subtraction"
     -- Dimless
-    [ checkParseExpr Succeed "5 + 4.4" (9.4 %# dimless_unit)
-    , checkParseExpr Succeed "2.2 - 3" (-0.8 %# dimless_unit)
+    [ checkParseExpr Succeed "5 + 4.4" (9.4 %# dimless)
+    , checkParseExpr Succeed "2.2 - 3" (-0.8 %# dimless)
     -- Same unit
     , checkParseExpr Succeed "4m + 7m" (11 %# meter)
     , checkParseExpr Succeed "7s - 9.1s" (-2.1 %# second)

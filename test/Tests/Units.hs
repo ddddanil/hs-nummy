@@ -4,13 +4,20 @@ import Protolude hiding (second)
 import Data.String (String)
 import Test.Tasty  (TestTree, testGroup, localOption)
 
-import Nummy.Metrology ((-|), (#^), (#*), (#/))
+import Nummy.Metrology (Quantity(..), Unit, Dimension, Prefix
+                       , (|^|), (|*|), (|/|)
+                       , (-|), (#^), (#*), (#/)
+                       , (%#), (%<|), (%^), (%*), (%/), (%+), (%-)
+                       )
+import Nummy.Metrology.Definitions
+import Nummy.Metrology.Definitions.Unit
+import Nummy.Metrology.Definitions.Prefix
 import Tests.Definitions
-import Nummy.Metrology.Definitions as Def
 import Tests.Parser (checkUnit, checkParseUnit)
 
 testUnits =
-  localOption average_timeout $ testGroup "Units"
+  -- localOption average_timeout $
+  testGroup "Units"
   [ testGroup "Base"
     [ checkParseUnit Succeed "m" (meter)
     , checkParseUnit Succeed "s" (second)
@@ -19,7 +26,7 @@ testUnits =
     , checkParseUnit Succeed "K" (kelvin)
     ]
   , testGroup "Syntax"
-    [ checkParseUnit Fail  ""                  (dimless_unit)
+    [ checkParseUnit Fail  ""                  (dimless)
     -- optional parenthesis
     , checkParseUnit Succeed  "(m)"            (meter)
     , checkParseUnit Succeed  "( m )"          (meter)
@@ -42,8 +49,8 @@ testUnits =
   , testGroup "Division"
     [ checkParseUnit Succeed  "m/s"  (meter #/ second)
     , checkParseUnit Succeed  "km/h" (kilo -| meter #/ hour)
-    , checkParseUnit Succeed  "1/s"  (dimless_unit #/ second)
-    , checkParseUnit Fail     "2/km" (dimless_unit #/ second)
+    , checkParseUnit Succeed  "1/s"  (dimless #/ second)
+    , checkParseUnit Fail     "2/km" (dimless #/ second)
     -- Simplification
     , checkParseUnit Succeed  "(m s/m)" (second)
     ]

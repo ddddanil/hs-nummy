@@ -4,19 +4,26 @@ import Protolude hiding (second)
 import Data.String (String)
 import Test.Tasty  (TestTree, testGroup, localOption)
 
-import Nummy.Metrology ((-|), (#^), (#*), (#/), (%#), (%<|), (%^), (%*), (%/), (%+), (%-), Quantity(..))
+import Nummy.Metrology (Quantity(..), Unit, Dimension, Prefix
+                       , (|^|), (|*|), (|/|)
+                       , (-|), (#^), (#*), (#/)
+                       , (%#), (%<|), (%^), (%*), (%/), (%+), (%-)
+                       )
+import Nummy.Metrology.Definitions
+import Nummy.Metrology.Definitions.Unit
+import Nummy.Metrology.Definitions.Prefix
 import Tests.Definitions
-import Nummy.Metrology.Definitions as Def
 import Tests.Parser (checkQu, checkParseQu)
 
 
 testQuantities =
-  localOption average_timeout $ testGroup "Quantities"
+  -- localOption average_timeout $
+  testGroup "Quantities"
   [ testGroup "Base"
     -- Dimensionless
-    [ checkParseQu Succeed "10"    (10 %# dimless_unit)
-    , checkParseQu Succeed "7.5"   (15/2 %# dimless_unit)
-    , checkParseQu Succeed "999.2" (4996/5 %# dimless_unit)
+    [ checkParseQu Succeed "10"    (10 %# dimless)
+    , checkParseQu Succeed "7.5"   (15/2 %# dimless)
+    , checkParseQu Succeed "999.2" (4996/5 %# dimless)
     -- Different allowed spacings
     , checkParseQu Succeed "5m"    (5 %# meter)
     , checkParseQu Succeed "6 m"   (6 %# meter)

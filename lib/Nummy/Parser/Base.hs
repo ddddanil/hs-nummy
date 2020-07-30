@@ -3,7 +3,7 @@ module Nummy.Parser.Base (
 , putDim, guardDim
 , oneOfStr, parenthesis
 , parseMaybe
-, parseBaseUnit, parsePrefix
+, baseUnitParsers
 , parseValue
 ) where
 
@@ -17,7 +17,7 @@ import Text.Parsec.Expr as P.Expr
 import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
 
 import Nummy.Metrology as M
-import Nummy.Metrology.Definitions (unitTable, prefixTable, lookupUnit, lookupPrefix)
+import Nummy.Metrology.Definitions (unitTable, prefixTable, comboTable, lookupUnit, lookupPrefix)
 
 
 -- | Parsec parser operating on 'String's and having an optional 'Dimension' as user state
@@ -40,7 +40,7 @@ guardDim d = do
 -- Combinators
 
 oneOfStr :: [[Char]] -> Parser [Char]
-oneOfStr ss = choice $ map (try . string) . sortBy (flip compare `on` length) $ ss
+oneOfStr ss = choice $ map (try . string)  $ ss
 
 parseMaybe :: Maybe a -> Parser a
 parseMaybe Nothing = parserFail "Could not unpack Maybe"
@@ -52,15 +52,12 @@ parenthesis = between (char '(' >> spaces >> notFollowedBy space) (spaces >> cha
 
 -- Parsers
 
-parseBaseUnit :: Parser Unit
-parseBaseUnit = do
-  base <- oneOfStr unitTable <?> "known unit symbol"
-  _ <- notFollowedBy alphaNum
-  parseMaybe (lookupUnit Nothing base) <?> "known unit symbol"
-
-parsePrefix :: Parser Prefix
-parsePrefix = (oneOfStr prefixTable <?> "known prefix") >>= \p -> parseMaybe (lookupPrefix p) <?> "known prefix"
-
+baseUnitParsers :: [Parser Unit]
+baseUnitParsers = map parserfy comboTable where
+  parserfy :: (Label, Unit) -> Parser Unit
+  parserfy (l, u) = try $ do
+    _ <- string l
+    return u
 
 parseValue :: Parser Value
 parseValue = do

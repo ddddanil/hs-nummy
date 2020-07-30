@@ -7,6 +7,9 @@ library
         Nummy.Parser
       , Nummy.Metrology
       , Nummy.Metrology.Definitions
+      , Nummy.Metrology.Definitions.Dimension
+      , Nummy.Metrology.Definitions.Unit
+      , Nummy.Metrology.Definitions.Prefix
     other-modules:
         Nummy.Parser.Base
       , Nummy.Parser.Expr
@@ -15,9 +18,6 @@ library
       , Nummy.Metrology.Dimension
       , Nummy.Metrology.Quantity
       , Nummy.Metrology.Unit
-      , Nummy.Metrology.Definitions.Dimension
-      , Nummy.Metrology.Definitions.Unit
-      , Nummy.Metrology.Definitions.Prefix
       , Nummy.Metrology.Definitions.Tables
     hs-source-dirs:     lib
     default-language:   Haskell2010

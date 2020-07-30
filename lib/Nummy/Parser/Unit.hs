@@ -10,7 +10,7 @@ import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Parser.Base
 import Nummy.Metrology as M
-import Nummy.Metrology.Definitions (dimless_unit)
+import Nummy.Metrology.Definitions.Unit (dimless)
 
 
 -- Unit operations
@@ -30,7 +30,7 @@ unitOpDiv = char '/' >> return (#/)
 unitOpInverse :: Parser (Unit -> Unit)
 unitOpInverse = do
   _ <- string "1/"
-  return $ \u -> (dimless_unit #/ u)
+  return $ \u -> (dimless #/ u)
 
 unitOpCombine :: Parser (Unit -> Unit -> Unit)
 unitOpCombine = char ' ' >> lookAhead baseUnit >> return (#*)
@@ -62,11 +62,7 @@ unitExpr :: OpTable Unit -> Parser Unit
 unitExpr table = buildExpressionParser table baseUnit
 
 baseUnit :: Parser Unit
-baseUnit = try prefixed <|> try parseBaseUnit <?> "base unit" where
-  prefixed = do
-    p <- parsePrefix
-    u <- parseBaseUnit
-    return $ p -| u
+baseUnit = choice baseUnitParsers <?> "base unit"
 
 shortUnit :: Parser Unit
 shortUnit = unitExpr shortUnitOpTable

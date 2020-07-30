@@ -3,13 +3,16 @@ module Nummy.Metrology.Definitions.Unit where
 import Protolude ((*), (/), (+), (-))
 import Nummy.Metrology.Definitions.Dimension
 import Nummy.Metrology.Base
-import Nummy.Metrology.Unit
+import Nummy.Metrology.Unit as U
 
 
 -- = Base units
 --
 -- [source](https://en.wikipedia.org/wiki/SI_derived_unit)
---
+
+
+dimless = U.dimless_unit
+
 -- == Length units
 
 meter = canonical_unit   length "m"

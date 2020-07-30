@@ -4,9 +4,14 @@ import Protolude hiding (length)
 import Data.String (String)
 import Test.Tasty  (TestTree, testGroup, localOption)
 
-import Nummy.Metrology ((|^|), (|*|), (|/|))
+import Nummy.Metrology (Quantity(..), Unit, Dimension, Prefix
+                       , (|^|), (|*|), (|/|)
+                       , (-|), (#^), (#*), (#/)
+                       , (%#), (%<|), (%^), (%*), (%/), (%+), (%-)
+                       )
+import Nummy.Metrology.Definitions
+import Nummy.Metrology.Definitions.Dimension
 import Tests.Definitions
-import Nummy.Metrology.Definitions as Def
 import Tests.Parser (checkDim)
 
 

@@ -2,39 +2,44 @@ module Nummy.Metrology.Definitions (
 -- * Definitions
 --
 -- *** Symbol tables
-  unitTable, prefixTable
+  unitTable, prefixTable, comboTable
 -- *** Lookups
 , lookupUnit, lookupPrefix
 -- *** Dimensions
-, module Nummy.Metrology.Definitions.Dimension
+, module D.D
 -- *** Units
-, module Nummy.Metrology.Definitions.Unit
-, dimless_unit
+, module D.U
 -- *** Prefixes
-, module Nummy.Metrology.Definitions.Prefix
+, module D.P
 ) where
 
-import Protolude hiding (length, Prefix)
+import Protolude hiding (Prefix)
 import Data.String (String)
-import Data.List (lookup)
+import Data.List as L(lookup)
 
-import Nummy.Metrology.Base
-import Nummy.Metrology.Dimension
-import Nummy.Metrology.Unit
-import Nummy.Metrology.Definitions.Dimension
-import Nummy.Metrology.Definitions.Unit
-import Nummy.Metrology.Definitions.Prefix hiding (exp)
-import Nummy.Metrology.Definitions.Tables
+import Nummy.Metrology.Base as B
+import Nummy.Metrology.Dimension as D
+import Nummy.Metrology.Unit as U
+import Nummy.Metrology.Definitions.Tables as D.T
+import qualified Nummy.Metrology.Definitions.Dimension as D.D
+import qualified Nummy.Metrology.Definitions.Unit as D.U
+import qualified Nummy.Metrology.Definitions.Prefix as D.P hiding (exp)
 
+
+expandSynonyms :: [([Label], a)] -> [(Label, a)]
+expandSynonyms xs = concatMap (\(ls, x) -> [ (l, x) | l <- ls] ) xs
 
 -- | All unit synonyms
-unitTable :: [Label]
-unitTable = concat . map fst $ unit_table
+unitTable :: [(Label, Unit)]
+unitTable = sortBy (flip compare `on` length . fst) . expandSynonyms $ unit_table
 
 -- | All prefix synonyms
-prefixTable :: [Label]
-prefixTable = concat . map fst $ prefix_table
+prefixTable :: [(Label, Prefix)]
+prefixTable = sortBy (flip compare `on` length . fst) . expandSynonyms $ prefix_table
 
+-- | All combinations of prefixes and units
+comboTable :: [(Label, Unit)]
+comboTable = sortBy (flip compare `on` length . fst) $ unitTable ++ (map (uncurry bimap) (bimap (++) (-|) <$> prefixTable) <*> unitTable)
 
 -- Lookups
 
