@@ -72,6 +72,6 @@ longUnit = unitExpr fullUnitOpTable
 
 -- | Tries a full unit expression inside parenthesis and defaults to a short expression
 unit :: Parser Unit
-unit = try (parenthesis longUnit) <|> try shortUnit <?> "unit"
+unit = try (parenthesis longUnit) <|> try (shortUnit <* notFollowedBy alphaNum) <?> "unit"
 
 

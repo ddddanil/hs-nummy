@@ -1,8 +1,8 @@
 module Nummy.Parser.Base (
   Parser, OpTable
-, putDim, guardDim
 , oneOfStr, parenthesis
 , parseMaybe
+, concatMaybe
 , baseUnitParsers
 , parseValue
 ) where
@@ -20,21 +20,10 @@ import Nummy.Metrology as M
 import Nummy.Metrology.Definitions (unitTable, prefixTable, comboTable, lookupUnit, lookupPrefix)
 
 
--- | Parsec parser operating on 'String's and having an optional 'Dimension' as user state
-type Parser = Parsec String (Maybe Dimension)
+-- | Parsec parser operating on 'String's
+type Parser = Parsec String ()
 
-type OpTable a = OperatorTable String (Maybe Dimension) Identity a
-
-
--- State manipulators
-
-putDim :: Dimension -> Parser ()
-putDim d = putState $ Just d
-
-guardDim :: Dimension -> Parser ()
-guardDim d = do
-  curr <- getState
-  guard (curr == Just d)
+type OpTable a = OperatorTable String () Identity a
 
 
 -- Combinators
@@ -46,6 +35,10 @@ parseMaybe :: Maybe a -> Parser a
 parseMaybe Nothing = parserFail "Could not unpack Maybe"
 parseMaybe (Just x) = return x
 
+concatMaybe :: Maybe (Maybe a) -> Maybe a
+concatMaybe (Just (Just x)) = Just x
+concatMaybe _ = Nothing
+
 parenthesis :: Parser a -> Parser a
 parenthesis = between (char '(' >> spaces >> notFollowedBy space) (spaces >> char ')')
 
@@ -55,9 +48,7 @@ parenthesis = between (char '(' >> spaces >> notFollowedBy space) (spaces >> cha
 baseUnitParsers :: [Parser Unit]
 baseUnitParsers = map parserfy comboTable where
   parserfy :: (Label, Unit) -> Parser Unit
-  parserfy (l, u) = try $ do
-    _ <- string l
-    return u
+  parserfy (l, u) = try $ string l >> return u
 
 parseValue :: Parser Value
 parseValue = do

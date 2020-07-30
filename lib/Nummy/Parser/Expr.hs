@@ -16,42 +16,36 @@ import Nummy.Metrology.Definitions.Unit (dimless)
 
 -- Quantity operations
 
-quOpMult :: Parser (Quantity -> Quantity -> Quantity)
-quOpMult = spaces >> char '*' >> spaces >> return (%*)
+quOpMult :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
+quOpMult = spaces >> char '*' >> spaces >> return (\a b -> (%*) <$> a <*> b)
 
-quOpDiv :: Parser (Quantity -> Quantity -> Quantity)
-quOpDiv = spaces >> char '/' >> spaces >> return (%/)
+quOpDiv :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
+quOpDiv = spaces >> char '/' >> spaces >> return (\a b -> (%/) <$> a <*> b)
 
-quOpSum :: Parser (Quantity -> Quantity -> Quantity)
+quOpSum :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
 quOpSum = do
   _ <- spaces >> char '+' >> spaces
-  next <- lookAhead quantity
-  guardDim (dimOfQu next) <?> "Quantities must be of same dimension"
-  return $ (fromJust.) . (%+)
+  return $ \a b -> concatMaybe ( (%+) <$> a <*> b )
 
-quOpDif :: Parser (Quantity -> Quantity -> Quantity)
+quOpDif :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
 quOpDif = do
   _ <- spaces >> char '-' >> spaces
-  next <- lookAhead quantity
-  guardDim (dimOfQu next) <?> "Quantities must be of same dimension"
-  return $ (fromJust.) . (%-)
+  return $ \a b -> concatMaybe ( (%-) <$> a <*> b )
 
-quOpNegate :: Parser (Quantity -> Quantity)
+quOpNegate :: Parser (Maybe Quantity -> Maybe Quantity)
 quOpNegate = do
   _ <- char '-'
-  return $ \q -> ((-1) %# dimless) %* q
+  return $ fmap $ \q -> ((-1) %# dimless) %* q
 
-quOpIn :: Parser (Quantity -> Quantity)
+quOpIn :: Parser (Maybe Quantity -> Maybe Quantity)
 quOpIn = do
-  _ <- spaces
-  _ <- string "in" <|> string "into" <|> string "of"
+  _ <- string "in" <|> string "into" <|> string "to"
   _ <- space >> spaces
   u <- unit
-  guardDim (dimension u) <?> "Specifier must be of same dimension"
-  return $ \q -> fromJust (q %<| u)
+  return $ \a -> a >>= (%<| u)
 
 
-quOpTable :: OpTable Quantity
+quOpTable :: OpTable (Maybe Quantity)
 quOpTable =
   [ [ Prefix (try quOpNegate) ]
   , [ Infix (try quOpMult) AssocLeft ]
@@ -80,27 +74,25 @@ quantity = try marked <|> try scalar <?> "quantity" where
     _ <- optional space
     u <- unit
     guard . not . (== dimless) $ u
+    notFollowedBy alphaNum
     return $ v %# u
   scalar = do
     v <- parseValue
     return $ v %# dimless
 
 
-parseQuantity :: Parser Quantity
-parseQuantity = do
-  q <- quantity
-  putDim $ dimOfQu q
-  return q
-
-exprParser :: Parser Quantity
-exprParser = buildExpressionParser quOpTable parseQuantity
+exprParser :: Parser (Maybe Quantity)
+exprParser = buildExpressionParser quOpTable (Just <$> quantity)
 
 -- | Parses an expression and attempts to convert it into an optional specifier
 expression :: Parser Quantity
 expression = do
   _ <- spaces
-  q <- exprParser
-  putDim $ dimOfQu q
+  mq <- exprParser
+  when (isNothing mq) $ parserFail "Dimensions are not consistent"
   conv <- optionMaybe quOpIn
   _ <- spaces
-  return $ maybe q ((&) q) conv
+  let mres = concatMaybe $ conv <*> pure mq
+  case mres <|> mq of
+    Just q -> return q
+    Nothing -> parserFail "Specifier dimension is not consistent"
