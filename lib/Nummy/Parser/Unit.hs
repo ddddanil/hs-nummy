@@ -67,7 +67,14 @@ baseUnit = try prefixed <|> try parseBaseUnit <?> "base unit" where
     u <- parseBaseUnit
     return $ p -| u
 
+shortUnit :: Parser Unit
+shortUnit = unitExpr shortUnitOpTable
+
+longUnit :: Parser Unit
+longUnit = unitExpr fullUnitOpTable
+
+-- | Tries a full unit expression inside parenthesis and defaults to a short expression
 unit :: Parser Unit
-unit = try (parenthesis $ unitExpr fullUnitOpTable) <|> try (unitExpr shortUnitOpTable) <?> "unit"
+unit = try (parenthesis longUnit) <|> try shortUnit <?> "unit"
 
 

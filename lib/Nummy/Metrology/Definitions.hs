@@ -1,5 +1,5 @@
 module Nummy.Metrology.Definitions (
-  baseUnitTable, prefixTable
+  unitTable, prefixTable
 , lookupUnit, lookupPrefix
 ) where
 
@@ -14,8 +14,8 @@ import Nummy.Metrology.Unit
 
 -- Table and its parts
 
-base_unit_table :: [ ([Label], Unit) ]  -- (Synonyms, Unit)
-base_unit_table =
+unit_table :: [ ([Label], Unit) ]  -- (Synonyms, Unit)
+unit_table =
   -- Length
   [ (["m", "meter", "metre"], canonical_unit   length "m"                            )
   , (["in", "inch"],          conversion_ratio length "in" 0.0254                   )
@@ -45,22 +45,36 @@ base_unit_table =
 
 prefix_table :: [ ([Label], Prefix) ]
 prefix_table =
-  [ (["k", "kilo"],  (1000, "k")    )
-  , (["m", "milli"], (1/1000, "m"))
+  [ (["k", "kilo"],  Prefix (1000, "k")    )
+  , (["m", "milli"], Prefix (1/1000, "m"))
   ]
 
-baseUnitTable :: [Label]
-baseUnitTable = concat . map fst $ base_unit_table
+-- | All unit synonyms
+unitTable :: [Label]
+unitTable = concat . map fst $ unit_table
 
+-- | All prefix synonyms
 prefixTable :: [Label]
 prefixTable = concat . map fst $ prefix_table
 
 
 -- Lookups
 
-lookupUnit :: Maybe Dimension -> Label -> Maybe Unit
+-- | Find a unit
+--
+-- Specifying a dimension will narrow down the search
+--
+-- >>> lookupUnit Nothing "m"
+-- Just meter
+-- >>> lookupUnit (Just time) "m"
+-- Just minute
+-- >>> lookupUnit Nothing "x"
+-- Nothing
+lookupUnit :: Maybe Dimension -- ^ Optional dimension specifier
+           -> Label           -- ^ Unit synonym
+           -> Maybe Unit      -- ^ Result
 lookupUnit md unit =
-  let has_unit = filter matches_unit base_unit_table
+  let has_unit = filter matches_unit unit_table
   in case md of
     Just dim -> snd <$> find (matches_dimension dim) has_unit
     Nothing -> snd <$> headMay has_unit
@@ -68,5 +82,11 @@ lookupUnit md unit =
     matches_unit = elem unit . fst
     matches_dimension dim = (==dim) . dimension . snd
 
+-- | Find a prefix
+--
+-- >>> lookupPrefix "k"
+-- Just kilo
+-- >>> lookupPrefix "x"
+-- Nothing
 lookupPrefix :: Label -> Maybe Prefix
 lookupPrefix p = snd <$> find (elem p . fst) prefix_table

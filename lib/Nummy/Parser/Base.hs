@@ -18,7 +18,10 @@ import Text.ParserCombinators.Parsec.Number as P.Number (floating2)
 
 import Nummy.Metrology as M hiding (length)
 
+
+-- | Parsec parser operating on 'String's and having an optional 'Dimension' as user state
 type Parser = Parsec String (Maybe Dimension)
+
 type OpTable a = OperatorTable String (Maybe Dimension) Identity a
 
 
@@ -50,7 +53,7 @@ parenthesis = between (char '(' >> spaces >> notFollowedBy space) (spaces >> cha
 
 parseBaseUnit :: Parser Unit
 parseBaseUnit = do
-  base <- oneOfStr baseUnitTable <?> "known unit symbol"
+  base <- oneOfStr unitTable <?> "known unit symbol"
   _ <- notFollowedBy alphaNum
   parseMaybe (lookupUnit Nothing base) <?> "known unit symbol"
 

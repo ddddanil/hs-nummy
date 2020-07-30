@@ -1,30 +1,49 @@
 {-# LANGUAGE ExplicitNamespaces #-}
+
+{-|
+Module        : Nummy.Metrology
+Description   : Types for dimensions, units and quantities geared for arithmetics
+Maintainer    : ddddanil@vivaldi.net
+Stability     : experimental
+-}
+
 module Nummy.Metrology (
 -- Types
-  B.Label, B.Prefix
--- Value
-, B.Value, B.valueF
--- Dimension
+  B.Label
+, B.Prefix
+-- * Value
+, B.Value, B.valueF, (B.^^^)
+-- * Dimension
 , D.Dimension
+-- ** Operators on dimensions
 , (D.|^|)
 , (D.|*|)
 , (D.|/|)
--- Unit
-, U.Unit, U.CUnit(..)
+-- * Unit
+, U.CUnit(..), U.Unit
+-- ** Operators on units
+-- *** Prefix
 , type (U.-|), (U.-|)
+-- *** Power
 , type (U.#^), (U.#^)
+-- *** Product
 , type (U.#*), (U.#*)
+-- *** Quotient
 , type (U.#/), (U.#/)
-, U.unitIsDimless
--- Quantity
+-- * Quantity
 , Qu.Quantity(..)
-, Qu.dimOfQu, Qu.mkQu, Qu.quIn
+, Qu.dimOfQu, (Qu.%#), (Qu.%<|)
+-- ** Operators on quantities
 , (Qu.%^), (Qu.%*), (Qu.%/), (Qu.%+), (Qu.%-)
--- Definitions
-, Def.baseUnitTable, Def.prefixTable
+-- * Definitions
+--
+-- *** Symbol tables
+, Def.unitTable, Def.prefixTable
+-- *** Lookups
 , Def.lookupUnit, Def.lookupPrefix
-, U.dimless_unit
+-- *** Base dimensions
 , D.length, D.time, D.mass, D.current, D.temp, D.dimless
+, U.dimless_unit
 ) where
 
 import qualified Nummy.Metrology.Base as B

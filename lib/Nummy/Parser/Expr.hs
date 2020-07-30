@@ -3,7 +3,7 @@ module Nummy.Parser.Expr (
 , expression
 ) where
 
-import Protolude hiding (Prefix, Infix, try)
+import Protolude hiding (Prefix, Infix, try, optional)
 import Data.Maybe (fromJust)
 import Text.Parsec as P hiding ( (<|>) )
 import Text.Parsec.Expr as P.Expr
@@ -38,7 +38,7 @@ quOpDif = do
 quOpNegate :: Parser (Quantity -> Quantity)
 quOpNegate = do
   _ <- char '-'
-  return $ \q -> (mkQu (-1) dimless_unit) %* q
+  return $ \q -> ((-1) %# dimless_unit) %* q
 
 quOpIn :: Parser (Quantity -> Quantity)
 quOpIn = do
@@ -47,7 +47,7 @@ quOpIn = do
   _ <- space >> spaces
   u <- unit
   guardDim (dimension u) <?> "Specifier must be of same dimension"
-  return $ \q -> fromJust (quIn q u)
+  return $ \q -> fromJust (q %<| u)
 
 
 quOpTable :: OpTable Quantity
@@ -58,23 +58,31 @@ quOpTable =
   , [ Infix (try quOpSum) AssocLeft ,  Infix (try quOpDif) AssocLeft ]
   ]
 
+
 -- Quantity parsers
 
+-- | Parses either a marked quantity or a scalar value
+--
+-- Examples:
+--
+-- @
+-- 5
+-- 10m
+-- 4 m
+-- 9m/s
+-- 3 (kg m/s^2)
+-- @
 quantity :: Parser Quantity
-quantity = try wideQu <|> try slimQu <|> try dimlessQu <?> "quantity" where
-  wideQu = do
+quantity = try marked <|> try scalar <?> "quantity" where
+  marked = do
     v <- parseValue
-    _ <- space
+    _ <- optional space
     u <- unit
-    guard . not . unitIsDimless $ u
-    return $ mkQu v u
-  slimQu = do
+    guard . not . (== dimless_unit) $ u
+    return $ v %# u
+  scalar = do
     v <- parseValue
-    u <- unit
-    return $ mkQu v u
-  dimlessQu = do
-    v <- parseValue
-    return $ mkQu v dimless_unit
+    return $ v %# dimless_unit
 
 
 parseQuantity :: Parser Quantity
@@ -86,6 +94,7 @@ parseQuantity = do
 exprParser :: Parser Quantity
 exprParser = buildExpressionParser quOpTable parseQuantity
 
+-- | Parses an expression and attempts to convert it into an optional specifier
 expression :: Parser Quantity
 expression = do
   _ <- spaces

@@ -13,8 +13,10 @@ import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Metrology.Base
 
--- Types
 
+-- | Base dimensions
+--
+-- [wiki](https://en.wikipedia.org/wiki/International_System_of_Units#Base_units)
 data BaseDim = Length | Mass | Time | Current | Temp deriving (Eq, Ord, Show)
 instance PP.Pretty BaseDim where
   pretty Length  = PP.text "m"
@@ -23,6 +25,10 @@ instance PP.Pretty BaseDim where
   pretty Current = PP.text "A"
   pretty Temp    = PP.text "K"
 
+
+-- | A dimension represents a product of several base dimensions raised to some power
+--
+-- [wiki](https://en.wikipedia.org/wiki/International_System_of_Units#Derived_units)
 newtype Dimension = Dimension { factors :: [(BaseDim, Value)] } deriving (Show)
 
 instance PP.Pretty Dimension where
@@ -46,11 +52,13 @@ instance PP.Pretty Dimension where
 instance Eq Dimension where
   d1 == d2 = f d1 == f d2 where f = factors . sanitizeDimension
 
+
 -- Working with dims
 
 baseDim :: BaseDim -> Dimension
 baseDim b = Dimension [(b, 1)]
 
+-- | Dimension of a scalar value
 dimless :: Dimension
 dimless = Dimension []
 
@@ -80,14 +88,17 @@ groupAssoc = foldl add []
 
 -- Operators
 
+-- | Raise dimension to a power
 infixl 8 |^|
 (|^|) :: Dimension -> Value -> Dimension
 (Dimension d1) |^| v = Dimension $ map (second (*v)) d1
 
+-- | Product of two dimensions
 infixl 7 |*|
 (|*|) :: Dimension -> Dimension -> Dimension
 (|*|) = (sanitizeDimension.) . combineDimensions (+)
 
+-- | Quotient of two dimensions
 infixl 7 |/|
 (|/|) :: Dimension -> Dimension -> Dimension
 d1 |/| (Dimension d2) = sanitizeDimension . combineDimensions (+) d1 $ Dimension $ map (second negate) d2
@@ -95,8 +106,17 @@ d1 |/| (Dimension d2) = sanitizeDimension . combineDimensions (+) d1 $ Dimension
 
 -- Base dim definitions
 
+-- | Length dimension
 length = baseDim Length
+
+-- | Mass dimension
 mass = baseDim Mass
+
+-- | Time dimension
 time = baseDim Time
+
+-- | Electrical current dimension
 current = baseDim Current
+
+-- | Temperature dimension
 temp = baseDim Temp
