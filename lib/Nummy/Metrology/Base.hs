@@ -49,5 +49,6 @@ valueF :: (RealFrac f) => f -> Value
 valueF f = Value $ approxRational f epsilon
   where epsilon = 0.000001
 
+-- | Generate a 'Value' from an 'Integer'
 valueI :: Integer -> Value
 valueI x = Value $ x % 1

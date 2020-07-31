@@ -1,3 +1,4 @@
+{-# OPTIONS_HADDOCK hide #-}
 module Nummy.Prelude (
   module Protolude
 , String

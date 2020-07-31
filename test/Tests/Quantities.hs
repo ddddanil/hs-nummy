@@ -29,8 +29,8 @@ testQuantities =
     , checkParseQu Succeed "6 m"   (6 %# meter)
     , checkParseQu Succeed "8(m)"  (8 %# meter)
     , checkParseQu Succeed "7 (m)" (7 %# meter)
-    , checkParseQu Succeed "6 m "  (6 %# meter)
     -- Illegal spaces
+    , checkParseQu Fail "6 m "  (6 %# meter)
     , checkParseQu Fail " 5m"     (5 %# meter)
     , checkParseQu Fail " 8(m) "  (8 %# meter)
     , checkParseQu Fail "  7 (m)" (7 %# meter)

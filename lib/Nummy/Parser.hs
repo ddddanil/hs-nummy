@@ -11,7 +11,7 @@ module Nummy.Parser (
 , unit
 , quantity
 , expression
-, line
+, physical
 ) where
 
 import Nummy.Prelude
@@ -23,5 +23,6 @@ import Nummy.Parser.Base
 import Nummy.Parser.Expr
 import Nummy.Parser.Unit
 
+-- | Parse input into an answer
 parse_nummy :: Parser Text
-parse_nummy = show . pretty <$> line <* eof
+parse_nummy = show . pretty <$> physical <* eof

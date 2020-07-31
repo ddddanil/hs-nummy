@@ -10,6 +10,7 @@ import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer (decimal, float)
 import Nummy.Metrology
 
+-- | Parser type on 'Label' using 'Identity' as a monad
 type Parser = Parsec Void Label
 
 pValue :: Parser Value

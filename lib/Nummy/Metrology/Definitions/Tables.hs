@@ -16,14 +16,20 @@ unit_table =
   , (["ft", "foot", "feet"],  foot          )
   , (["yd", "yard"],          yard          )
   , (["mi", "mile"],          mile          )
+  , (["n_mi", "naut_mile"],   naut_mile     )
   -- Mass
   , (["g", "gram"],           gram          )
-  , (["lbs", "pound"],        pound         )
+  , (["T", "tonne"],          tonne         )
+  , (["lb", "pound"],         pound         )
   , (["oz", "ounce"],         ounce         )
+  , (["t", "ton"],            ton           )
   -- Time
   , (["s", "sec", "second"],  second        )
   , (["m", "min", "minute"],  minute        )
   , (["h", "hour"],           hour          )
+  , (["day"],                 day           )
+  , (["week"],                week          )
+  , (["year"],                year          )
   -- Current
   , (["A", "amp", "ampere"],  ampere        )
   -- Temp
@@ -37,15 +43,30 @@ unit_table =
   -- Information
   , (["bit"],                 bit           )
   , (["byte"],                byte          )
+
   -- Derived
+  -- Force
   , (["N", "newton"],         newton        )
+  , (["dyn", "dyne"],         dyne          )
+  , (["lbf"],                 pound_force   )
+  -- Pressure
   , (["Pa", "pascal"],        pascal        )
+  , (["Ba", "barye"],         barye         )
+  -- Energy
   , (["J", "joule"],          joule         )
+  , (["erg"],                 erg           )
+  -- Power
   , (["W", "watt"],           watt          )
+  -- Frequency
   , (["Hz", "herz", "hertz"], hertz         )
+  -- Charge
   , (["C", "coulomb"],        coulomb       )
+  -- Voltage
   , (["V", "volt"],           volt          )
+  -- Resistance
   , (["O", "ohm"],            ohm           )
+  -- Capacitance
+  , (["F", "farad"],          farad         )
   ]
 
 -- | [Source](https://en.wikipedia.org/wiki/Metric_prefix)

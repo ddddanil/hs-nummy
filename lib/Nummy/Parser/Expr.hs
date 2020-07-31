@@ -1,7 +1,7 @@
 module Nummy.Parser.Expr (
   quantity
 , expression
-, line
+, physical
 ) where
 
 import Nummy.Prelude hiding (many, Prefix, try)
@@ -21,13 +21,22 @@ import Nummy.Metrology.Definitions.Unit (dimless)
 
 -- Term
 
+-- | Quantity parser
+--
+-- Attempts to bind an optional unit (maybe in parenthesis) to a value
+--
+-- Examples:
+-- 
+-- > 6
+-- > 4m
+-- > 8 Pa
+-- > 9.8 m/s^2
 quantity :: Parser Quantity
 quantity = do
   v <- pValue
   u <- optional . try $ do
     _ <- optional spaceChar
     parenthesis unit <|> unit
-  _ <- space
   return $ maybe (v %# dimless) ((%#) v) u
 
 
@@ -84,8 +93,11 @@ opQuTable =
 
 -- Expression builder
 
+-- | Parses a quantity expression
+--
+-- Returns 'Just' when all dimensions are consistent and 'Nothing' otherwise
 expression :: Parser (Maybe Quantity)
-expression = makeExprParser (Just <$> quantity) opQuTable
+expression = makeExprParser (Just <$> quantity <* space) opQuTable
 
 
 -- Line parser
@@ -97,9 +109,11 @@ pFormat = do
   u <- unit
   return $ (%<| u)
 
-
-line :: Parser Quantity
-line = do
+-- | Parser for an expression with physical units
+--
+-- Accepts a unit as its format. Fails if the dimensions are not consistent
+physical :: Parser Quantity
+physical = do
   _ <- space
   mqu <- expression
   when (isNothing mqu) $ fail "Expression dimensions are not consistent"

@@ -34,11 +34,11 @@ testDimensions =
     , checkDim Succeed "vol = length * length ^ 2" (volume) (length |*| length |^| 2)
     , checkDim Succeed "vol = length * length * length" (volume) (length |*| length |*| length)
     -- Acceleration
-    , checkDim Succeed "acc = speed / time" (acceleration) (speed |/| time)
+    , checkDim Succeed "acc = velocity / time" (acceleration) (velocity |/| time)
     , checkDim Succeed "acc = length / time ^ 2" (acceleration) (length |/| time |^| 2)
     -- Force
     , checkDim Succeed "force = mass * acc" (force) (mass |*| acceleration)
-    , checkDim Succeed "force = mass * speed / time" (force) (mass |*| speed |/| time)
+    , checkDim Succeed "force = mass * velocity / time" (force) (mass |*| velocity |/| time)
     , checkDim Succeed "force = mass * len / time ^ 2" (force) (mass |*| length |/| time |^| 2)
     -- Energy
     , checkDim Succeed "energy = mass * length ^ 2 / time ^ 2" (energy) (mass |*| (length |^| 2) |/| (time |^| 2))

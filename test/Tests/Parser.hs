@@ -50,4 +50,4 @@ checkParseQu :: TestType -> Label -> Quantity -> TestTree
 checkParseQu t s q = testCase (show s) $ checkParse quantity t s q
 
 checkParseExpr :: TestType -> Label -> Quantity -> TestTree
-checkParseExpr t s q = testCase (show s) $ checkParse line t s q
+checkParseExpr t s q = testCase (show s) $ checkParse physical t s q

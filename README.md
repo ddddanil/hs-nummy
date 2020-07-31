@@ -10,7 +10,7 @@ Handling of dimensions and units is inspired by the [`units` package](http://hac
 
 Nummy is designed to compute and convert different values in a human-readable format
 
-Generally any query line looks like `expression in format`
+Generally any query line looks like `expression | format`
 
 ### Physical units
 
@@ -23,7 +23,7 @@ You can compute an arithmetic expression of units and present them in another un
 > 60 km/h + 3 m/s
 70.8 km/h
 
-> 3 m^2 - 1ft^2 in mm^2
+> 3 m^2 - 1ft^2 | mm^2
 2907096.96 mm²
 ```
 

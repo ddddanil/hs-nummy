@@ -68,5 +68,18 @@ opUnitTable =
 
 -- Expression builder
 
+-- | Parser for a unit expression
+--
+-- Base terms: units with prefixes
+-- Operators: @\'^\', \' \', \'*\', \'/\', \"1/\"@
+--
+-- @\' \'@ binds tighter than @\'*\'@
+--
+-- Examples:
+-- 
+-- > m
+-- > kg
+-- > km/h
+-- > N ms
 unit :: Parser Unit
 unit = makeExprParser pBaseUnit opUnitTable
