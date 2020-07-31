@@ -44,5 +44,6 @@ testExpressions c =
     [ checkParseExpr Succeed "2 m * 3 kg"   (6 %# meter #* kilo -| gram) c
     , checkParseExpr Succeed "10 m / 5 s"   (2 %# meter #/ second) c
     , checkParseExpr Succeed "10m / 2s | km/h" (18 %# kilo -| meter #/ hour) c
+    , checkParseExpr Succeed "4m ^ 2 / 2m"  (8 %# meter) c
     ]
   ]

@@ -26,7 +26,7 @@ import Nummy.Metrology.Definitions.Unit (dimless)
 -- Attempts to bind an optional unit (maybe in parenthesis) to a value
 --
 -- Examples:
--- 
+--
 -- > 6
 -- > 4m
 -- > 8 Pa
@@ -47,6 +47,7 @@ pOpQuPow = do
   _ <- char '^'
   _ <- space
   p <- pValue
+  _ <- space
   return $ fmap (%^ p)
 
 pOpQuNeg :: Parser (Maybe Quantity -> Maybe Quantity)
