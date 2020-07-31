@@ -3,7 +3,7 @@
 {-# LANGUAGE GADTs #-}
 module Nummy.Metrology.Unit (
   Unit
-, toSi, fromSi, dimension
+, convert, dimension
 , (-|), (#^), (#*), (#/)
 , complex_conversion, conversion_ratio, canonical_unit, dimless_unit
 ) where
@@ -16,6 +16,7 @@ import Data.Text.Prettyprint.Doc
 import Nummy.Metrology.Base as B
 import Nummy.Metrology.Dimension as D
 
+-- | Datatype representing a unit
 data Unit where
   DimlessUnit :: Value -> Unit
   BaseUnit :: (Value -> Value, Value -> Value, Dimension, Label) -> Unit
@@ -24,7 +25,11 @@ data Unit where
   MultUnit :: Unit -> Unit -> Unit
   DivUnit :: Unit -> Unit -> Unit
 
-toSi :: Unit -> Value -> Value
+-- | Get a function to convert a value from one unit into another
+convert :: Unit -> Unit -> (Value -> Value)
+convert u1 u2 = fromSi u2 . toSi u1
+
+toSi :: Unit -> (Value -> Value)
 toSi (DimlessUnit x) = \v -> v * x
 toSi (BaseUnit (f, _, _, _)) = f
 toSi (PrefixUnit (Prefix (p, _)) x) = \v -> p * toSi x v
@@ -32,7 +37,7 @@ toSi (PowerUnit u p) = \v -> v * (toSi u 1 ^^^ p)
 toSi (MultUnit u1 u2) = toSi u1 . toSi u2
 toSi (DivUnit u1 u2) = \v -> v * (toSi u1 1 / toSi u2 1)
 
-fromSi :: Unit -> Value -> Value
+fromSi :: Unit -> (Value -> Value)
 fromSi (DimlessUnit x) = \v -> v / x
 fromSi (BaseUnit (_, g, _, _)) = g
 fromSi (PrefixUnit (Prefix (p, _)) x) = \v -> fromSi x v / p
@@ -40,6 +45,7 @@ fromSi (PowerUnit u p) = \v -> v * (fromSi u 1 ^^^ p)
 fromSi (MultUnit u1 u2) = fromSi u1 . fromSi u2
 fromSi (DivUnit u1 u2) = \v -> v * (fromSi u1 1 / fromSi u2 1)
 
+-- | Get the dimension of a unit
 dimension :: Unit -> Dimension
 dimension (DimlessUnit _) = dimless
 dimension (BaseUnit (_, _, d, _)) = d

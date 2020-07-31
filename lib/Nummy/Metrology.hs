@@ -21,8 +21,7 @@ module Nummy.Metrology (
 , (D.|/|)
 -- * Unit
 , U.Unit
-, U.toSi
-, U.fromSi
+, U.convert
 , U.dimension
 -- ** Operators on units
 -- *** Prefix

@@ -24,7 +24,7 @@ instance Pretty Quantity where
 
 instance Eq Quantity where
   Quantity (v1, u1) == Quantity (v2, u2) =
-    (toSi u1) v1 == (toSi u2) v2 &&
+    v1 == convert u2 u1 v2 &&
     dimension u1 == dimension u2
 
 
@@ -39,7 +39,7 @@ dimOfQu (Quantity (_, u)) = dimension u
 quIn :: Quantity -> Unit -> Maybe Quantity
 quIn (Quantity (v, u)) u' =
   if dimension u /= dimension u' then Nothing
-  else Just . Quantity $ (fromSi u' . toSi u $ v, u')
+  else Just . Quantity $ (convert u u' $ v, u')
 
 -- | Convert a quantity into a new unit
 --
@@ -115,7 +115,7 @@ infix 4 %+
 (%+) :: Quantity -> Quantity -> Maybe Quantity
 Quantity (v1, u1) %+ Quantity (v2, u2) =
   if dimension u1 /= dimension u2 then Nothing
-  else Just . Quantity $ (fromSi u1 $ toSi u1 v1 + toSi u2 v2, u1)
+  else Just . Quantity $ (v1 + convert u2 u1 v2, u1)
 
 -- | Subtract quantities
 --
@@ -129,5 +129,5 @@ infix 4 %-
 (%-) :: Quantity -> Quantity -> Maybe Quantity
 Quantity (v1, u1) %- Quantity (v2, u2) =
   if dimension u1 /= dimension u2 then Nothing
-  else Just . Quantity $ (fromSi u1 $ toSi u1 v1 - toSi u2 v2, u1)
+  else Just . Quantity $ (v1 - convert u2 u1 v2, u1)
 
