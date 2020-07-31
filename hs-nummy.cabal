@@ -26,6 +26,7 @@ library
     build-depends:
         base
       , extra           == 1.7.4
+      , containers
       , protolude
       , mtl
       , transformers

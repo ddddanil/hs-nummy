@@ -1,11 +1,11 @@
 module Nummy.Metrology.Dimension (
   Dimension, BaseDim(..)
 , baseDim, dimless
-, isBaseUnit, dimIsDimless
 , (|*|), (|/|), (|^|)
 ) where
 
 import Nummy.Prelude hiding (Prefix)
+import qualified Data.Map.Strict as M
 import qualified Text.PrettyPrint.Leijen as PP
 
 import Nummy.Metrology.Base
@@ -15,6 +15,7 @@ import Nummy.Metrology.Base
 --
 -- [wiki](https://en.wikipedia.org/wiki/International_System_of_Units#Base_units)
 data BaseDim = Length | Mass | Time | Current | Temp | Information deriving (Eq, Ord, Show)
+
 instance PP.Pretty BaseDim where
   pretty Length      = PP.text "m"
   pretty Mass        = PP.text "kg"
@@ -27,25 +28,9 @@ instance PP.Pretty BaseDim where
 -- | A dimension represents a product of several base dimensions raised to some power
 --
 -- [wiki](https://en.wikipedia.org/wiki/International_System_of_Units#Derived_units)
-newtype Dimension = Dimension { factors :: [(BaseDim, Value)] } deriving (Show)
+newtype Dimension = Dimension { factors :: M.Map BaseDim Value } deriving (Show)
 
-instance PP.Pretty Dimension where
-  pretty (Dimension dim) =
-    if null dim
-    then PP.empty
-    else
-    if show num_line == ("" :: Text)
-    then PP.char '1'
-    else num_line
-    <>
-    if show den_line == ("" :: Text)
-    then PP.empty
-    else PP.char '/' <> den_line
-    where
-      (num, den) = partition ((> 0) . snd) dim
-      print_term (d, p) = PP.pretty d <> if abs p /= 1 then PP.char '^' <> PP.pretty p else PP.empty
-      num_line = PP.hsep $ map print_term num
-      den_line = PP.hsep $ map print_term den
+-- instance PP.Pretty Dimension where
 
 instance Eq Dimension where
   d1 == d2 = f d1 == f d2 where f = factors . sanitizeDimension
@@ -54,50 +39,31 @@ instance Eq Dimension where
 -- Working with dims
 
 baseDim :: BaseDim -> Dimension
-baseDim b = Dimension [(b, 1)]
+baseDim b = Dimension $ M.singleton b 1
 
 -- | Dimension of a scalar value
 dimless :: Dimension
-dimless = Dimension []
+dimless = Dimension $ M.empty
 
-dimIsDimless :: Dimension -> Bool
-dimIsDimless (Dimension d ) = d == []
-
-isBaseUnit :: Dimension -> Bool
-isBaseUnit (Dimension [(d, 1)]) = True
-isBaseUnit _ = False
-
--- Remove components with power 0 and merge same base dimensions
+-- | Remove components with exponent 0
 sanitizeDimension :: Dimension -> Dimension
-sanitizeDimension (Dimension dim) = combineDimensions (+) (Dimension []) . Dimension . filter (\d -> power d ) $ dim
-  where power = (/= 0) . snd
+sanitizeDimension (Dimension dim) = Dimension $ M.filter (/= 0) dim
 
-combineDimensions :: (Value -> Value -> Value) -> Dimension -> Dimension -> Dimension
-combineDimensions op (Dimension d1) (Dimension d2) = Dimension $ sort . map (second $ foldl1 op) . groupAssoc $ d1 ++ d2
-
-groupAssoc :: (Eq a) => [(a, b)] -> [(a, [b])]
-groupAssoc = foldl add []
-  where
-    add :: (Eq a) => [(a, [b])] -> (a, b) -> [(a, [b])]
-    add acc (k, v) =
-      case lookup k acc of
-        Just _ -> map (\(k', vs) -> if k == k' then (k, vs ++ [v]) else (k', vs) ) acc
-        Nothing -> (k,[v]):acc
 
 -- Operators
 
 -- | Raise dimension to a power
 infixl 8 |^|
 (|^|) :: Dimension -> Value -> Dimension
-(Dimension d1) |^| v = Dimension $ map (second (*v)) d1
+(Dimension d1) |^| v = Dimension $ M.map (*v) d1
 
 -- | Product of two dimensions
 infixl 7 |*|
 (|*|) :: Dimension -> Dimension -> Dimension
-(|*|) = (sanitizeDimension.) . combineDimensions (+)
+(Dimension d1) |*| (Dimension d2) = sanitizeDimension . Dimension $ M.unionWith (+) d1 d2
 
 -- | Quotient of two dimensions
 infixl 7 |/|
 (|/|) :: Dimension -> Dimension -> Dimension
-d1 |/| (Dimension d2) = sanitizeDimension . combineDimensions (+) d1 $ Dimension $ map (second negate) d2
+d1 |/| d2 = d1 |*| d2 |^| (-1)
 

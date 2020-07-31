@@ -33,7 +33,7 @@ instance PP.Pretty Value where
   pretty (Value v) =
     if denominator v == 1
       then PP.pretty $ numerator v
-      else PP.pretty ( fromRational v :: Double )
+      else PP.double ( fromRational v :: Double )
 
 -- | Raise one 'Value' to the power of another
 -- Optimises for whole numbers, falls back on doubles
