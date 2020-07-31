@@ -16,12 +16,15 @@ import Nummy.Metrology.Definitions.Unit (dimless)
 -- Term
 
 pBaseUnit :: Parser Unit
-pBaseUnit = choice (map parserify comboTable) <?> "base unit" where
-  parserify :: (Label, Unit) -> Parser Unit
-  parserify (s, u) = do
-    _ <- string s
-    notFollowedBy alphaNumChar
-    return u
+pBaseUnit = do
+  units <- lift comboTable
+  choice (map parserify units) <?> "base unit"
+  where
+    parserify :: (Label, Unit) -> Parser Unit
+    parserify (s, u) = do
+      _ <- string s
+      notFollowedBy alphaNumChar
+      return u
 
 
 -- Operators
@@ -76,7 +79,7 @@ opUnitTable =
 -- @\' \'@ binds tighter than @\'*\'@
 --
 -- Examples:
--- 
+--
 -- > m
 -- > kg
 -- > km/h

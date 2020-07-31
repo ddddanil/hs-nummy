@@ -9,9 +9,10 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer (decimal, float)
 import Nummy.Metrology
+import Nummy.Currency
 
--- | Parser type on 'Label' using 'Identity' as a monad
-type Parser = Parsec Void Label
+-- | Parser type on 'Label'. The internal monad gives us access to the currency cache and IO operations
+type Parser = ParsecT Void Label ReadUnit
 
 pValue :: Parser Value
 pValue = valueF <$> try float <|> valueI <$> decimal <?> "value"

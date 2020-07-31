@@ -14,7 +14,7 @@ import Nummy.Metrology.Base
 -- | Base dimensions
 --
 -- [wiki](https://en.wikipedia.org/wiki/International_System_of_Units#Base_units)
-data BaseDim = Length | Mass | Time | Current | Temp | Information deriving (Eq, Ord, Show)
+data BaseDim = Length | Mass | Time | Current | Temp | Information | Currency deriving (Eq, Ord, Show)
 
 instance Pretty BaseDim where
   pretty Length      = pretty ("length" :: Text)
@@ -23,6 +23,7 @@ instance Pretty BaseDim where
   pretty Current     = pretty ("current" :: Text)
   pretty Temp        = pretty ("temperature" :: Text)
   pretty Information = pretty ("information" :: Text)
+  pretty Currency    = pretty ("currency" :: Text)
 
 
 -- | A dimension represents a product of several base dimensions raised to some power

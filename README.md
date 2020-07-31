@@ -27,6 +27,19 @@ You can compute an arithmetic expression of units and present them in another un
 2907096.96 mm²
 ```
 
+### Currency
+
+You can mix currency with other units, the exchange rate is provided courtesy of
+[exchangeratesapi.io](https://exchangeratesapi.io/)
+
+```
+> 5 USD | EUR
+4.22 EUR
+
+> 40000 EUR/year | USD/hour
+5.41 USD/h
+```
+
 ## Contact
 
 - Danil Doroshin [email](mailto:ddddanil@vivaldi.net)

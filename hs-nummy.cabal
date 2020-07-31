@@ -1,11 +1,12 @@
 cabal-version: 2.2
 name:          hs-nummy
-version:       0.3
+version:       0.4
 
 library
     exposed-modules:
         Nummy.Prelude
       , Nummy.Parser
+      , Nummy.Currency
       , Nummy.Metrology
       , Nummy.Metrology.Definitions
       , Nummy.Metrology.Definitions.Dimension
@@ -16,6 +17,7 @@ library
       , Nummy.Parser.Expr
       , Nummy.Parser.Unit
       , Nummy.Metrology.Base
+      , Nummy.Metrology.Currency
       , Nummy.Metrology.Dimension
       , Nummy.Metrology.Quantity
       , Nummy.Metrology.Unit
@@ -24,16 +26,28 @@ library
     default-language:   Haskell2010
     default-extensions: NoImplicitPrelude, OverloadedStrings
     build-depends:
+    -- Base
         base
+      , protolude
+    -- Data
       , extra           == 1.7.4
       , text
+      , scientific
       , containers
-      , protolude
+      , unordered-containers
+    -- Trans
       , mtl
       , transformers
-      , prettyprinter
+    -- Requests
+      , req
+      , cache
+      , aeson
+    -- Parsing
       , megaparsec
       , parser-combinators
+    -- Util
+      , clock
+      , prettyprinter
 
 executable nummy
     main-is:            Main.hs

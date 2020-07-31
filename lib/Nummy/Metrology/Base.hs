@@ -1,12 +1,14 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Nummy.Metrology.Base (
   Prefix(..), Label
+, ReadUnit, runReadUnit
 , Value(..), valueF, valueI, (^^^)
 ) where
 
 import Nummy.Prelude hiding (Prefix)
 import Data.Ratio (approxRational)
 import Data.Text.Prettyprint.Doc
+import Nummy.Currency
 
 
 -- Types
@@ -14,6 +16,10 @@ import Data.Text.Prettyprint.Doc
 -- | Preferred string-like datatype
 type Label = Text
 
+type ReadUnit = ReaderT CurrencyCache IO
+
+runReadUnit :: ReaderT CurrencyCache IO b -> IO b
+runReadUnit m = newCurrencyCache >>= runReaderT (m)
 
 -- | Representation of a unit prefix
 newtype Prefix = Prefix (Value, Label) -- ^ (prefix multiplier, prefix name)

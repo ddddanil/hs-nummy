@@ -11,6 +11,7 @@ module Nummy.Metrology (
 -- Types
   B.Label
 , B.Prefix
+, B.ReadUnit, B.runReadUnit
 -- * Value
 , B.Value, B.valueF, B.valueI, (B.^^^)
 -- * Dimension

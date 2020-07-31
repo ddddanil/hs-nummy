@@ -14,17 +14,19 @@ import Data.Text.Prettyprint.Doc (Pretty, pretty)
 
 import Nummy.Parser
 import Nummy.Metrology
+import Nummy.Currency
 import Tests.Definitions
 
 
 -- Parser
 
-getParse :: Parser a -> Label -> Either (ParseErrorBundle Label Void) a
-getParse p s = parse (p <* eof) "<test>" s
+getParse :: Parser a -> Label -> CurrencyCache -> IO (Either (ParseErrorBundle Label Void) a)
+getParse p s c = runReaderT (runParserT (p <* eof) "<test>" s) c
 
-checkParse :: (Eq a, Pretty a) => Parser a -> TestType -> Label -> a -> Assertion
-checkParse p t s x =
-  case getParse p s of
+checkParse :: (Eq a, Pretty a) => Parser a -> TestType -> Label -> a -> CurrencyCache -> Assertion
+checkParse p t s x c = do
+  res <- getParse p s c
+  case res of
     Left err ->
       if t == Succeed
       then assertFailure (errorBundlePretty err)
@@ -43,11 +45,11 @@ checkUnit t s u1 u2 = testCase (T.unpack s) $ assert t u1 u2
 checkQu :: TestType -> Label -> Quantity -> Quantity -> TestTree
 checkQu t s q1 q2 = testCase (T.unpack s) $ assert t q1 q2
 
-checkParseUnit :: TestType -> Label -> Unit -> TestTree
-checkParseUnit t s u = testCase (show s) $ checkParse unit t s u
+checkParseUnit :: TestType -> Label -> Unit -> CurrencyCache -> TestTree
+checkParseUnit t s u c = testCase (show s) $ checkParse unit t s u c
 
-checkParseQu :: TestType -> Label -> Quantity -> TestTree
-checkParseQu t s q = testCase (show s) $ checkParse quantity t s q
+checkParseQu :: TestType -> Label -> Quantity -> CurrencyCache -> TestTree
+checkParseQu t s q c = testCase (show s) $ checkParse quantity t s q c
 
-checkParseExpr :: TestType -> Label -> Quantity -> TestTree
-checkParseExpr t s q = testCase (show s) $ checkParse physical t s q
+checkParseExpr :: TestType -> Label -> Quantity -> CurrencyCache -> TestTree
+checkParseExpr t s q c = testCase (show s) $ checkParse physical t s q c

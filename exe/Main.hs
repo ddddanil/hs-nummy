@@ -6,7 +6,9 @@ import Text.Megaparsec
 import System.Console.Haskeline
 
 import Nummy.Parser (parse_nummy)
+import Nummy.Metrology (runReadUnit)
 
+runNummy i = runReadUnit (runParserT parse_nummy "<input>" (T.pack i))
 
 main :: IO ()
 main = runInputT defaultSettings loop where
@@ -15,7 +17,8 @@ main = runInputT defaultSettings loop where
     case minput of
       Nothing -> return ()
       Just input -> do
-        case parse parse_nummy "<input>" (T.pack input) of
+        output <- liftIO $ runNummy input
+        case output of
           Left err -> outputStrLn $ errorBundlePretty err
           Right res -> outputStrLn (T.unpack res)
         loop

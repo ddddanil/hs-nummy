@@ -46,6 +46,8 @@ temp = baseDim Temp
 info :: Dimension
 info = baseDim Information
 
+currency = baseDim Currency
+
 
 -- *** Derived dimensions
 

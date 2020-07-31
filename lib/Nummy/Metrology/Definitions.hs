@@ -27,6 +27,7 @@ import Nummy.Metrology.Base as B
 import Nummy.Metrology.Dimension as D
 import Nummy.Metrology.Unit as U
 import Nummy.Metrology.Definitions.Tables as D.T
+import Nummy.Metrology.Currency
 import qualified Nummy.Metrology.Definitions.Dimension as D.D
 import qualified Nummy.Metrology.Definitions.Unit as D.U
 import qualified Nummy.Metrology.Definitions.Prefix as D.P
@@ -43,9 +44,18 @@ unitTable = sortBy (flip compare `on` T.length . fst) . expandSynonyms $ unit_ta
 prefixTable :: [(Label, Prefix)]
 prefixTable = sortBy (flip compare `on` T.length . fst) . expandSynonyms $ prefix_table
 
--- | All combinations of prefixes and units
-comboTable :: [(Label, Unit)]
-comboTable = sortBy (flip compare `on` T.length . fst) $ unitTable ++ (map (uncurry bimap) (bimap (T.append) (-|) <$> prefixTable) <*> unitTable)
+currencyTable :: ReadUnit [(Label, Unit)]
+currencyTable = accessCurrency >>= return . map transformCurrency
+
+
+-- | All combinations of prefixes, units and currencies
+comboTable :: ReadUnit [(Label, Unit)]
+comboTable = do
+  curs <- currencyTable
+  let table = unitTable
+            ++ (map (uncurry bimap) (bimap (T.append) (-|) <$> prefixTable) <*> unitTable)
+            ++ curs
+  return $ sortBy (flip compare `on` T.length . fst) table
 
 -- Lookups
 

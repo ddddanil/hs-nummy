@@ -5,13 +5,6 @@
 
 packages:
 - completed:
-    hackage: wl-pprint-1.2.1@sha256:aea676cff4a062d7d912149d270e33f5bb0c01b68a9db46ff13b438141ff4b7c,734
-    pantry-tree:
-      size: 221
-      sha256: 750b375c6fc33400551f9e32e26e41844c372270a9bc3571e912fa36df7c6d4f
-  original:
-    hackage: wl-pprint-1.2.1@sha256:aea676cff4a062d7d912149d270e33f5bb0c01b68a9db46ff13b438141ff4b7c,734
-- completed:
     hackage: extra-1.7.4@sha256:bd0855c26e58a75a9d64c79026521eb9ebd68bc94fca3fc70e1a4d12f097e1a7,2667
     pantry-tree:
       size: 1829

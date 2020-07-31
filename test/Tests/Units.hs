@@ -15,62 +15,62 @@ import Nummy.Metrology.Definitions.Prefix
 import Tests.Definitions
 import Tests.Parser (checkUnit, checkParseUnit)
 
-testUnits =
+testUnits c =
   -- localOption average_timeout $
   testGroup "Units"
   [ testGroup "Base"
-    [ checkParseUnit Succeed "m" (meter)
-    , checkParseUnit Succeed "s" (second)
-    , checkParseUnit Succeed "g" (gram)
-    , checkParseUnit Succeed "A" (ampere)
-    , checkParseUnit Succeed "K" (kelvin)
-    , checkParseUnit Succeed "bit" (bit)
+    [ checkParseUnit Succeed "m" (meter) c
+    , checkParseUnit Succeed "s" (second) c
+    , checkParseUnit Succeed "g" (gram) c
+    , checkParseUnit Succeed "A" (ampere) c
+    , checkParseUnit Succeed "K" (kelvin) c
+    , checkParseUnit Succeed "bit" (bit) c
     ]
   , testGroup "Syntax"
-    [ checkParseUnit Fail  ""                  (dimless)
+    [ checkParseUnit Fail  ""                  (dimless) c
     -- illegal spaces
-    , checkParseUnit Fail  " m"             (meter)
-    , checkParseUnit Fail  "m "             (meter)
-    , checkParseUnit Fail  " m "            (meter)
-    , checkParseUnit Fail  "   m   "        (meter)
+    , checkParseUnit Fail  " m"             (meter) c
+    , checkParseUnit Fail  "m "             (meter) c
+    , checkParseUnit Fail  " m "            (meter) c
+    , checkParseUnit Fail  "   m   "        (meter) c
     ]
   , testGroup "Prefixes"
-    [ checkParseUnit Succeed  "mm" (milli -| meter)
-    , checkParseUnit Succeed  "ms" (milli -| second)
-    , checkParseUnit Succeed  "kg" (kilo -| gram)
-    , checkParseUnit Succeed  "daPa" (deca -| pascal)
-    , checkParseUnit Succeed  "Tbyte" (tera -| byte)
-    , checkParseUnit Succeed  "meganewton" (mega -| newton)
-    , checkParseUnit Succeed  "mum" (micro -| meter)
-    , checkParseUnit Succeed  "ng" (nano -| gram)
+    [ checkParseUnit Succeed  "mm" (milli -| meter) c
+    , checkParseUnit Succeed  "ms" (milli -| second) c
+    , checkParseUnit Succeed  "kg" (kilo -| gram) c
+    , checkParseUnit Succeed  "daPa" (deca -| pascal) c
+    , checkParseUnit Succeed  "Tbyte" (tera -| byte) c
+    , checkParseUnit Succeed  "meganewton" (mega -| newton) c
+    , checkParseUnit Succeed  "mum" (micro -| meter) c
+    , checkParseUnit Succeed  "ng" (nano -| gram) c
     ]
   , testGroup "Division"
-    [ checkParseUnit Succeed  "m/s"  (meter #/ second)
-    , checkParseUnit Succeed  "km/h" (kilo -| meter #/ hour)
-    , checkParseUnit Succeed  "1/s"  (dimless #/ second)
-    , checkParseUnit Succeed  "1/s"  (hertz)
-    , checkParseUnit Fail     "2/km" (dimless #/ second)
+    [ checkParseUnit Succeed  "m/s"  (meter #/ second) c
+    , checkParseUnit Succeed  "km/h" (kilo -| meter #/ hour) c
+    , checkParseUnit Succeed  "1/s"  (dimless #/ second) c
+    , checkParseUnit Succeed  "1/s"  (hertz) c
+    , checkParseUnit Fail     "2/km" (dimless #/ second) c
     -- Simplification
-    , checkParseUnit Succeed  "m s/m" (second)
+    , checkParseUnit Succeed  "m s/m" (second) c
     ]
   , testGroup "Multiplication"
     -- Commutative prefixes
-    [ checkParseUnit Succeed  "m*kg" (meter #* kilo -| gram)
-    , checkParseUnit Succeed  "km*g" (kilo -| meter #* gram)
+    [ checkParseUnit Succeed  "m*kg" (meter #* kilo -| gram) c
+    , checkParseUnit Succeed  "km*g" (kilo -| meter #* gram) c
     -- Commutative units
-    , checkParseUnit Succeed  "m s" (meter #* second)
-    , checkParseUnit Succeed  "s m" (meter #* second)
-    , checkParseUnit Succeed  "m s" (second #* meter)
+    , checkParseUnit Succeed  "m s" (meter #* second) c
+    , checkParseUnit Succeed  "s m" (meter #* second) c
+    , checkParseUnit Succeed  "m s" (second #* meter) c
     -- Same dimension
-    , checkParseUnit Succeed  "m*m"   (meter #* meter)
-    , checkParseUnit Succeed  "km*m"  (kilo -| meter #* meter)
-    , checkParseUnit Succeed  "km*m"  (meter #* kilo -| meter)
+    , checkParseUnit Succeed  "m*m"   (meter #* meter) c
+    , checkParseUnit Succeed  "km*m"  (kilo -| meter #* meter) c
+    , checkParseUnit Succeed  "km*m"  (meter #* kilo -| meter) c
     ]
   , testGroup "Powers"
-    [ checkParseUnit Succeed  "m^2"  (meter #^ 2)
-    , checkParseUnit Succeed  "km^2" (kilo -| meter #^ 2)
+    [ checkParseUnit Succeed  "m^2"  (meter #^ 2) c
+    , checkParseUnit Succeed  "km^2" (kilo -| meter #^ 2) c
     -- Simplification
-    , checkParseUnit Succeed  "m^2/m"  (meter)
-    , checkParseUnit Succeed  "m/m"    (dimless)
+    , checkParseUnit Succeed  "m^2/m"  (meter) c
+    , checkParseUnit Succeed  "m/m"    (dimless) c
     ]
   ]
