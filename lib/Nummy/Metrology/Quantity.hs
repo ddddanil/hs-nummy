@@ -17,7 +17,7 @@ import Nummy.Metrology.Unit as U
 -- Type
 
 -- | Quantity represents a value with a unit
-newtype Quantity = Quantity (Value, Unit)
+newtype Quantity = Quantity (Value, Unit) deriving Show
 
 instance Pretty Quantity where
   pretty (Quantity (v, u)) = pretty v <+> pretty u

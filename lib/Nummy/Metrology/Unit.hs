@@ -11,6 +11,7 @@ module Nummy.Metrology.Unit (
 ) where
 
 import Nummy.Prelude hiding (Prefix)
+import GHC.Show as S
 import Data.Text.Prettyprint.Doc
 
 import Nummy.Metrology.Base as B
@@ -20,7 +21,7 @@ import Nummy.Metrology.Dimension as D
 -- Class
 
 -- | Unit typeclass
-class (Eq a, Pretty a) => CUnit a where
+class (Eq a, Pretty a, Show a) => CUnit a where
   -- | Convert a value in a given unit into SI
   --
   -- >>> toSi foot 1
@@ -48,6 +49,9 @@ class (Eq a, Pretty a) => CUnit a where
 data Unit where
   Unit :: CUnit a => a -> Unit
 
+instance Show Unit where
+  show (Unit u) = S.show u
+
 instance Pretty Unit where
   pretty (Unit u) = pretty u
 
@@ -65,7 +69,7 @@ instance CUnit Unit where
 
 -- Dimless instance
 
-data Dimless = Dimless Value deriving Eq
+data Dimless = Dimless Value deriving (Eq, Show)
 
 instance Pretty Dimless where
   pretty (Dimless v) =
@@ -87,6 +91,10 @@ instance Eq BaseUnit where
   BaseUnit (f1, g1, d1, l1) == BaseUnit (f2, g2, d2, l2) =
     f1 1 == f2 1 && g1 1 == g2 1 && d1 == d2 && l1 == l2
 
+instance Show BaseUnit where
+  show (BaseUnit (f, g, d, l)) = "BaseUnit(" ++ S.show (f 1) ++ "," ++ S.show (g 1)
+                                          ++ "," ++ S.show d ++ "," ++ S.show l ++ ")"
+
 instance Pretty BaseUnit where
   pretty (BaseUnit (_, _, _, l)) = pretty l
 
@@ -106,6 +114,9 @@ data (-|) p u where
 instance (Eq a) => Eq (Prefix -| a) where
   (Prefix' p1 u1) == (Prefix' p2 u2) =
     p1 == p2 && u1 == u2
+
+instance (Show a) => Show (Prefix -| a) where
+  show (Prefix' p u) = "Prefix " ++ S.show p ++ " " ++ S.show u
 
 instance (Pretty a) => Pretty (Prefix -| a) where
   pretty (Prefix' p x) = pretty p <> pretty x
@@ -133,6 +144,9 @@ instance (Eq a) => Eq (a #^ Value) where
   (Power u1 p1) == (Power u2 p2) =
     u1 == u2 && p1 == p2
 
+instance (Show a) => Show (a #^ Value) where
+  show (Power a v) = "Power " ++ S.show a ++ " " ++ S.show v
+
 instance (Pretty a) => Pretty (a #^ Value) where
   pretty (Power u p) = pretty u <> pretty_power p where
     pretty_power 1 = mempty
@@ -156,7 +170,7 @@ instance (CUnit a) => CUnit (a #^ Value) where
 
 -- | Combine two 'CUnit's by multiplying them
 infixl 7 #*
-data (#*) u1 u2 = Mult u1 u2 deriving Eq
+data (#*) u1 u2 = Mult u1 u2 deriving (Eq, Show)
 
 instance (Pretty a, Pretty b) => Pretty (a #* b) where
   pretty (Mult u1 u2) = pretty u1 <+> pretty u2
@@ -177,7 +191,7 @@ instance (CUnit a, CUnit b) => CUnit (a #* b) where
 
 -- | Combine two 'CUnit's by dividing them
 infixl 7 #/
-data (#/) u1 u2 = Div u1 u2 deriving Eq
+data (#/) u1 u2 = Div u1 u2 deriving (Eq, Show)
 
 instance (Pretty a, Pretty b) => Pretty (a #/ b) where
   pretty (Div u1 u2) = pretty u1 <> pretty '/' <> pretty u2
