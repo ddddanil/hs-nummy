@@ -10,7 +10,7 @@ import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer (decimal, float)
 import Nummy.Metrology
 
-type Parser = Parsec Void String
+type Parser = Parsec Void Label
 
 pValue :: Parser Value
 pValue = valueF <$> try float <|> valueI <$> decimal <?> "value"

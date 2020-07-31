@@ -6,21 +6,21 @@ module Nummy.Metrology.Base (
 
 import Nummy.Prelude hiding (Prefix)
 import Data.Ratio (approxRational)
-import qualified Text.PrettyPrint.Leijen as PP
+import Data.Text.Prettyprint.Doc
 
 
 -- Types
 
 -- | Preferred string-like datatype
-type Label = String
+type Label = Text
 
 
 -- | Representation of a unit prefix
 newtype Prefix = Prefix (Value, Label) -- ^ (prefix multiplier, prefix name)
   deriving (Show, Eq)
 
-instance PP.Pretty Prefix where
-  pretty (Prefix (_, l)) = PP.text l
+instance Pretty Prefix where
+  pretty (Prefix (_, l)) = pretty l
 
 
 -- | Boxed 'Rational' value with additional properties
@@ -29,11 +29,11 @@ newtype Value =
         }
   deriving (Eq, Show, Ord, Num, Fractional, Real, RealFrac, Read)
 
-instance PP.Pretty Value where
+instance Pretty Value where
   pretty (Value v) =
     if denominator v == 1
-      then PP.pretty $ numerator v
-      else PP.double ( fromRational v :: Double )
+      then pretty $ numerator v
+      else pretty ( fromRational v :: Double )
 
 -- | Raise one 'Value' to the power of another
 -- Optimises for whole numbers, falls back on doubles

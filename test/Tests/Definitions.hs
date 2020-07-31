@@ -8,7 +8,7 @@ import Data.Maybe (fromJust)
 
 import Test.Tasty (Timeout(Timeout))
 import Test.Tasty.HUnit (Assertion, (@?))
-import qualified Text.PrettyPrint.Leijen as PP
+import Data.Text.Prettyprint.Doc
 
 import Nummy.Metrology as M
 
@@ -17,9 +17,9 @@ import Nummy.Metrology as M
 
 data TestType = Fail | Succeed deriving (Show, Eq, Ord)
 
-assert :: (Eq a, PP.Pretty a) => TestType -> a -> a -> Assertion
-assert Succeed a b = a == b @? "assert equal\n" ++ (show . PP.pretty $ a) ++ " == " ++ (show . PP.pretty $ b)
-assert Fail    a b = a /= b @? "assert not equal\n" ++ (show . PP.pretty $ a) ++ " /= " ++ (show . PP.pretty $ b)
+assert :: (Eq a, Pretty a) => TestType -> a -> a -> Assertion
+assert Succeed a b = a == b @? "assert equal\n" ++ (show . pretty $ a) ++ " == " ++ (show . pretty $ b)
+assert Fail    a b = a /= b @? "assert not equal\n" ++ (show . pretty $ a) ++ " /= " ++ (show . pretty $ b)
 
 
 -- Timeouts

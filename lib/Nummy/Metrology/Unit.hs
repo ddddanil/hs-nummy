@@ -11,7 +11,7 @@ module Nummy.Metrology.Unit (
 ) where
 
 import Nummy.Prelude hiding (Prefix)
-import qualified Text.PrettyPrint.Leijen as PP
+import Data.Text.Prettyprint.Doc
 
 import Nummy.Metrology.Base as B
 import Nummy.Metrology.Dimension as D
@@ -20,7 +20,7 @@ import Nummy.Metrology.Dimension as D
 -- Class
 
 -- | Unit typeclass
-class (Eq a, PP.Pretty a) => CUnit a where
+class (Eq a, Pretty a) => CUnit a where
   -- | Convert a value in a given unit into SI
   --
   -- >>> toSi foot 1
@@ -48,8 +48,8 @@ class (Eq a, PP.Pretty a) => CUnit a where
 data Unit where
   Unit :: CUnit a => a -> Unit
 
-instance PP.Pretty Unit where
-  pretty (Unit u) = PP.pretty u
+instance Pretty Unit where
+  pretty (Unit u) = pretty u
 
 instance Eq Unit where
   (Unit u1) == (Unit u2) =
@@ -67,11 +67,11 @@ instance CUnit Unit where
 
 data Dimless = Dimless Value deriving Eq
 
-instance PP.Pretty Dimless where
+instance Pretty Dimless where
   pretty (Dimless v) =
     if v == 1
-      then PP.empty
-      else PP.pretty v
+      then mempty
+      else pretty v
 
 instance CUnit Dimless where
   toSi (Dimless x) = \v -> v * x
@@ -87,8 +87,8 @@ instance Eq BaseUnit where
   BaseUnit (f1, g1, d1, l1) == BaseUnit (f2, g2, d2, l2) =
     f1 1 == f2 1 && g1 1 == g2 1 && d1 == d2 && l1 == l2
 
-instance PP.Pretty BaseUnit where
-  pretty (BaseUnit (_, _, _, l)) = PP.text l
+instance Pretty BaseUnit where
+  pretty (BaseUnit (_, _, _, l)) = pretty l
 
 instance CUnit BaseUnit where
   toSi (BaseUnit (f, _, _, _)) = f
@@ -107,8 +107,8 @@ instance (Eq a) => Eq (Prefix -| a) where
   (Prefix' p1 u1) == (Prefix' p2 u2) =
     p1 == p2 && u1 == u2
 
-instance (PP.Pretty a) => PP.Pretty (Prefix -| a) where
-  pretty (Prefix' p x) = PP.pretty p <> PP.pretty x
+instance (Pretty a) => Pretty (Prefix -| a) where
+  pretty (Prefix' p x) = pretty p <> pretty x
 
 instance (CUnit a) => CUnit (Prefix -| a) where
   toSi   (Prefix' (Prefix (p, _)) x) = \v -> p * toSi x v
@@ -133,13 +133,12 @@ instance (Eq a) => Eq (a #^ Value) where
   (Power u1 p1) == (Power u2 p2) =
     u1 == u2 && p1 == p2
 
-instance (PP.Pretty a) => PP.Pretty (a #^ Value) where
-  pretty (Power u p) = PP.pretty u <> pretty_power p where
-    pretty_power :: Value -> PP.Doc
-    pretty_power 1 = PP.empty
-    pretty_power 2 = PP.char '²'
-    pretty_power 3 = PP.char '³'
-    pretty_power x = PP.char '^' <> PP.pretty x
+instance (Pretty a) => Pretty (a #^ Value) where
+  pretty (Power u p) = pretty u <> pretty_power p where
+    pretty_power 1 = mempty
+    pretty_power 2 = pretty '²'
+    pretty_power 3 = pretty '³'
+    pretty_power x = pretty '^' <> pretty x
 
 instance (CUnit a) => CUnit (a #^ Value) where
   toSi (Power u p) = \v -> v * (toSi u 1 ^^^ p)
@@ -159,8 +158,8 @@ instance (CUnit a) => CUnit (a #^ Value) where
 infixl 7 #*
 data (#*) u1 u2 = Mult u1 u2 deriving Eq
 
-instance (PP.Pretty a, PP.Pretty b) => PP.Pretty (a #* b) where
-  pretty (Mult u1 u2) = PP.pretty u1 PP.<+> PP.pretty u2
+instance (Pretty a, Pretty b) => Pretty (a #* b) where
+  pretty (Mult u1 u2) = pretty u1 <+> pretty u2
 
 instance (CUnit a, CUnit b) => CUnit (a #* b) where
   toSi (Mult u1 u2) = toSi u1 . toSi u2
@@ -180,8 +179,8 @@ instance (CUnit a, CUnit b) => CUnit (a #* b) where
 infixl 7 #/
 data (#/) u1 u2 = Div u1 u2 deriving Eq
 
-instance (PP.Pretty a, PP.Pretty b) => PP.Pretty (a #/ b) where
-  pretty (Div u1 u2) = PP.pretty u1 <> PP.char '/' <> PP.pretty u2
+instance (Pretty a, Pretty b) => Pretty (a #/ b) where
+  pretty (Div u1 u2) = pretty u1 <> pretty '/' <> pretty u2
 
 instance (CUnit a, CUnit b) => CUnit (a #/ b) where
   toSi (Div u1 u2) = \v -> v * (toSi u1 1 / toSi u2 1)

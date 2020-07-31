@@ -17,11 +17,11 @@ module Nummy.Parser (
 import Nummy.Prelude
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Text.PrettyPrint.Leijen (pretty)
+import Data.Text.Prettyprint.Doc (pretty)
 
 import Nummy.Parser.Base
 import Nummy.Parser.Expr
 import Nummy.Parser.Unit
 
-parse_nummy :: Parser String
+parse_nummy :: Parser Text
 parse_nummy = show . pretty <$> line <* eof

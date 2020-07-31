@@ -7,7 +7,7 @@ module Nummy.Metrology.Quantity (
 ) where
 
 import Nummy.Prelude
-import qualified Text.PrettyPrint.Leijen as PP
+import Data.Text.Prettyprint.Doc
 
 import Nummy.Metrology.Base
 import Nummy.Metrology.Dimension as D
@@ -19,8 +19,8 @@ import Nummy.Metrology.Unit as U
 -- | Quantity represents a value with a unit
 newtype Quantity = Quantity (Value, Unit)
 
-instance PP.Pretty Quantity where
-  pretty (Quantity (v, u)) = PP.pretty v PP.<+> PP.pretty u
+instance Pretty Quantity where
+  pretty (Quantity (v, u)) = pretty v <+> pretty u
 
 instance Eq Quantity where
   Quantity (v1, u1) == Quantity (v2, u2) =

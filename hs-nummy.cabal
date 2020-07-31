@@ -26,11 +26,12 @@ library
     build-depends:
         base
       , extra           == 1.7.4
+      , text
       , containers
       , protolude
       , mtl
       , transformers
-      , wl-pprint
+      , prettyprinter
       , megaparsec
       , parser-combinators
 
@@ -41,8 +42,8 @@ executable nummy
     default-extensions: NoImplicitPrelude, OverloadedStrings
     build-depends:
         base
+      , text
       , ansi-terminal
-      , wl-pprint
       , megaparsec
       , haskeline
       , hs-nummy
@@ -62,9 +63,10 @@ test-suite tests
   default-extensions: NoImplicitPrelude, OverloadedStrings
   build-depends:
       base
+    , text
     , megaparsec
     , tasty
     , tasty-hunit
     , tasty-expected-failure
-    , wl-pprint
+    , prettyprinter
     , hs-nummy

@@ -21,6 +21,7 @@ module Nummy.Metrology.Definitions (
 ) where
 
 import Nummy.Prelude hiding (Prefix)
+import qualified Data.Text as T
 
 import Nummy.Metrology.Base as B
 import Nummy.Metrology.Dimension as D
@@ -36,15 +37,15 @@ expandSynonyms xs = concatMap (\(ls, x) -> [ (l, x) | l <- ls] ) xs
 
 -- | All unit synonyms
 unitTable :: [(Label, Unit)]
-unitTable = sortBy (flip compare `on` length . fst) . expandSynonyms $ unit_table
+unitTable = sortBy (flip compare `on` T.length . fst) . expandSynonyms $ unit_table
 
 -- | All prefix synonyms
 prefixTable :: [(Label, Prefix)]
-prefixTable = sortBy (flip compare `on` length . fst) . expandSynonyms $ prefix_table
+prefixTable = sortBy (flip compare `on` T.length . fst) . expandSynonyms $ prefix_table
 
 -- | All combinations of prefixes and units
 comboTable :: [(Label, Unit)]
-comboTable = sortBy (flip compare `on` length . fst) $ unitTable ++ (map (uncurry bimap) (bimap (++) (-|) <$> prefixTable) <*> unitTable)
+comboTable = sortBy (flip compare `on` T.length . fst) $ unitTable ++ (map (uncurry bimap) (bimap (T.append) (-|) <$> prefixTable) <*> unitTable)
 
 -- Lookups
 
