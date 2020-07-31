@@ -20,16 +20,19 @@ module Nummy.Metrology (
 , (D.|*|)
 , (D.|/|)
 -- * Unit
-, U.CUnit(..), U.Unit
+, U.Unit
+, U.toSi
+, U.fromSi
+, U.dimension
 -- ** Operators on units
 -- *** Prefix
-, type (U.-|), (U.-|)
+, (U.-|)
 -- *** Power
-, type (U.#^), (U.#^)
+, (U.#^)
 -- *** Product
-, type (U.#*), (U.#*)
+, (U.#*)
 -- *** Quotient
-, type (U.#/), (U.#/)
+, (U.#/)
 -- * Quantity
 , Qu.Quantity(..)
 , Qu.dimOfQu, (Qu.%#), (Qu.%<|)
