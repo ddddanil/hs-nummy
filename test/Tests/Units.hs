@@ -65,8 +65,6 @@ testUnits =
     , checkParseUnit Succeed  "m*m"   (meter #* meter)
     , checkParseUnit Succeed  "km*m"  (kilo -| meter #* meter)
     , checkParseUnit Succeed  "km*m"  (meter #* kilo -| meter)
-    -- Illegal wide notation
-    , checkParseUnit Fail     "m s"   (meter #* second)
     ]
   , testGroup "Powers"
     [ checkParseUnit Succeed  "m^2"  (meter #^ 2)
