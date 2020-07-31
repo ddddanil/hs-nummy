@@ -10,6 +10,7 @@ module Nummy.Metrology.Unit (
 
 import Nummy.Prelude hiding (Prefix)
 import GHC.Show as S
+import Data.List (intersect, (\\))
 import Data.Text.Prettyprint.Doc
 
 import Nummy.Metrology.Base as B
@@ -47,14 +48,51 @@ dimension (PowerUnit u p) = dimension u |^| p
 dimension (MultUnit u1 u2) = dimension u1 |*| dimension u2
 dimension (DivUnit u1 u2) = dimension u1 |/| dimension u2
 
+simplify :: Unit -> Unit
+-- Propagate powers into multiplication
+simplify (PowerUnit (MultUnit u1 u2) v) = simplify $ MultUnit (simplify (PowerUnit u1 v)) (simplify (PowerUnit u2 v))
+-- Propagate powers into division
+simplify (PowerUnit (DivUnit u1 u2) v) = simplify $ DivUnit (simplify (PowerUnit u1 v)) (simplify (PowerUnit u2 v))
+-- Assoc multiplication to the right
+simplify (MultUnit (MultUnit u1 u2) u3) = simplify $ MultUnit (simplify u1) (simplify (MultUnit u2 u3))
+-- Propagate multiplication into the numerator of division
+simplify (MultUnit un (DivUnit u1 u2)) = simplify $ DivUnit (simplify (MultUnit un u1)) (simplify u2)
+simplify (MultUnit (DivUnit u1 u2) un) = simplify $ DivUnit (simplify (MultUnit un u1)) (simplify u2)
+-- Remove Dimless 1 from multiplication
+simplify (MultUnit (DimlessUnit 1) u2) = simplify u2
+-- Remove Dimless 1 from division
+simplify (DivUnit u1 (DimlessUnit 1)) = simplify u1
+-- Remove double division
+simplify (DivUnit un (DivUnit u1 u2)) = simplify $ DivUnit (simplify (MultUnit un u2)) (simplify u1)
+-- Remove repeating terms
+simplify (DivUnit num den) =
+  case new_den of
+    (DimlessUnit 1) -> new_num
+    _ -> DivUnit new_num new_den
+  where
+    mult_unfold :: Unit -> [Unit]
+    mult_unfold (MultUnit u rest) = u : mult_unfold rest
+    mult_unfold a = [a]
+    mult_fold :: Unit -> [Unit] -> Unit
+    mult_fold u (n:rest) = mult_fold (u #* n) rest
+    mult_fold u [] = u
+    nums = mult_unfold num
+    dens = mult_unfold den
+    repeating = intersect nums dens
+    new_num = simplify $ mult_fold dimless_unit $ nums \\ repeating
+    new_den = simplify $ mult_fold dimless_unit $ dens \\ repeating
+-- catch-all
+simplify x = x
+
+
 instance Show Unit where
   show (DimlessUnit v) = "DimlessUnit " ++ S.show v
   show (BaseUnit (f, g, d, l)) = "BaseUnit(" ++ S.show (f 1) ++ "," ++ S.show (g 1)
                                           ++ "," ++ S.show d ++ "," ++ S.show l ++ ")"
-  show (PrefixUnit p u) = "PrefixUnit " ++ S.show p ++ " " ++ S.show u
-  show (PowerUnit a v) = "PowerUnit " ++ S.show a ++ " " ++ S.show v
-  show (MultUnit u1 u2) = "MultUnit " ++ S.show u1 ++ " " ++ S.show u2
-  show (DivUnit u1 u2) = "MultUnit " ++ S.show u1 ++ " " ++ S.show u2
+  show (PrefixUnit p u) = "PrefixUnit(" ++ S.show p ++ " " ++ S.show u ++ ")"
+  show (PowerUnit a v) = "PowerUnit(" ++ S.show a ++ " " ++ S.show v ++ ")"
+  show (MultUnit u1 u2) = "MultUnit(" ++ S.show u1 ++ " " ++ S.show u2 ++ ")"
+  show (DivUnit u1 u2) = "DivUnit(" ++ S.show u1 ++ " " ++ S.show u2 ++ ")"
 
 
 instance Pretty Unit where
@@ -114,7 +152,7 @@ p -| u = PrefixUnit p u
 -- >  meter #^ 2
 infixl 8 #^
 (#^) :: Unit -> Value -> Unit
-u #^ p = PowerUnit u p
+u #^ p = simplify $ PowerUnit u p
 
 
 -- | Multiply two 'Unit's
@@ -122,7 +160,7 @@ u #^ p = PowerUnit u p
 -- >  gram #* second
 infixl 7 #*
 (#*) :: Unit -> Unit -> Unit
-u1 #* u2 = MultUnit u1 u2
+u1 #* u2 = simplify $ MultUnit u1 u2
 
 
 -- | Divide two 'Unit's
@@ -130,7 +168,7 @@ u1 #* u2 = MultUnit u1 u2
 -- >  meter #/ second
 infixl 7 #/
 (#/) :: Unit -> Unit -> Unit
-u1 #/ u2 = DivUnit u1 u2
+u1 #/ u2 = simplify $ DivUnit u1 u2
 
 
 -- Basic constructors
