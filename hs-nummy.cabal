@@ -2,88 +2,90 @@ cabal-version: 2.2
 name:          hs-nummy
 version:       0.4
 
+common common-options
+  default-language:   Haskell2010
+  default-extensions: NoImplicitPrelude, OverloadedStrings
+  ghc-options:        -Wall
+                      -fwrite-ide-info
+                      -hiedir=.hie
+  build-depends:      base
+
 library
-    exposed-modules:
-        Nummy.Prelude
-      , Nummy.Parser
-      , Nummy.Cache
-      , Nummy.Metrology
-      , Nummy.Metrology.Definitions
-      , Nummy.Metrology.Definitions.Dimension
-      , Nummy.Metrology.Definitions.Unit
-      , Nummy.Metrology.Definitions.Prefix
-    other-modules:
-        Nummy.Parser.Base
-      , Nummy.Parser.Expr
-      , Nummy.Parser.Unit
-      , Nummy.Currency
-      , Nummy.Currency.Base
-      , Nummy.Currency.Request
-      , Nummy.Metrology.Base
-      , Nummy.Metrology.Currency
-      , Nummy.Metrology.Dimension
-      , Nummy.Metrology.Quantity
-      , Nummy.Metrology.Unit
-      , Nummy.Metrology.Definitions.Tables
-    hs-source-dirs:     lib
-    default-language:   Haskell2010
-    default-extensions: NoImplicitPrelude, OverloadedStrings
-    build-depends:
+  import:           common-options
+  exposed-modules:
+      Nummy.Prelude
+    , Nummy.Parser
+    , Nummy.Cache
+    , Nummy.Metrology
+    , Nummy.Metrology.Definitions
+    , Nummy.Metrology.Definitions.Dimension
+    , Nummy.Metrology.Definitions.Unit
+    , Nummy.Metrology.Definitions.Prefix
+  other-modules:
+      Nummy.Parser.Base
+    , Nummy.Parser.Expr
+    , Nummy.Parser.Unit
+    , Nummy.Currency
+    , Nummy.Currency.Base
+    , Nummy.Currency.Request
+    , Nummy.Metrology.Base
+    , Nummy.Metrology.Currency
+    , Nummy.Metrology.Dimension
+    , Nummy.Metrology.Quantity
+    , Nummy.Metrology.Unit
+    , Nummy.Metrology.Definitions.Tables
+  hs-source-dirs:     lib
+  build-depends:
     -- Base
-        base
-      , protolude
+      protolude
     -- Data
-      , extra           == 1.7.4
-      , text
-      , scientific
-      , containers
-      , unordered-containers
+    , extra           == 1.7.4
+    , text
+    , scientific
+    , containers
+    , unordered-containers
     -- Trans
-      , mtl
-      , transformers
+    , mtl
+    , transformers
     -- Requests
-      , req
-      , cache
-      , aeson
+    , req
+    , cache
+    , aeson
     -- Parsing
-      , megaparsec
-      , parser-combinators
+    , megaparsec
+    , parser-combinators
     -- Util
-      , clock
-      , prettyprinter
+    , clock
+    , prettyprinter
 
 executable nummy
-    main-is:            Main.hs
-    hs-source-dirs:     exe
-    default-language:   Haskell2010
-    default-extensions: NoImplicitPrelude, OverloadedStrings
-    build-depends:
-        base
-      , text
-      , ansi-terminal
-      , megaparsec
-      , haskeline
-      , hs-nummy
+  import:             common-options
+  main-is:            Main.hs
+  hs-source-dirs:     exe
+  build-depends:
+      hs-nummy
+    , text
+    , ansi-terminal
+    , megaparsec
+    , haskeline
 
 test-suite tests
+  import:             common-options
   main-is:            Main.hs
   other-modules:
-        Tests.Parser
-      , Tests.Definitions
-      , Tests.Dimensions
-      , Tests.Units
-      , Tests.Quantities
-      , Tests.Expressions
+      Tests.Parser
+    , Tests.Definitions
+    , Tests.Dimensions
+    , Tests.Units
+    , Tests.Quantities
+    , Tests.Expressions
   hs-source-dirs:     test
-  default-language:   Haskell2010
   type:               exitcode-stdio-1.0
-  default-extensions: NoImplicitPrelude, OverloadedStrings
   build-depends:
-      base
+      hs-nummy
     , text
     , megaparsec
     , tasty
     , tasty-hunit
     , tasty-expected-failure
     , prettyprinter
-    , hs-nummy
