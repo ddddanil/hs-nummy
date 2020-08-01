@@ -9,12 +9,14 @@ import Nummy.Metrology.Unit
 import Nummy.Metrology.Definitions.Unit
 import Nummy.Metrology.Definitions.Prefix
 
+
 no_prefix     :: [PrefixType]
 no_prefix     = []
 metric_prefix :: [PrefixType]
 metric_prefix = [PrefixAboveOne, PrefixBelowOne]
 info_prefix   :: [PrefixType]
 info_prefix   = [PrefixAboveOne, PrefixBinary]
+
 
 unit_table :: [ ([Label], Unit, [PrefixType]) ]  -- ^ (Synonyms, Unit)
 unit_table =
@@ -76,6 +78,7 @@ unit_table =
   -- Capacitance
   , (["F", "farad"],          farad       , metric_prefix  )
   ]
+
 
 -- | [Source](https://en.wikipedia.org/wiki/Metric_prefix)
 prefix_table :: [ ([Label], Prefix, PrefixType) ]  -- ^ (Synonyms, Prefix)

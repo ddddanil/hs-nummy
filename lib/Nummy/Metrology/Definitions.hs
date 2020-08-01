@@ -55,22 +55,17 @@ baseUnitTable = map (\(a, b, _)->(a, b)) unitTable ++ units_with_prefixes
           pt `elem` ut
         ]
 
--- | All combinations of prefixes, units and currencies
---
--- Deprecated
-{-
-comboTable :: ReadCache [(Label, Unit)]
-comboTable = do
-  curs <- currencyTable
-  return $ sortBy (flip compare `on` T.length . fst) (baseUnitTable ++ curs)
--}
-
 
 -- Lookups
 
 -- | Find a unit
 --
--- Specifying a dimension will narrow down the search
+-- In case there are several competing synonyms, one will be chosen according to
+-- the implicit preference in the unit table. Specifying a dimension will narrow
+-- down the search
+--
+-- The search prefers statically defined units, and only accesses the currency
+-- cache when it can't find the unit in other tables.
 --
 -- >>> lookupUnit Nothing "m"
 -- Just meter
@@ -78,8 +73,8 @@ comboTable = do
 -- Just minute
 -- >>> lookupUnit Nothing "x"
 -- Nothing
-lookupUnit :: Maybe Dimension         -- ^ Optional dimension specifier
-           -> Label                   -- ^ Unit synonym
+lookupUnit :: Maybe Dimension          -- ^ Optional dimension specifier
+           -> Label                    -- ^ Unit synonym
            -> ReadCache (Maybe Unit)   -- ^ Result
 lookupUnit md unit =
   case find_unit baseUnitTable of

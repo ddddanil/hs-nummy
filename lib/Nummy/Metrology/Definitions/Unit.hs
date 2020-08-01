@@ -1,3 +1,4 @@
+{-# LANGUAGE NumericUnderscores #-}
 {-# OPTIONS_HADDOCK hide #-}
 module Nummy.Metrology.Definitions.Unit where
 
@@ -68,19 +69,19 @@ tonne = conversion_ratio mass "T"  1000
 --
 -- 1 lbs = 0.453 592 37 kg
 pound :: Unit
-pound = conversion_ratio mass "lb" 0.45359237
+pound = conversion_ratio mass "lb" 0.453_592_37
 
 -- | Derived Imperial
 --
 -- 1 oz = 1/16 lbs
 ounce :: Unit
-ounce = conversion_ratio mass "oz"  (0.45359237 / 16)
+ounce = conversion_ratio mass "oz"  (0.453_592_37 / 16)
 
 -- | Derived Imperial
 --
 -- 1 t = 2240 lbs
 ton :: Unit
-ton = conversion_ratio mass "t"  (0.45359237 * 2240)
+ton = conversion_ratio mass "t"  (0.453_592_37 * 2240)
 
 
 -- **** Time units
@@ -171,11 +172,11 @@ newton = canonical_unit force "N"
 
 -- | CGS
 dyne :: Unit
-dyne = conversion_ratio force "dyn" (1/100000)
+dyne = conversion_ratio force "dyn" (1/100_000)
 
 -- | Imperial
 pound_force :: Unit
-pound_force = conversion_ratio force "lbf" 4.448222
+pound_force = conversion_ratio force "lbf" 4.448_222
 
 -- **** Pressure
 
@@ -195,7 +196,7 @@ joule = canonical_unit energy "J"
 
 -- | CGS
 erg :: Unit
-erg = conversion_ratio energy "erg" (1/10000000)
+erg = conversion_ratio energy "erg" (1/10_000_000)
 
 -- **** Power
 

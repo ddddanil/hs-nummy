@@ -1,4 +1,12 @@
 {-# LANGUAGE NumericUnderscores #-}
+
+{-|
+Module        : Nummy.Cache
+Description   : Caching functionality for expensive unit definitions
+Maintainer    : ddddanil@vivaldi.net
+Stability     : experimental
+-}
+
 module Nummy.Cache where
 
 import Nummy.Prelude
@@ -7,13 +15,17 @@ import System.Clock (fromNanoSecs)
 import Nummy.Currency.Base
 
 
+-- | Caches all recorded currencies
 type CurrencyCache = Cache Int [Currency]
 
+-- | Make a new cache with a 5 minute timeout
 newCurrencyCache :: IO CurrencyCache
 newCurrencyCache = newCache . Just . fromNanoSecs $ 5 * 60 * 1_000_000_000 -- 5 minutes
 
 
+-- | Reader monad that gives access to the cache
 type ReadCache = ReaderT CurrencyCache IO
 
-runReadCache :: ReaderT CurrencyCache IO b -> IO b
-runReadCache m = newCurrencyCache >>= runReaderT (m)
+-- | Run the Cache Reader monad
+runReadCache :: ReaderT CurrencyCache IO a -> IO a
+runReadCache m = newCurrencyCache >>= runReaderT m
