@@ -6,10 +6,10 @@ import Text.Megaparsec
 import System.Console.Haskeline
 
 import Nummy.Parser (parse_nummy)
-import Nummy.Metrology (runReadUnit)
+import Nummy.Cache (runReadCache)
 
 runNummy :: String -> IO (Either (ParseErrorBundle Text Void) Text)
-runNummy i = runReadUnit (runParserT parse_nummy "<input>" (T.pack i))
+runNummy i = runReadCache (runParserT parse_nummy "<input>" (T.pack i))
 
 main :: IO ()
 main = runInputT defaultSettings loop where

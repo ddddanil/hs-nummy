@@ -2,25 +2,18 @@
 module Nummy.Metrology.Base (
   Label
 , Prefix(..), PrefixType(..)
-, ReadUnit, runReadUnit
 , Value(..), valueF, valueI, (^^^)
 ) where
 
 import Nummy.Prelude hiding (Prefix)
 import Data.Ratio (approxRational)
 import Data.Text.Prettyprint.Doc
-import Nummy.Cache
 
 
 -- Types
 
 -- | Preferred string-like datatype
 type Label = Text
-
-type ReadUnit = ReaderT CurrencyCache IO
-
-runReadUnit :: ReaderT CurrencyCache IO b -> IO b
-runReadUnit m = newCurrencyCache >>= runReaderT (m)
 
 
 -- Prefix

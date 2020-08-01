@@ -29,6 +29,7 @@ import Nummy.Metrology.Currency
 import Nummy.Metrology.Definitions.Dimension as D.D hiding (dimless)
 import Nummy.Metrology.Definitions.Unit as D.U
 import Nummy.Metrology.Definitions.Prefix as D.P
+import Nummy.Cache
 
 
 -- | All unit synonyms
@@ -39,7 +40,7 @@ unitTable = concatMap (\(ls, u, p) -> [ (l, u, p) | l <- ls] ) $ unit_table
 prefixTable :: [(Label, Prefix, PrefixType)]
 prefixTable = concatMap (\(ls, p, t) -> [ (l, p, t) | l <- ls] ) $ prefix_table
 
-currencyTable :: ReadUnit [(Label, Unit)]
+currencyTable :: ReadCache [(Label, Unit)]
 currencyTable = accessCurrency >>= return . map transformCurrency
 
 baseUnitTable :: [(Label, Unit)]
@@ -58,7 +59,7 @@ baseUnitTable = map (\(a, b, _)->(a, b)) unitTable ++ units_with_prefixes
 --
 -- Deprecated
 {-
-comboTable :: ReadUnit [(Label, Unit)]
+comboTable :: ReadCache [(Label, Unit)]
 comboTable = do
   curs <- currencyTable
   return $ sortBy (flip compare `on` T.length . fst) (baseUnitTable ++ curs)
@@ -79,7 +80,7 @@ comboTable = do
 -- Nothing
 lookupUnit :: Maybe Dimension         -- ^ Optional dimension specifier
            -> Label                   -- ^ Unit synonym
-           -> ReadUnit (Maybe Unit)   -- ^ Result
+           -> ReadCache (Maybe Unit)   -- ^ Result
 lookupUnit md unit =
   case find_unit baseUnitTable of
     Just u -> return . return $ u
