@@ -3,13 +3,15 @@ module Nummy.Parser.Unit (
 ) where
 
 import Nummy.Prelude hiding (many, Prefix, try)
+import Data.Char (isAlphaNum)
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Control.Monad.Combinators.Expr
+import Control.Monad.Fail
 
 import Nummy.Parser.Base
 import Nummy.Metrology
-import Nummy.Metrology.Definitions (comboTable)
+import Nummy.Metrology.Definitions (lookupUnit)
 import Nummy.Metrology.Definitions.Unit (dimless)
 
 
@@ -17,14 +19,11 @@ import Nummy.Metrology.Definitions.Unit (dimless)
 
 pBaseUnit :: Parser Unit
 pBaseUnit = do
-  units <- lift comboTable
-  choice (map parserify units) <?> "base unit"
-  where
-    parserify :: (Label, Unit) -> Parser Unit
-    parserify (s, u) = do
-      _ <- string s
-      notFollowedBy alphaNumChar
-      return u
+  str <- takeWhile1P (Just "base unit") isAlphaNum
+  mu <- lift $ lookupUnit Nothing str
+  case mu of
+    Just u -> return u
+    Nothing -> fail "Not a known base unit"
 
 
 -- Operators

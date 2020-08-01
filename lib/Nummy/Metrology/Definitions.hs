@@ -8,10 +8,8 @@ Stability     : experimental
 module Nummy.Metrology.Definitions (
 -- * Definitions
 --
--- ** Symbol tables
-  baseUnitTable, comboTable
--- -- ** Lookups
--- , lookupUnit, lookupPrefix
+-- ** Lookups
+  lookupUnit
 -- ** Dimensions
 , module D.D
 -- ** Units
@@ -75,16 +73,14 @@ comboTable = do
 -- Just minute
 -- >>> lookupUnit Nothing "x"
 -- Nothing
-{-
-lookupUnit :: Maybe Dimension -- ^ Optional dimension specifier
-           -> Label           -- ^ Unit synonym
-           -> Maybe Unit      -- ^ Result
-lookupUnit md unit =
-  let has_unit = filter matches_unit unit_table
-  in case md of
-    Just dim -> snd <$> find (matches_dimension dim) has_unit
-    Nothing -> snd <$> headMay has_unit
+lookupUnit :: Maybe Dimension         -- ^ Optional dimension specifier
+           -> Label                   -- ^ Unit synonym
+           -> ReadUnit (Maybe Unit)   -- ^ Result
+lookupUnit md unit = do
+  has_unit <- filter matches_unit <$> comboTable
+  case md of
+    Just dim -> return $ snd <$> find (matches_dimension dim) has_unit
+    Nothing ->  return $ snd <$> headMay has_unit
   where
-    matches_unit = elem unit . fst
+    matches_unit = (== unit) . fst
     matches_dimension dim = (==dim) . dimension . snd
--}
