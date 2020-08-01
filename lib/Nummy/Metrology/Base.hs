@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Nummy.Metrology.Base (
-  Prefix(..), Label
+  Label
+, Prefix(..), PrefixType(..)
 , ReadUnit, runReadUnit
 , Value(..), valueF, valueI, (^^^)
 ) where
@@ -21,13 +22,21 @@ type ReadUnit = ReaderT CurrencyCache IO
 runReadUnit :: ReaderT CurrencyCache IO b -> IO b
 runReadUnit m = newCurrencyCache >>= runReaderT (m)
 
+
+-- Prefix
+
 -- | Representation of a unit prefix
 newtype Prefix = Prefix (Value, Label) -- ^ (prefix multiplier, prefix name)
   deriving (Show, Eq)
 
+data PrefixType = PrefixBelowOne | PrefixBinary | PrefixAboveOne
+  deriving (Eq, Show, Ord, Enum)
+
 instance Pretty Prefix where
   pretty (Prefix (_, l)) = pretty l
 
+
+-- Value
 
 -- | Boxed 'Rational' value with additional properties
 newtype Value =

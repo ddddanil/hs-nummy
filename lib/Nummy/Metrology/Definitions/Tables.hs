@@ -1,94 +1,103 @@
 {-# OPTIONS_HADDOCK hide #-}
-module Nummy.Metrology.Definitions.Tables where
+module Nummy.Metrology.Definitions.Tables (
+  unit_table
+, prefix_table
+) where
 
 import Nummy.Metrology.Base
 import Nummy.Metrology.Unit
 import Nummy.Metrology.Definitions.Unit
 import Nummy.Metrology.Definitions.Prefix
 
+no_prefix     :: [PrefixType]
+no_prefix     = []
+metric_prefix :: [PrefixType]
+metric_prefix = [PrefixAboveOne, PrefixBelowOne]
+info_prefix   :: [PrefixType]
+info_prefix   = [PrefixAboveOne, PrefixBinary]
 
-unit_table :: [ ([Label], Unit) ]  -- ^ (Synonyms, Unit)
+unit_table :: [ ([Label], Unit, [PrefixType]) ]  -- ^ (Synonyms, Unit)
 unit_table =
   -- Length
-  [ (["m", "meter", "metre"], meter         )
-  , (["in", "inch"],          inch          )
-  , (["ft", "foot", "feet"],  foot          )
-  , (["yd", "yard"],          yard          )
-  , (["mi", "mile"],          mile          )
-  , (["n_mi", "naut_mile"],   naut_mile     )
+  [ (["m", "meter", "metre"], meter       , metric_prefix  )
+  , (["in", "inch"],          inch        , no_prefix      )
+  , (["ft", "foot", "feet"],  foot        , no_prefix      )
+  , (["yd", "yard"],          yard        , no_prefix      )
+  , (["mi", "mile"],          mile        , no_prefix      )
+  , (["n_mi", "naut_mile"],   naut_mile   , no_prefix      )
   -- Mass
-  , (["g", "gram"],           gram          )
-  , (["T", "tonne"],          tonne         )
-  , (["lb", "pound"],         pound         )
-  , (["oz", "ounce"],         ounce         )
-  , (["t", "ton"],            ton           )
+  , (["g", "gram"],           gram        , metric_prefix  )
+  , (["T", "tonne"],          tonne       , metric_prefix  )
+  , (["lb", "pound"],         pound       , no_prefix      )
+  , (["oz", "ounce"],         ounce       , no_prefix      )
+  , (["t", "ton"],            ton         , no_prefix      )
   -- Time
-  , (["s", "sec", "second"],  second        )
-  , (["m", "min", "minute"],  minute        )
-  , (["h", "hour"],           hour          )
-  , (["day"],                 day           )
-  , (["week"],                week          )
-  , (["year"],                year          )
+  , (["s", "sec", "second"],  second      , metric_prefix  )
+  , (["m", "min", "minute"],  minute      , no_prefix      )
+  , (["h", "hour"],           hour        , no_prefix      )
+  , (["day"],                 day         , no_prefix      )
+  , (["week"],                week        , no_prefix      )
+  , (["year"],                year        , no_prefix      )
   -- Current
-  , (["A", "amp", "ampere"],  ampere        )
+  , (["A", "amp", "ampere"],  ampere      , metric_prefix  )
   -- Temp
-  , (["K", "kelvin"],         kelvin        )
-  , (["C", "celsius"],        celsius       )
-  , (["F", "fahrenheit"],     fahrenheit    )
-  , (["R", "rankine"],        rankine       )
+  , (["K", "kelvin"],         kelvin      , metric_prefix  )
+  , (["C", "celsius"],        celsius     , no_prefix      )
+  , (["F", "fahrenheit"],     fahrenheit  , no_prefix      )
+  , (["R", "rankine"],        rankine     , no_prefix      )
   -- Temp differences
-  , (["dK", "dC"],            kelvin        )
-  , (["dF", "dR"],            rankine       )
+  , (["dK", "dC"],            kelvin      , no_prefix      )
+  , (["dF", "dR"],            rankine     , no_prefix      )
   -- Information
-  , (["bit"],                 bit           )
-  , (["byte"],                byte          )
+  , (["bit"],                 bit         , info_prefix    )
+  , (["byte"],                byte        , info_prefix    )
 
   -- Derived
   -- Force
-  , (["N", "newton"],         newton        )
-  , (["dyn", "dyne"],         dyne          )
-  , (["lbf"],                 pound_force   )
+  , (["N", "newton"],         newton      , metric_prefix  )
+  , (["dyn", "dyne"],         dyne        , metric_prefix  )
+  , (["lbf"],                 pound_force , no_prefix      )
   -- Pressure
-  , (["Pa", "pascal"],        pascal        )
-  , (["Ba", "barye"],         barye         )
+  , (["Pa", "pascal"],        pascal      , metric_prefix  )
+  , (["Ba", "barye"],         barye       , metric_prefix  )
   -- Energy
-  , (["J", "joule"],          joule         )
-  , (["erg"],                 erg           )
+  , (["J", "joule"],          joule       , metric_prefix  )
+  , (["erg"],                 erg         , metric_prefix  )
   -- Power
-  , (["W", "watt"],           watt          )
+  , (["W", "watt"],           watt        , metric_prefix  )
   -- Frequency
-  , (["Hz", "herz", "hertz"], hertz         )
+  , (["Hz", "herz", "hertz"], hertz       , metric_prefix  )
   -- Charge
-  , (["C", "coulomb"],        coulomb       )
+  , (["C", "coulomb"],        coulomb     , metric_prefix  )
   -- Voltage
-  , (["V", "volt"],           volt          )
+  , (["V", "volt"],           volt        , metric_prefix  )
   -- Resistance
-  , (["O", "ohm"],            ohm           )
+  , (["O", "ohm"],            ohm         , metric_prefix  )
   -- Capacitance
-  , (["F", "farad"],          farad         )
+  , (["F", "farad"],          farad       , metric_prefix  )
   ]
 
 -- | [Source](https://en.wikipedia.org/wiki/Metric_prefix)
-prefix_table :: [ ([Label], Prefix) ]  -- ^ (Synonyms, Prefix)
+prefix_table :: [ ([Label], Prefix, PrefixType) ]  -- ^ (Synonyms, Prefix)
 prefix_table =
-  [ (["Y", "yotta"],  yotta  )
-  , (["Z", "zetta"],  zetta  )
-  , (["E", "exa"],    exa    )
-  , (["P", "peta"],   peta   )
-  , (["T", "tera"],   tera   )
-  , (["G", "giga"],   giga   )
-  , (["M", "mega"],   mega   )
-  , (["k", "kilo"],   kilo   )
-  , (["h", "hecto"],  hecto  )
-  , (["da", "deca"],  deca   )
-  , (["d", "deci"],   deci   )
-  , (["c", "centi"],  centi  )
-  , (["m", "milli"],  milli  )
-  , (["mu", "micro"], micro  )
-  , (["n", "nano"],   nano   )
-  , (["p", "pico"],   pico   )
-  , (["f", "femto"],  femto  )
-  , (["a", "atto"],   atto   )
-  , (["z", "zepto"],  zepto  )
-  , (["y", "yocto"],  yocto  )
+  [ (["Y", "yotta"],  yotta , PrefixAboveOne )
+  , (["Z", "zetta"],  zetta , PrefixAboveOne )
+  , (["E", "exa"],    exa   , PrefixAboveOne )
+  , (["P", "peta"],   peta  , PrefixAboveOne )
+  , (["T", "tera"],   tera  , PrefixAboveOne )
+  , (["G", "giga"],   giga  , PrefixAboveOne )
+  , (["M", "mega"],   mega  , PrefixAboveOne )
+  , (["k", "kilo"],   kilo  , PrefixAboveOne )
+  , (["h", "hecto"],  hecto , PrefixAboveOne )
+  , (["da", "deca"],  deca  , PrefixAboveOne )
+  , (["d", "deci"],   deci  , PrefixBelowOne )
+  , (["c", "centi"],  centi , PrefixBelowOne )
+  , (["m", "milli"],  milli , PrefixBelowOne )
+  , (["mu", "micro"], micro , PrefixBelowOne )
+  , (["n", "nano"],   nano  , PrefixBelowOne )
+  , (["p", "pico"],   pico  , PrefixBelowOne )
+  , (["f", "femto"],  femto , PrefixBelowOne )
+  , (["a", "atto"],   atto  , PrefixBelowOne )
+  , (["z", "zepto"],  zepto , PrefixBelowOne )
+  , (["y", "yocto"],  yocto , PrefixBelowOne )
   ]

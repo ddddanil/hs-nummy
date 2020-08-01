@@ -9,9 +9,9 @@ module Nummy.Metrology.Definitions (
 -- * Definitions
 --
 -- ** Symbol tables
-  unitTable, prefixTable, comboTable
--- ** Lookups
-, lookupUnit, lookupPrefix
+  baseUnitTable, comboTable
+-- -- ** Lookups
+-- , lookupUnit, lookupPrefix
 -- ** Dimensions
 , module D.D
 -- ** Units
@@ -33,29 +33,35 @@ import Nummy.Metrology.Definitions.Unit as D.U
 import Nummy.Metrology.Definitions.Prefix as D.P
 
 
-expandSynonyms :: [([Label], a)] -> [(Label, a)]
-expandSynonyms xs = concatMap (\(ls, x) -> [ (l, x) | l <- ls] ) xs
-
 -- | All unit synonyms
-unitTable :: [(Label, Unit)]
-unitTable = sortBy (flip compare `on` T.length . fst) . expandSynonyms $ unit_table
+unitTable :: [(Label, Unit, [PrefixType])]
+unitTable = concatMap (\(ls, u, p) -> [ (l, u, p) | l <- ls] ) $ unit_table
 
 -- | All prefix synonyms
-prefixTable :: [(Label, Prefix)]
-prefixTable = sortBy (flip compare `on` T.length . fst) . expandSynonyms $ prefix_table
+prefixTable :: [(Label, Prefix, PrefixType)]
+prefixTable = concatMap (\(ls, p, t) -> [ (l, p, t) | l <- ls] ) $ prefix_table
 
 currencyTable :: ReadUnit [(Label, Unit)]
 currencyTable = accessCurrency >>= return . map transformCurrency
 
+baseUnitTable :: [(Label, Unit)]
+baseUnitTable = map (\(a, b, _)->(a, b)) unitTable ++ units_with_prefixes
+  where
+      units_with_prefixes =
+        [ ( T.append pl ul
+          , p -| u
+          )
+        | (pl, p, pt) <- prefixTable,
+          (ul, u, ut) <- unitTable,
+          pt `elem` ut
+        ]
 
 -- | All combinations of prefixes, units and currencies
 comboTable :: ReadUnit [(Label, Unit)]
 comboTable = do
   curs <- currencyTable
-  let table = unitTable
-            ++ (map (uncurry bimap) (bimap (T.append) (-|) <$> prefixTable) <*> unitTable)
-            ++ curs
-  return $ sortBy (flip compare `on` T.length . fst) table
+  return $ sortBy (flip compare `on` T.length . fst) (baseUnitTable ++ curs)
+
 
 -- Lookups
 
@@ -69,6 +75,7 @@ comboTable = do
 -- Just minute
 -- >>> lookupUnit Nothing "x"
 -- Nothing
+{-
 lookupUnit :: Maybe Dimension -- ^ Optional dimension specifier
            -> Label           -- ^ Unit synonym
            -> Maybe Unit      -- ^ Result
@@ -80,12 +87,4 @@ lookupUnit md unit =
   where
     matches_unit = elem unit . fst
     matches_dimension dim = (==dim) . dimension . snd
-
--- | Find a prefix
---
--- >>> lookupPrefix "k"
--- Just kilo
--- >>> lookupPrefix "x"
--- Nothing
-lookupPrefix :: Label -> Maybe Prefix
-lookupPrefix p = snd <$> find (elem p . fst) prefix_table
+-}

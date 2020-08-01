@@ -10,8 +10,6 @@ import Nummy.Metrology (Quantity(..), Unit, Dimension, Prefix
                        , (%#), (%<|), (%^), (%*), (%/), (%+), (%-)
                        )
 import Nummy.Metrology.Definitions
-import Nummy.Metrology.Definitions.Unit
-import Nummy.Metrology.Definitions.Prefix
 import Tests.Definitions
 import Tests.Parser (checkQu, checkParseQu)
 
