@@ -8,7 +8,7 @@ import Nummy.Metrology ((-|), (#^), (#*), (#/))
 import Nummy.Metrology.Definitions
 import Nummy.Cache (CurrencyCache)
 import Tests.Definitions
-import Tests.Parser (checkUnit, checkParseUnit)
+import Tests.Parser (checkParseUnit)
 
 
 testUnits :: CurrencyCache -> TestTree

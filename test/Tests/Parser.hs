@@ -5,12 +5,11 @@ module Tests.Parser (
 
 import Nummy.Prelude
 
-import Test.Tasty       (TestTree, defaultMain, testGroup, localOption, Timeout(Timeout))
-import Test.Tasty.HUnit (testCase, (@?=), (@=?), (@?), Assertion, assertFailure)
-import Test.Tasty.ExpectedFailure (expectFail, expectFailBecause)
+import Test.Tasty       (TestTree)
+import Test.Tasty.HUnit (testCase, (@?), Assertion, assertFailure)
 import Text.Megaparsec
-import qualified Data.Text as T (pack, unpack)
-import Data.Text.Prettyprint.Doc (Pretty, pretty)
+import qualified Data.Text as T (unpack)
+import Data.Text.Prettyprint.Doc (Pretty)
 
 import Nummy.Parser
 import Nummy.Metrology

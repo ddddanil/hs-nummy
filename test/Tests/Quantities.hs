@@ -4,13 +4,11 @@ import Nummy.Prelude (($), (/))
 
 import Test.Tasty  (TestTree, testGroup, localOption)
 
-import Nummy.Metrology ( (-|), (#^), (#*), (#/)
-                       , (%#), (%<|), (%^), (%*), (%/), (%+), (%-)
-                       )
+import Nummy.Metrology ( (-|), (#^), (#*), (#/), (%#) )
 import Nummy.Metrology.Definitions
 import Nummy.Cache (CurrencyCache)
 import Tests.Definitions
-import Tests.Parser (checkQu, checkParseQu)
+import Tests.Parser (checkParseQu)
 
 
 testQuantities :: CurrencyCache -> TestTree

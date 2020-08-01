@@ -4,13 +4,10 @@ module Tests.Definitions (
 ) where
 
 import Nummy.Prelude hiding (length, second)
-import Data.Maybe (fromJust)
 
 import Test.Tasty (Timeout(Timeout))
 import Test.Tasty.HUnit (Assertion, (@?))
 import Data.Text.Prettyprint.Doc
-
-import Nummy.Metrology as M
 
 
 -- TestType
@@ -24,7 +21,12 @@ assert Fail    a b = a /= b @? "assert not equal\n" ++ (show . pretty $ a) ++ " 
 
 -- Timeouts
 
+short_timeout :: Timeout
 short_timeout = Timeout 50 "50ms"
+
+average_timeout :: Timeout
 average_timeout = Timeout 333 "1/3s"
+
+long_timeout :: Timeout
 long_timeout = Timeout 1000 "1s"
 
