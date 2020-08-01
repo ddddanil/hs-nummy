@@ -6,7 +6,7 @@ library
     exposed-modules:
         Nummy.Prelude
       , Nummy.Parser
-      , Nummy.Currency
+      , Nummy.Cache
       , Nummy.Metrology
       , Nummy.Metrology.Definitions
       , Nummy.Metrology.Definitions.Dimension
@@ -16,6 +16,9 @@ library
         Nummy.Parser.Base
       , Nummy.Parser.Expr
       , Nummy.Parser.Unit
+      , Nummy.Currency
+      , Nummy.Currency.Base
+      , Nummy.Currency.Request
       , Nummy.Metrology.Base
       , Nummy.Metrology.Currency
       , Nummy.Metrology.Dimension

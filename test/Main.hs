@@ -8,7 +8,7 @@ import Tests.Units
 import Tests.Quantities
 import Tests.Expressions
 
-import Nummy.Currency (newCurrencyCache)
+import Nummy.Cache (newCurrencyCache)
 
 main :: IO ()
 main = do

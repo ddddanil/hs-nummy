@@ -14,7 +14,7 @@ import Data.Text.Prettyprint.Doc (Pretty, pretty)
 
 import Nummy.Parser
 import Nummy.Metrology
-import Nummy.Currency
+import Nummy.Cache
 import Tests.Definitions
 
 

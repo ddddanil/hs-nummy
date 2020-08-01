@@ -8,7 +8,7 @@ module Nummy.Metrology.Base (
 import Nummy.Prelude hiding (Prefix)
 import Data.Ratio (approxRational)
 import Data.Text.Prettyprint.Doc
-import Nummy.Currency
+import Nummy.Cache
 
 
 -- Types

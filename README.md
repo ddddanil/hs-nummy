@@ -17,7 +17,7 @@ Generally any query line looks like `expression | format`
 You can compute an arithmetic expression of units and present them in another unit you prefer.
 
 ```
-> 3ft in m
+> 3ft | m
 0.9144 m
 
 > 60 km/h + 3 m/s
