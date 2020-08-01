@@ -5,7 +5,6 @@ module Nummy.Parser.Expr (
 ) where
 
 import Nummy.Prelude hiding (many, Prefix, try)
-import Data.Bifoldable (bimsum)
 import Data.Maybe (fromJust)
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -15,7 +14,6 @@ import Control.Monad.Combinators.Expr
 import Nummy.Parser.Base
 import Nummy.Parser.Unit
 import Nummy.Metrology
-import Nummy.Metrology.Definitions (comboTable)
 import Nummy.Metrology.Definitions.Unit (dimless)
 
 

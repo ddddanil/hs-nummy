@@ -16,7 +16,6 @@ module Nummy.Parser (
 
 import Nummy.Prelude
 import Text.Megaparsec
-import Text.Megaparsec.Char
 import Data.Text.Prettyprint.Doc (pretty)
 
 import Nummy.Parser.Base

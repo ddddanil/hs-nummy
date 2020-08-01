@@ -34,7 +34,7 @@ module Nummy.Metrology (
 -- *** Quotient
 , (U.#/)
 -- * Quantity
-, Qu.Quantity(..)
+, Qu.Quantity
 , Qu.dimOfQu, (Qu.%#), (Qu.%<|)
 -- ** Operators on quantities
 , (Qu.%^), (Qu.%*), (Qu.%/), (Qu.%+), (Qu.%-)
@@ -43,5 +43,4 @@ module Nummy.Metrology (
 import qualified Nummy.Metrology.Base as B
 import qualified Nummy.Metrology.Unit as U
 import qualified Nummy.Metrology.Dimension as D
-import qualified Nummy.Metrology.Definitions as Def
 import qualified Nummy.Metrology.Quantity as Qu

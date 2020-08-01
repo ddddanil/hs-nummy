@@ -1,7 +1,7 @@
 {-# OPTIONS_HADDOCK hide #-}
 module Nummy.Metrology.Definitions.Prefix where
 
-import Nummy.Prelude ((*), (/), (+), (-), Integer, (^^), ($))
+import Nummy.Prelude ((^^))
 import Nummy.Metrology.Base
 
 

@@ -46,6 +46,8 @@ temp = baseDim Temp
 info :: Dimension
 info = baseDim Information
 
+-- | Make currency distinct from scalar values
+currency :: Dimension
 currency = baseDim Currency
 
 

@@ -28,9 +28,9 @@ import Nummy.Metrology.Dimension as D
 import Nummy.Metrology.Unit as U
 import Nummy.Metrology.Definitions.Tables as D.T
 import Nummy.Metrology.Currency
-import qualified Nummy.Metrology.Definitions.Dimension as D.D
-import qualified Nummy.Metrology.Definitions.Unit as D.U
-import qualified Nummy.Metrology.Definitions.Prefix as D.P
+import Nummy.Metrology.Definitions.Dimension as D.D hiding (dimless)
+import Nummy.Metrology.Definitions.Unit as D.U
+import Nummy.Metrology.Definitions.Prefix as D.P
 
 
 expandSynonyms :: [([Label], a)] -> [(Label, a)]

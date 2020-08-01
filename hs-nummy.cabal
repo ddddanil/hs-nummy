@@ -6,6 +6,7 @@ common common-options
   default-language:   Haskell2010
   default-extensions: NoImplicitPrelude, OverloadedStrings
   ghc-options:        -Wall
+                      -Wtype-defaults
                       -fwrite-ide-info
                       -hiedir=.hie
   build-depends:      base
@@ -18,9 +19,6 @@ library
     , Nummy.Cache
     , Nummy.Metrology
     , Nummy.Metrology.Definitions
-    , Nummy.Metrology.Definitions.Dimension
-    , Nummy.Metrology.Definitions.Unit
-    , Nummy.Metrology.Definitions.Prefix
   other-modules:
       Nummy.Parser.Base
     , Nummy.Parser.Expr
@@ -31,6 +29,9 @@ library
     , Nummy.Metrology.Base
     , Nummy.Metrology.Currency
     , Nummy.Metrology.Dimension
+    , Nummy.Metrology.Definitions.Dimension
+    , Nummy.Metrology.Definitions.Unit
+    , Nummy.Metrology.Definitions.Prefix
     , Nummy.Metrology.Quantity
     , Nummy.Metrology.Unit
     , Nummy.Metrology.Definitions.Tables

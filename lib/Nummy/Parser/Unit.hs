@@ -43,7 +43,7 @@ pOpUnitMultC = do
 pOpUnitMultS :: Parser (Unit -> Unit -> Unit)
 pOpUnitMultS = try $ do
   _ <- char ' '
-  lookAhead pBaseUnit
+  _ <- lookAhead pBaseUnit
   return (#*)
 
 pOpUnitDiv :: Parser (Unit -> Unit -> Unit)

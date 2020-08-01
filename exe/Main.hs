@@ -8,6 +8,7 @@ import System.Console.Haskeline
 import Nummy.Parser (parse_nummy)
 import Nummy.Metrology (runReadUnit)
 
+runNummy :: String -> IO (Either (ParseErrorBundle Text Void) Text)
 runNummy i = runReadUnit (runParserT parse_nummy "<input>" (T.pack i))
 
 main :: IO ()

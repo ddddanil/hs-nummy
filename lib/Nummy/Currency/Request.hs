@@ -1,7 +1,6 @@
 module Nummy.Currency.Request (requestCurrencies) where
 
 import Nummy.Prelude
-import Control.Monad.IO.Class
 import Data.Aeson
 import Data.Scientific (toRealFloat)
 import qualified Data.HashMap.Strict as M
