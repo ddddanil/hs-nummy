@@ -12,7 +12,7 @@ import Control.Monad.Fail
 import Nummy.Parser.Base
 import Nummy.Metrology
 import Nummy.Metrology.Definitions (lookupUnit)
-import Nummy.Metrology.Definitions.Unit (dimless)
+import Nummy.Metrology.Definitions.Unit (scalar_unit)
 
 
 -- Term
@@ -53,7 +53,7 @@ pOpUnitDiv = do
 pOpUnitInv :: Parser (Unit -> Unit)
 pOpUnitInv = do
   _ <- string "1/"
-  return $ ((#/) (dimless))
+  return $ ((#/) (scalar_unit))
 
 
 -- Operator table

@@ -5,7 +5,7 @@ module Nummy.Metrology.Unit (
   Unit
 , convert, dimension
 , (-|), (#^), (#*), (#/)
-, complex_conversion, conversion_ratio, canonical_unit, dimless_unit
+, complex_conversion, conversion_ratio, canonical_unit, scalar_unit
 ) where
 
 import Nummy.Prelude hiding (Prefix)
@@ -29,6 +29,7 @@ data Unit where
 convert :: Unit -> Unit -> (Value -> Value)
 convert u1 u2 = fromSi u2 . toSi u1
 
+-- | Get a function that converts a value represented in that unit into SI
 toSi :: Unit -> (Value -> Value)
 toSi (DimlessUnit x) = \v -> v * x
 toSi (BaseUnit (f, _, _, _)) = f
@@ -37,6 +38,7 @@ toSi (PowerUnit u p) = \v -> v * (toSi u 1 ^^^ p)
 toSi (MultUnit u1 u2) = toSi u1 . toSi u2
 toSi (DivUnit u1 u2) = \v -> v * (toSi u1 1 / toSi u2 1)
 
+-- | Get a function that converts a value in SI into a given unit
 fromSi :: Unit -> (Value -> Value)
 fromSi (DimlessUnit x) = \v -> v / x
 fromSi (BaseUnit (_, g, _, _)) = g
@@ -47,13 +49,14 @@ fromSi (DivUnit u1 u2) = \v -> v * (fromSi u1 1 / fromSi u2 1)
 
 -- | Get the dimension of a unit
 dimension :: Unit -> Dimension
-dimension (DimlessUnit _) = dimless
+dimension (DimlessUnit _) = scalar
 dimension (BaseUnit (_, _, d, _)) = d
 dimension (PrefixUnit _ x) = dimension x
 dimension (PowerUnit u p) = dimension u |^| p
 dimension (MultUnit u1 u2) = dimension u1 |*| dimension u2
 dimension (DivUnit u1 u2) = dimension u1 |/| dimension u2
 
+-- | Simplify the internal structure of a unit (performance drain)
 simplify :: Unit -> Unit
 -- Propagate powers into multiplication
 simplify (PowerUnit (MultUnit u1 u2) v) = simplify $ MultUnit (simplify (PowerUnit u1 v)) (simplify (PowerUnit u2 v))
@@ -85,8 +88,8 @@ simplify (DivUnit num den) =
     nums = mult_unfold num
     dens = mult_unfold den
     repeating = intersect nums dens
-    new_num = simplify $ mult_fold dimless_unit $ nums \\ repeating
-    new_den = simplify $ mult_fold dimless_unit $ dens \\ repeating
+    new_num = simplify $ mult_fold scalar_unit $ nums \\ repeating
+    new_den = simplify $ mult_fold scalar_unit $ dens \\ repeating
 -- catch-all
 simplify x = x
 
@@ -192,5 +195,5 @@ canonical_unit :: Dimension -> Label -> Unit
 canonical_unit d l = conversion_ratio d l 1
 
 -- | Unit of a scalar value
-dimless_unit :: Unit
-dimless_unit = DimlessUnit 1
+scalar_unit :: Unit
+scalar_unit = DimlessUnit 1

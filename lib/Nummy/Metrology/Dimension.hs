@@ -1,6 +1,6 @@
 module Nummy.Metrology.Dimension (
   Dimension, BaseDim(..)
-, baseDim, dimless
+, baseDim, scalar
 , (|*|), (|/|), (|^|)
 ) where
 
@@ -49,12 +49,13 @@ instance Eq Dimension where
 
 -- Working with dims
 
+-- | Generate a base dimension
 baseDim :: BaseDim -> Dimension
 baseDim b = Dimension $ M.singleton b 1
 
 -- | Dimension of a scalar value
-dimless :: Dimension
-dimless = Dimension $ M.empty
+scalar :: Dimension
+scalar = Dimension $ M.empty
 
 
 -- Operators

@@ -13,8 +13,8 @@ import Nummy.Metrology.Unit as U
 -- [source](https://en.wikipedia.org/wiki/SI_derived_unit)
 
 -- | Unit of a scalar value
-dimless :: Unit
-dimless = U.dimless_unit
+scalar_unit :: Unit
+scalar_unit = U.scalar_unit
 
 -- **** Length units
 

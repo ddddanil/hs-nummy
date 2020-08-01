@@ -7,8 +7,8 @@ import Nummy.Metrology.Dimension as D
 -- *** Base dimensions
 
 -- | Scalar   [wiki](https://en.wikipedia.org/wiki/Scalar_\(physics\))
-dimless :: Dimension
-dimless = D.dimless
+scalar :: Dimension
+scalar = D.scalar
 
 -- | Length   [wiki](https://en.wikipedia.org/wiki/Length)
 --

@@ -24,7 +24,7 @@ testUnits c =
     , checkParseUnit Succeed "bit" (bit) c
     ]
   , testGroup "Syntax"
-    [ checkParseUnit Fail  ""                  (dimless) c
+    [ checkParseUnit Fail  ""                  (scalar_unit) c
     -- illegal spaces
     , checkParseUnit Fail  " m"             (meter) c
     , checkParseUnit Fail  "m "             (meter) c
@@ -44,9 +44,9 @@ testUnits c =
   , testGroup "Division"
     [ checkParseUnit Succeed  "m/s"  (meter #/ second) c
     , checkParseUnit Succeed  "km/h" (kilo -| meter #/ hour) c
-    , checkParseUnit Succeed  "1/s"  (dimless #/ second) c
+    , checkParseUnit Succeed  "1/s"  (scalar_unit #/ second) c
     , checkParseUnit Succeed  "1/s"  (hertz) c
-    , checkParseUnit Fail     "2/km" (dimless #/ second) c
+    , checkParseUnit Fail     "2/km" (scalar_unit #/ second) c
     -- Simplification
     , checkParseUnit Succeed  "m s/m" (second) c
     ]
@@ -68,6 +68,6 @@ testUnits c =
     , checkParseUnit Succeed  "km^2" (kilo -| meter #^ 2) c
     -- Simplification
     , checkParseUnit Succeed  "m^2/m"  (meter) c
-    , checkParseUnit Succeed  "m/m"    (dimless) c
+    , checkParseUnit Succeed  "m/m"    (scalar_unit) c
     ]
   ]

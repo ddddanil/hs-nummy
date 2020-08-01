@@ -14,7 +14,7 @@ import Control.Monad.Combinators.Expr
 import Nummy.Parser.Base
 import Nummy.Parser.Unit
 import Nummy.Metrology
-import Nummy.Metrology.Definitions.Unit (dimless)
+import Nummy.Metrology.Definitions.Unit (scalar_unit)
 
 
 -- Term
@@ -35,7 +35,7 @@ quantity = do
   u <- optional . try $ do
     _ <- optional spaceChar
     parenthesis unit <|> unit
-  return $ maybe (v %# dimless) ((%#) v) u
+  return $ maybe (v %# scalar_unit) ((%#) v) u
 
 
 -- Operators
@@ -51,7 +51,7 @@ pOpQuPow = do
 pOpQuNeg :: Parser (Maybe Quantity -> Maybe Quantity)
 pOpQuNeg = do
   _ <- char '-'
-  return $ fmap (%* (-1) %# dimless)
+  return $ fmap (%* (-1) %# scalar_unit)
 
 pOpQuMul :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
 pOpQuMul = do

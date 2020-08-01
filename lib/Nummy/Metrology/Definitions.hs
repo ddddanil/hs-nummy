@@ -26,7 +26,7 @@ import Nummy.Metrology.Dimension as D
 import Nummy.Metrology.Unit as U
 import Nummy.Metrology.Definitions.Tables as D.T
 import Nummy.Metrology.Currency
-import Nummy.Metrology.Definitions.Dimension as D.D hiding (dimless)
+import Nummy.Metrology.Definitions.Dimension as D.D
 import Nummy.Metrology.Definitions.Unit as D.U
 import Nummy.Metrology.Definitions.Prefix as D.P
 import Nummy.Cache
@@ -40,9 +40,11 @@ unitTable = concatMap (\(ls, u, p) -> [ (l, u, p) | l <- ls] ) $ unit_table
 prefixTable :: [(Label, Prefix, PrefixType)]
 prefixTable = concatMap (\(ls, p, t) -> [ (l, p, t) | l <- ls] ) $ prefix_table
 
+-- | All currencies
 currencyTable :: ReadCache [(Label, Unit)]
 currencyTable = accessCurrency >>= return . map transformCurrency
 
+-- | Mix units with allowed prefixes
 baseUnitTable :: [(Label, Unit)]
 baseUnitTable = map (\(a, b, _)->(a, b)) unitTable ++ units_with_prefixes
   where

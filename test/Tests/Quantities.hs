@@ -17,9 +17,9 @@ testQuantities c =
   testGroup "Quantities"
   [ testGroup "Base"
     -- Dimensionless
-    [ checkParseQu Succeed "10"    (10 %# dimless) c
-    , checkParseQu Succeed "7.5"   (15/2 %# dimless) c
-    , checkParseQu Succeed "999.2" (4996/5 %# dimless) c
+    [ checkParseQu Succeed "10"    (10 %# scalar_unit) c
+    , checkParseQu Succeed "7.5"   (15/2 %# scalar_unit) c
+    , checkParseQu Succeed "999.2" (4996/5 %# scalar_unit) c
     -- Different allowed spacings
     , checkParseQu Succeed "5m"    (5 %# meter) c
     , checkParseQu Succeed "6 m"   (6 %# meter) c

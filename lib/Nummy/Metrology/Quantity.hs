@@ -36,11 +36,6 @@ dimOfQu :: Quantity -> Dimension
 dimOfQu (Quantity (_, u)) = dimension u
 
 
-quIn :: Quantity -> Unit -> Maybe Quantity
-quIn (Quantity (v, u)) u' =
-  if dimension u /= dimension u' then Nothing
-  else Just . Quantity $ (convert u u' $ v, u')
-
 -- | Convert a quantity into a new unit
 --
 -- >>> 9 %# meter %<| foot
@@ -52,11 +47,10 @@ infixl 3 %<|
       -> Unit            -- ^ Unit to cast into
       -> Maybe Quantity  -- ^ * Just qu -> successful conversion
                          --   * Nothing -> dimension of the quantity and unit were different
-(%<|) = quIn
+(%<|) (Quantity (v, u)) u' =
+  if dimension u /= dimension u' then Nothing
+  else Just . Quantity $ (convert u u' $ v, u')
 
-
-mkQu :: Value -> Unit -> Quantity
-mkQu = curry Quantity
 
 -- | Construct a quantity using a value and a unit
 --
@@ -66,7 +60,7 @@ infixl 6 %#
 (%#) :: Value
      -> Unit
      -> Quantity
-(%#) = mkQu
+(%#) = curry Quantity
 
 
 -- Quantity operators
