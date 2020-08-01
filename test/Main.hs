@@ -1,7 +1,7 @@
 module Main where
 
 import Nummy.Prelude
-import Test.Tasty       (TestTree, defaultMain, testGroup)
+import Test.Tasty       (defaultMain, testGroup)
 
 import Tests.Dimensions
 import Tests.Units

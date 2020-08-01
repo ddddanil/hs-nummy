@@ -3,7 +3,7 @@ module Nummy.Parser.Unit (
 ) where
 
 import Nummy.Prelude hiding (many, Prefix, try)
-import Data.Char (isAlphaNum)
+import Data.Char (isAlpha)
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Control.Monad.Combinators.Expr
@@ -19,7 +19,7 @@ import Nummy.Metrology.Definitions.Unit (dimless)
 
 pBaseUnit :: Parser Unit
 pBaseUnit = do
-  str <- takeWhile1P (Just "base unit") isAlphaNum
+  str <- takeWhile1P (Just "base unit") isAlpha
   mu <- lift $ lookupUnit Nothing str
   case mu of
     Just u -> return u

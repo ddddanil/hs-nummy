@@ -1,21 +1,18 @@
 module Tests.Dimensions (testDimensions) where
 
-import Nummy.Prelude hiding (length, force)
+import Nummy.Prelude (($))
 
 import Test.Tasty  (TestTree, testGroup, localOption)
 
-import Nummy.Metrology (Quantity(..), Unit, Dimension, Prefix
-                       , (|^|), (|*|), (|/|)
-                       , (-|), (#^), (#*), (#/)
-                       , (%#), (%<|), (%^), (%*), (%/), (%+), (%-)
-                       )
+import Nummy.Metrology ((|^|), (|*|), (|/|))
 import Nummy.Metrology.Definitions
 import Tests.Definitions
 import Tests.Parser (checkDim)
 
 
+testDimensions :: TestTree
 testDimensions =
-  -- localOption average_timeout $
+  localOption average_timeout $
   testGroup "Dimensions"
   [ testGroup "Algebra"
     [ checkDim Succeed "len * len == len ^ 2" (length |*| length) (length |^| 2)

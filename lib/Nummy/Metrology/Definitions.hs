@@ -55,10 +55,14 @@ baseUnitTable = map (\(a, b, _)->(a, b)) unitTable ++ units_with_prefixes
         ]
 
 -- | All combinations of prefixes, units and currencies
+--
+-- Deprecated
+{-
 comboTable :: ReadUnit [(Label, Unit)]
 comboTable = do
   curs <- currencyTable
   return $ sortBy (flip compare `on` T.length . fst) (baseUnitTable ++ curs)
+-}
 
 
 -- Lookups
@@ -76,11 +80,16 @@ comboTable = do
 lookupUnit :: Maybe Dimension         -- ^ Optional dimension specifier
            -> Label                   -- ^ Unit synonym
            -> ReadUnit (Maybe Unit)   -- ^ Result
-lookupUnit md unit = do
-  has_unit <- filter matches_unit <$> comboTable
-  case md of
-    Just dim -> return $ snd <$> find (matches_dimension dim) has_unit
-    Nothing ->  return $ snd <$> headMay has_unit
+lookupUnit md unit =
+  case find_unit baseUnitTable of
+    Just u -> return . return $ u
+    Nothing -> find_unit <$> currencyTable
   where
+    find_unit :: [(Label, Unit)] -> Maybe Unit
+    find_unit t =
+      let has_unit = filter matches_unit t
+      in case md of
+        Just dim -> snd <$> find (matches_dimension dim) has_unit
+        Nothing ->  snd <$> headMay has_unit
     matches_unit = (== unit) . fst
     matches_dimension dim = (==dim) . dimension . snd

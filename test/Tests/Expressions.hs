@@ -1,21 +1,21 @@
 module Tests.Expressions (testExpressions) where
 
-import Nummy.Prelude hiding (second, bit)
+import Nummy.Prelude (($))
 
 import Test.Tasty  (TestTree, testGroup, localOption)
 
-import Nummy.Metrology (Quantity(..), Unit, Dimension, Prefix
-                       , (|^|), (|*|), (|/|)
-                       , (-|), (#^), (#*), (#/)
+import Nummy.Metrology ( (-|), (#^), (#*), (#/)
                        , (%#), (%<|), (%^), (%*), (%/), (%+), (%-)
                        )
 import Nummy.Metrology.Definitions
+import Nummy.Cache (CurrencyCache)
 import Tests.Definitions
 import Tests.Parser (checkQu, checkParseExpr)
 
 
+testExpressions :: CurrencyCache -> TestTree
 testExpressions c =
-  -- localOption average_timeout $
+  localOption average_timeout $
   testGroup "Expressions"
   [ testGroup "Conversions"
     [ checkParseExpr Succeed "1in | mm" (25.4 %# milli -| meter) c

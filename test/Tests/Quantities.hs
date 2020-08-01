@@ -1,21 +1,21 @@
 module Tests.Quantities (testQuantities) where
 
-import Nummy.Prelude hiding (second)
+import Nummy.Prelude (($), (/))
 
 import Test.Tasty  (TestTree, testGroup, localOption)
 
-import Nummy.Metrology (Quantity(..), Unit, Dimension, Prefix
-                       , (|^|), (|*|), (|/|)
-                       , (-|), (#^), (#*), (#/)
+import Nummy.Metrology ( (-|), (#^), (#*), (#/)
                        , (%#), (%<|), (%^), (%*), (%/), (%+), (%-)
                        )
 import Nummy.Metrology.Definitions
+import Nummy.Cache (CurrencyCache)
 import Tests.Definitions
 import Tests.Parser (checkQu, checkParseQu)
 
 
+testQuantities :: CurrencyCache -> TestTree
 testQuantities c =
-  -- localOption average_timeout $
+  localOption average_timeout $
   testGroup "Quantities"
   [ testGroup "Base"
     -- Dimensionless
