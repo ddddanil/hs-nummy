@@ -25,6 +25,9 @@ You can compute an arithmetic expression of units and present them in another un
 
 > 3 m^2 - 1ft^2 | mm^2
 2907096.96 mm²
+
+> 100 Mb/s | kB/s
+12500 kbyte/s
 ```
 
 ### Currency
