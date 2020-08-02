@@ -8,7 +8,7 @@ import Nummy.Prelude hiding (Prefix)
 import qualified Data.Map.Strict as M
 import Data.Text.Prettyprint.Doc
 
-import Nummy.Metrology.Base
+import Nummy.Base
 
 
 -- | Base dimensions

@@ -15,6 +15,7 @@ library
   import:           common-options
   exposed-modules:
       Nummy.Prelude
+    , Nummy.Base
     , Nummy.Parser
     , Nummy.Cache
     , Nummy.Metrology
@@ -26,12 +27,12 @@ library
     , Nummy.Currency
     , Nummy.Currency.Base
     , Nummy.Currency.Request
-    , Nummy.Metrology.Base
     , Nummy.Metrology.Currency
     , Nummy.Metrology.Dimension
     , Nummy.Metrology.Definitions.Dimension
     , Nummy.Metrology.Definitions.Unit
     , Nummy.Metrology.Definitions.Prefix
+    , Nummy.Metrology.Prefix
     , Nummy.Metrology.Quantity
     , Nummy.Metrology.Unit
     , Nummy.Metrology.Definitions.Tables

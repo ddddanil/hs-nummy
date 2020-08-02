@@ -1,32 +1,28 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Nummy.Metrology.Base (
+
+{-|
+Module        : Nummy.Base
+Description   : Common types for use throughout Nummy
+Maintainer    : ddddanil@vivaldi.net
+Stability     : experimental
+-}
+
+module Nummy.Base (
+  -- * Label
   Label
-, Prefix(..), PrefixType(..)
+  -- * Value
 , Value(..), valueF, valueI, (^^^)
 ) where
 
-import Nummy.Prelude hiding (Prefix)
+import Nummy.Prelude
 import Data.Ratio (approxRational)
 import Data.Text.Prettyprint.Doc
 
 
--- Types
+-- Label
 
 -- | Preferred string-like datatype
 type Label = Text
-
-
--- Prefix
-
--- | Representation of a unit prefix
-newtype Prefix = Prefix (Value, Label) -- ^ (prefix multiplier, prefix name)
-  deriving (Show, Eq)
-
-data PrefixType = PrefixBelowOne | PrefixBinary | PrefixAboveOne
-  deriving (Eq, Show, Ord, Enum)
-
-instance Pretty Prefix where
-  pretty (Prefix (_, l)) = pretty l
 
 
 -- Value
@@ -43,8 +39,8 @@ instance Pretty Value where
       then pretty $ numerator v
       else pretty ( fromRational v :: Double )
 
--- | Raise one 'Value' to the power of another
--- Optimises for whole numbers, falls back on doubles
+-- | Raise one 'Value' to the power of another.
+-- Optimizes for whole numbers, falls back on doubles
 infixr 8 ^^^
 (^^^) :: Value -> Value -> Value
 (^^^) (Value v1) (Value v2) =

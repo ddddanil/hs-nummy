@@ -12,7 +12,7 @@ import Test.Tasty.HUnit ((@?), assertFailure)
 import Text.Megaparsec
 import Data.Text.Prettyprint.Doc
 
-import Nummy.Metrology (Label)
+import Nummy.Base
 import Nummy.Cache (ReadCache, runReadCache)
 
 

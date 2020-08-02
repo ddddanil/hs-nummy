@@ -2,7 +2,7 @@
 module Nummy.Metrology.Definitions.Prefix where
 
 import Nummy.Prelude ((^^))
-import Nummy.Metrology.Base
+import Nummy.Metrology.Prefix
 
 
 -- *** Above one

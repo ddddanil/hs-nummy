@@ -9,28 +9,22 @@ Stability     : experimental
 
 module Nummy.Metrology (
 -- Types
-  B.Label
-, B.Prefix
--- * Value
-, B.Value, B.valueF, B.valueI, (B.^^^)
 -- * Dimension
-, D.Dimension
+  D.Dimension
 -- ** Operators on dimensions
 , (D.|^|)
 , (D.|*|)
 , (D.|/|)
+-- * Prefix
+, P.Prefix
 -- * Unit
 , U.Unit
 , U.convert
 , U.dimension
 -- ** Operators on units
--- *** Prefix
 , (U.-|)
--- *** Power
 , (U.#^)
--- *** Product
 , (U.#*)
--- *** Quotient
 , (U.#/)
 -- * Quantity
 , Qu.Quantity
@@ -39,7 +33,7 @@ module Nummy.Metrology (
 , (Qu.%^), (Qu.%*), (Qu.%/), (Qu.%+), (Qu.%-)
 ) where
 
-import qualified Nummy.Metrology.Base as B
+import qualified Nummy.Metrology.Prefix as P
 import qualified Nummy.Metrology.Unit as U
 import qualified Nummy.Metrology.Dimension as D
 import qualified Nummy.Metrology.Quantity as Qu

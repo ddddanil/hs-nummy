@@ -1,7 +1,7 @@
 module Nummy.Metrology.Currency (transformCurrency, accessCurrency) where
 
 import Nummy.Prelude
-import Nummy.Metrology.Base
+import Nummy.Base
 import Nummy.Metrology.Definitions.Dimension
 import Nummy.Metrology.Unit
 import Nummy.Currency

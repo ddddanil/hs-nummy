@@ -23,14 +23,15 @@ import Nummy.Prelude hiding (Prefix)
 import Data.Char (isUpper)
 import qualified Data.Text as T
 
-import Nummy.Metrology.Base as B
+import Nummy.Base
 import Nummy.Metrology.Dimension as D
 import Nummy.Metrology.Unit as U
-import Nummy.Metrology.Definitions.Tables as D.T
+import Nummy.Metrology.Prefix as P
 import Nummy.Metrology.Currency
 import Nummy.Metrology.Definitions.Dimension as D.D
 import Nummy.Metrology.Definitions.Unit as D.U
 import Nummy.Metrology.Definitions.Prefix as D.P
+import Nummy.Metrology.Definitions.Tables as D.T
 import Nummy.Cache
 
 

@@ -13,8 +13,9 @@ import GHC.Show as S
 import Data.List (intersect, (\\))
 import Data.Text.Prettyprint.Doc
 
-import Nummy.Metrology.Base as B
-import Nummy.Metrology.Dimension as D
+import Nummy.Base
+import Nummy.Metrology.Dimension
+import Nummy.Metrology.Prefix
 
 -- | Datatype representing a unit
 data Unit where

@@ -9,9 +9,9 @@ module Nummy.Metrology.Quantity (
 import Nummy.Prelude
 import Data.Text.Prettyprint.Doc
 
-import Nummy.Metrology.Base
-import Nummy.Metrology.Dimension as D
-import Nummy.Metrology.Unit as U
+import Nummy.Base
+import Nummy.Metrology.Dimension
+import Nummy.Metrology.Unit
 
 
 -- Type

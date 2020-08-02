@@ -3,8 +3,8 @@
 module Nummy.Metrology.Definitions.Unit where
 
 import Nummy.Prelude ((*), (/), (+), (-))
+import Nummy.Base
 import Nummy.Metrology.Definitions.Dimension
-import Nummy.Metrology.Base
 import Nummy.Metrology.Unit as U
 
 

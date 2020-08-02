@@ -4,8 +4,9 @@ module Nummy.Metrology.Definitions.Tables (
 , prefix_table
 ) where
 
-import Nummy.Metrology.Base
+import Nummy.Base
 import Nummy.Metrology.Unit
+import Nummy.Metrology.Prefix
 import Nummy.Metrology.Definitions.Unit
 import Nummy.Metrology.Definitions.Prefix
 
