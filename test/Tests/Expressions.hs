@@ -20,7 +20,7 @@ testExpressions c =
     , checkParseExpr Succeed "1in | m" (0.0254 %# meter) c
     , checkParseExpr Succeed "3 km^2 | m^2" (3000000 %# meter #^ 2) c
     , checkParseExpr Succeed "7.2 km/h | m/s" (2 %# meter #/ second) c
-    , checkParseExpr Succeed "3 kbit/min | bit/s" (50 %# bit #/ second) c
+    , checkParseExpr Succeed "3 kb/min | bit/s" (50 %# bit #/ second) c
     , checkParseExpr Succeed "7 nm * 1000000 | mm"   (7 %# milli -| meter) c
     ]
   , testGroup "Addition and subtraction"

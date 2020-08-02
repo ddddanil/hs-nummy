@@ -5,6 +5,7 @@ module Nummy.Prelude (
 , module Data.Tuple.Extra
 , module Data.List
 , concatMaybe
+, (&|&)
 ) where
 
 import Protolude
@@ -16,3 +17,9 @@ concatMaybe :: Maybe (Maybe a) -> Maybe a
 concatMaybe (Just (Just x)) = Just x
 concatMaybe _ = Nothing
 
+-- | Boolean XOR
+infixr 2 &|&
+(&|&) :: Bool -> Bool -> Bool
+(&|&) True True = False
+(&|&) False False = False
+(&|&) _ _ = True

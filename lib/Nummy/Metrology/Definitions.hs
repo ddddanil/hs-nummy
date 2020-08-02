@@ -10,6 +10,7 @@ module Nummy.Metrology.Definitions (
 --
 -- ** Lookups
   lookupUnit
+, baseUnitTable    -- Uncomment for inspection/debug
 -- ** Dimensions
 , module D.D
 -- ** Units
@@ -19,6 +20,7 @@ module Nummy.Metrology.Definitions (
 ) where
 
 import Nummy.Prelude hiding (Prefix)
+import Data.Char (isUpper)
 import qualified Data.Text as T
 
 import Nummy.Metrology.Base as B
@@ -46,7 +48,7 @@ currencyTable = accessCurrency >>= return . map transformCurrency
 
 -- | Mix units with allowed prefixes
 baseUnitTable :: [(Label, Unit)]
-baseUnitTable = map (\(a, b, _)->(a, b)) unitTable ++ units_with_prefixes
+baseUnitTable = sortOn (T.length . fst) $ map (\(a, b, _)->(a, b)) unitTable ++ units_with_prefixes
   where
       units_with_prefixes =
         [ ( T.append pl ul
@@ -54,7 +56,10 @@ baseUnitTable = map (\(a, b, _)->(a, b)) unitTable ++ units_with_prefixes
           )
         | (pl, p, pt) <- prefixTable,
           (ul, u, ut) <- unitTable,
-          pt `elem` ut
+          pt `elem` ut &&
+          not (T.length pl <= 2 &|&                       -- Short-hand prefix = k mu da G
+              (T.length ul == 1 || isUpper (T.head ul)) ) -- Short-hand unit   = m s Pa J
+          -- Combine short-hand prefixes with short-hand units and vice versa
         ]
 
 
@@ -81,7 +86,11 @@ lookupUnit :: Maybe Dimension          -- ^ Optional dimension specifier
 lookupUnit md unit =
   case find_unit baseUnitTable of
     Just u -> return . return $ u
-    Nothing -> find_unit <$> currencyTable
+    Nothing ->
+      if T.length unit == 3 && T.foldl (flip $ (&&) . isUpper) True unit
+         -- Possible units are only 3-letter uppercase names
+        then find_unit <$> currencyTable
+        else return Nothing
   where
     find_unit :: [(Label, Unit)] -> Maybe Unit
     find_unit t =

@@ -51,8 +51,8 @@ unit_table =
   , (["dK", "dC"],            kelvin      , no_prefix      )
   , (["dF", "dR"],            rankine     , no_prefix      )
   -- Information
-  , (["bit"],                 bit         , info_prefix    )
-  , (["byte"],                byte        , info_prefix    )
+  , (["b", "bit"],            bit         , info_prefix    )
+  , (["B", "byte"],           byte        , info_prefix    )
 
   -- Derived
   -- Force

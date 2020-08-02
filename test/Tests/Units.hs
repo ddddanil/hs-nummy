@@ -21,7 +21,7 @@ testUnits c =
     , checkParseUnit Succeed "g" (gram) c
     , checkParseUnit Succeed "A" (ampere) c
     , checkParseUnit Succeed "K" (kelvin) c
-    , checkParseUnit Succeed "bit" (bit) c
+    , checkParseUnit Succeed "b" (bit) c
     ]
   , testGroup "Syntax"
     [ checkParseUnit Fail  ""                  (scalar_unit) c
@@ -36,7 +36,8 @@ testUnits c =
     , checkParseUnit Succeed  "ms" (milli -| second) c
     , checkParseUnit Succeed  "kg" (kilo -| gram) c
     , checkParseUnit Succeed  "daPa" (deca -| pascal) c
-    , checkParseUnit Succeed  "Tbyte" (tera -| byte) c
+    , checkParseUnit Succeed  "terabyte" (tera -| byte) c
+    , checkParseUnit Succeed  "TB" (tera -| byte) c
     , checkParseUnit Succeed  "meganewton" (mega -| newton) c
     , checkParseUnit Succeed  "mum" (micro -| meter) c
     , checkParseUnit Succeed  "ng" (nano -| gram) c
