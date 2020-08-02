@@ -6,7 +6,7 @@ module Nummy.Parser.Expr (
 
 import Nummy.Prelude hiding (many, Prefix, try)
 import Data.Maybe (fromJust)
-import Text.Megaparsec ()
+import Text.Megaparsec (choice)
 import Text.Megaparsec.Char
 import Control.Monad.Fail
 import Control.Monad.Combinators.Expr
@@ -104,8 +104,10 @@ pFormat :: Parser (Quantity -> Maybe Quantity)
 pFormat = do
   _ <- char '|'
   _ <- space
-  u <- unit
-  return $ (%<| u)
+  choice -- Accept a '1' as a substitute for a scalar unit
+    [ do { u <- unit; return $ (%<| u); }
+    , do { _ <- char '1'; return $ (%<| scalar_unit); }
+    ]
 
 -- | Parser for an expression with physical units
 --
