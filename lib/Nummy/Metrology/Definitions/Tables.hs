@@ -65,6 +65,10 @@ unit_table =
   -- Energy
   , (["J", "joule"],          joule       , metric_prefix  )
   , (["erg"],                 erg         , metric_prefix  )
+  , (["Wh"],                  watt #* hour, metric_prefix  )
+  , (["cal"],                 calorie     , metric_prefix  )
+  , (["Cal", "calorie"],      kilo -| calorie, no_prefix   )
+  , (["eV", "electron-volt"], electron_volt, metric_prefix )
   -- Power
   , (["W", "watt"],           watt        , metric_prefix  )
   , (["hp", "horsepower"],    horsepower  , no_prefix      )

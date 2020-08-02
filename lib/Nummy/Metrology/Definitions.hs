@@ -58,8 +58,8 @@ baseUnitTable = sortOn (T.length . fst) $ map (\(a, b, _)->(a, b)) unitTable ++ 
         | (pl, p, pt) <- prefixTable,
           (ul, u, ut) <- unitTable,
           pt `elem` ut &&
-          not (T.length pl <= 2 &|&                       -- Short-hand prefix = k mu da G
-              (T.length ul == 1 || isUpper (T.head ul)) ) -- Short-hand unit   = m s Pa J
+          not (T.length pl <= 2 &|&      -- Short-hand prefix = k mu da G
+               T.length ul <= 2 )        -- Short-hand unit   = m s Pa J
           -- Combine short-hand prefixes with short-hand units and vice versa
         ]
 

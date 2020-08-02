@@ -114,6 +114,12 @@ week = conversion_ratio time "week"  (3600 * 24 * 7)
 
 -- | Derived time
 --
+-- 1 month = 30 day
+month :: Unit
+month = conversion_ratio time "month" (3600 * 24 * 30)
+
+-- | Derived time
+--
 -- 1 year = 365 day
 year :: Unit
 year = conversion_ratio time "year"  (3600 * 24 * 365)
@@ -195,6 +201,14 @@ joule = canonical_unit energy "J"
 -- | CGS
 erg :: Unit
 erg = conversion_ratio energy "erg" (1/10_000_000)
+
+-- | Derived metric
+calorie :: Unit
+calorie = conversion_ratio energy "cal" (4.184)
+
+-- | Derived metric
+electron_volt :: Unit
+electron_volt = conversion_ratio energy "eV" (1.602_176_634e-19)
 
 -- **** Power
 
