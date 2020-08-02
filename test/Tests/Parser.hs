@@ -20,13 +20,13 @@ import Tests.Definitions
 
 -- Parser
 
-getParse :: Parser a -> Label -> Test TestParseError a
+getParse :: Parser a -> Label -> ParseExcept a
 getParse p s = do
   c <- ask
   e <- liftIO $ runReaderT (runParserT (p <* eof) "<test>" s) c
   liftEither e
 
-checkParse :: (Eq a, Pretty a) => Parser a -> TestType -> Label -> a -> Test TestParseError ()
+checkParse :: (Eq a, Pretty a) => Parser a -> TestType -> Label -> a -> ParseExcept ()
 checkParse p t s x = do
   res <- getParse p s
   assert t x res

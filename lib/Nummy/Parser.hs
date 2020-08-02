@@ -7,14 +7,18 @@ Stability     : experimental
 
 module Nummy.Parser (
   Parser
-, parse_nummy
+, ParserError
+, ParseExcept
+, nummy
 , unit
 , quantity
 , expression
 , physical
+, parse_nummy
 ) where
 
 import Nummy.Prelude
+import Control.Monad.Except (liftEither)
 import Text.Megaparsec
 import Data.Text.Prettyprint.Doc (pretty)
 
@@ -26,3 +30,6 @@ import Nummy.Parser.Unit
 parse_nummy :: Parser Text
 parse_nummy = parse_physical where
   parse_physical = show . pretty <$> physical <* eof
+
+nummy :: Text -> ParseExcept Text
+nummy t = liftEither =<< (lift $ runParserT parse_nummy "<input>" t)

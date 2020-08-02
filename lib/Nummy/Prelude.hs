@@ -6,6 +6,7 @@ module Nummy.Prelude (
 , module Data.List
 , concatMaybe
 , (&|&)
+, whenJust
 ) where
 
 import Protolude
@@ -25,3 +26,8 @@ infixr 2 &|&
 (&|&) True True = False
 (&|&) False False = False
 (&|&) _ _ = True
+
+-- | Conditional execution based on a maybe
+whenJust :: (Applicative m) => Maybe a -> (a -> m () ) -> m ()
+whenJust (Just a) k = k a
+whenJust Nothing _ = pure ()

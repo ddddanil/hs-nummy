@@ -21,6 +21,7 @@ common common-depends
     -- Data
     , extra
     , text
+    , lens
     , scientific
     , containers
     , unordered-containers
@@ -71,6 +72,8 @@ library
 executable nummy
   import:             common-options, common-depends
   main-is:            Main.hs
+  other-modules:
+      Repl
   hs-source-dirs:     exe
   build-depends:
       hs-nummy
