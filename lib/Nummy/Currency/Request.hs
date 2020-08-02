@@ -1,3 +1,4 @@
+{-# LANGUAGE BlockArguments #-}
 module Nummy.Currency.Request (requestCurrencies) where
 
 import Nummy.Prelude
@@ -27,13 +28,16 @@ decodeResponse :: ExchangeResponse -> [Currency]
 decodeResponse r = Currency 1 (base r)  : map (uncurry . flip $ Currency) (rates r)
 
 requestCurrencies :: IO [Currency]
-requestCurrencies = runReq defaultHttpConfig $ do
-    r <-
-      req
-        GET
-        (https "api.exchangeratesapi.io" /: "latest")
-        NoReqBody
-        jsonResponse
-        mempty
-      :: Req (JsonResponse ExchangeResponse)
-    return . decodeResponse . responseBody $ r
+requestCurrencies =
+  handle ((\_ -> return []) :: HttpException -> IO [Currency]) $
+  -- Default to an empty list on any exception
+  runReq defaultHttpConfig $ do
+  r <-
+    req
+      GET
+      (https "api.exchangeratesapi.io" /: "latest")
+      NoReqBody
+      jsonResponse
+      mempty
+    :: Req (JsonResponse ExchangeResponse)
+  return . decodeResponse . responseBody $ r
