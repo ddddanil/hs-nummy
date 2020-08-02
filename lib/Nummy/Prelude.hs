@@ -13,6 +13,8 @@ import Data.String (String)
 import Data.Tuple.Extra hiding (first, second)
 import Data.List (lookup, partition, foldl1)
 
+
+-- | Concat nested maybes
 concatMaybe :: Maybe (Maybe a) -> Maybe a
 concatMaybe (Just (Just x)) = Just x
 concatMaybe _ = Nothing

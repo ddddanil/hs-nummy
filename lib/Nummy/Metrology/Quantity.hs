@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeOperators #-}
 module Nummy.Metrology.Quantity (
   Quantity
 , dimOfQu

@@ -1,4 +1,3 @@
-{-# OPTIONS_HADDOCK hide #-}
 module Nummy.Metrology.Definitions.Tables (
   unit_table
 , prefix_table

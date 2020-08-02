@@ -1,6 +1,3 @@
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE GADTs #-}
 module Nummy.Metrology.Unit (
   Unit
 , convert, dimension
@@ -18,13 +15,13 @@ import Nummy.Metrology.Dimension
 import Nummy.Metrology.Prefix
 
 -- | Datatype representing a unit
-data Unit where
-  DimlessUnit :: Value -> Unit
-  BaseUnit :: (Value -> Value, Value -> Value, Dimension, Label) -> Unit
-  PrefixUnit :: Prefix -> Unit -> Unit
-  PowerUnit :: Unit -> Value -> Unit
-  MultUnit :: Unit -> Unit -> Unit
-  DivUnit :: Unit -> Unit -> Unit
+data Unit
+  = DimlessUnit Value
+  | BaseUnit (Value -> Value, Value -> Value, Dimension, Label)
+  | PrefixUnit Prefix Unit
+  | PowerUnit Unit Value
+  | MultUnit Unit Unit
+  | DivUnit Unit Unit
 
 -- | Get a function to convert a value from one unit into another
 convert :: Unit -> Unit -> (Value -> Value)

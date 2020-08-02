@@ -1,4 +1,3 @@
-{-# OPTIONS_HADDOCK hide #-}
 module Nummy.Metrology.Definitions.Dimension where
 
 import Nummy.Metrology.Dimension as D

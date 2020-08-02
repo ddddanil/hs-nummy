@@ -1,4 +1,3 @@
-{-# LANGUAGE BlockArguments #-}
 module Nummy.Currency.Request (requestCurrencies) where
 
 import Nummy.Prelude

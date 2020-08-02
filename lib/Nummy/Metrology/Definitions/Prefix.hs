@@ -1,4 +1,3 @@
-{-# OPTIONS_HADDOCK hide #-}
 module Nummy.Metrology.Definitions.Prefix where
 
 import Nummy.Prelude ((^^))

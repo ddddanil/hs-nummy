@@ -1,5 +1,3 @@
-{-# LANGUAGE ExplicitNamespaces #-}
-
 {-|
 Module        : Nummy.Metrology
 Description   : Types for dimensions, units and quantities geared for arithmetics
@@ -33,7 +31,7 @@ module Nummy.Metrology (
 , (Qu.%^), (Qu.%*), (Qu.%/), (Qu.%+), (Qu.%-)
 ) where
 
-import qualified Nummy.Metrology.Prefix as P
-import qualified Nummy.Metrology.Unit as U
-import qualified Nummy.Metrology.Dimension as D
-import qualified Nummy.Metrology.Quantity as Qu
+import Nummy.Metrology.Prefix as P
+import Nummy.Metrology.Unit as U
+import Nummy.Metrology.Dimension as D
+import Nummy.Metrology.Quantity as Qu

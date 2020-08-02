@@ -1,5 +1,3 @@
-{-# LANGUAGE NumericUnderscores #-}
-{-# OPTIONS_HADDOCK hide #-}
 module Nummy.Metrology.Definitions.Unit where
 
 import Nummy.Prelude ((*), (/), (+), (-))

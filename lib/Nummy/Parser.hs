@@ -24,4 +24,5 @@ import Nummy.Parser.Unit
 
 -- | Parse input into an answer
 parse_nummy :: Parser Text
-parse_nummy = show . pretty <$> physical <* eof
+parse_nummy = parse_physical where
+  parse_physical = show . pretty <$> physical <* eof

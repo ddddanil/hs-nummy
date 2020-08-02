@@ -1,5 +1,3 @@
-{-# LANGUAGE NumericUnderscores #-}
-
 {-|
 Module        : Nummy.Cache
 Description   : Caching functionality for expensive unit definitions

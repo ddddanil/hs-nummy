@@ -1,5 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-
 {-|
 Module        : Nummy.Base
 Description   : Common types for use throughout Nummy
