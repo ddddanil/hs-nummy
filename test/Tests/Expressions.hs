@@ -27,8 +27,10 @@ testExpressions c =
     -- Dimless
     [ checkParseExpr Succeed "5 + 4.4" (9.4 %# scalar_unit) c
     , checkParseExpr Succeed "2.2 - 3" (-0.8 %# scalar_unit) c
+    , checkParseExpr Succeed "5+6"     (11 %# scalar_unit) c
     -- Same unit
     , checkParseExpr Succeed "4m + 7m" (11 %# meter) c
+    , checkParseExpr Succeed "10kg-7kg" (3 %# kilo -| gram) c
     , checkParseExpr Succeed "7s - 9.1s" (-2.1 %# second) c
     -- Mixed unit
     , checkParseExpr Succeed "1m + 1km" (1001 %# meter) c

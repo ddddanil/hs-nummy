@@ -6,7 +6,7 @@ module Nummy.Parser.Expr (
 
 import Nummy.Prelude hiding (many, Prefix, try)
 import Data.Maybe (fromJust)
-import Text.Megaparsec
+import Text.Megaparsec ()
 import Text.Megaparsec.Char
 import Control.Monad.Fail
 import Control.Monad.Combinators.Expr
@@ -32,9 +32,8 @@ import Nummy.Metrology.Definitions.Unit (scalar_unit)
 quantity :: Parser Quantity
 quantity = do
   v <- pValue
-  u <- optional . try $ do
-    _ <- optional spaceChar
-    parenthesis unit <|> unit
+  _ <- space
+  u <- optional $ parenthesis unit <|> unit
   return $ maybe (v %# scalar_unit) ((%#) v) u
 
 
