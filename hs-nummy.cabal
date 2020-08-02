@@ -86,6 +86,9 @@ test-suite tests
       hs-nummy
     , text
     , megaparsec
+    -- Trans
+    , mtl
+    , transformers
     , tasty
     , tasty-hunit
     , tasty-expected-failure

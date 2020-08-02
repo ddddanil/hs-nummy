@@ -5,50 +5,59 @@ module Tests.Parser (
 
 import Nummy.Prelude
 
+import Control.Monad.Except (liftEither)
 import Test.Tasty       (TestTree)
-import Test.Tasty.HUnit (testCase, (@?), Assertion, assertFailure)
+import Test.Tasty.HUnit (testCase, assertFailure)
 import Text.Megaparsec
 import qualified Data.Text as T (unpack)
 import Data.Text.Prettyprint.Doc (Pretty)
 
 import Nummy.Parser
 import Nummy.Metrology
-import Nummy.Cache
 import Tests.Definitions
 
 
 -- Parser
 
-getParse :: Parser a -> Label -> CurrencyCache -> IO (Either (ParseErrorBundle Label Void) a)
-getParse p s c = runReaderT (runParserT (p <* eof) "<test>" s) c
+getParse :: Parser a -> Label -> Test TestParseError a
+getParse p s = do
+  c <- ask
+  e <- liftIO $ runReaderT (runParserT (p <* eof) "<test>" s) c
+  liftEither e
 
-checkParse :: (Eq a, Pretty a) => Parser a -> TestType -> Label -> a -> CurrencyCache -> Assertion
-checkParse p t s x c = do
-  res <- getParse p s c
-  case res of
-    Left err ->
-      if t == Succeed
-      then assertFailure (errorBundlePretty err)
-      else True @? "Expected parse failure"
-    Right y -> assert t x y
+checkParse :: (Eq a, Pretty a) => Parser a -> TestType -> Label -> a -> Test TestParseError ()
+checkParse p t s x = do
+  res <- getParse p s
+  assert t x res
+  `catchError` \e -> case t of
+    Fail -> return () -- Expected parser failure
+    _    -> liftIO $ assertFailure (errorBundlePretty e)
 
 
 -- check functions
 
 checkDim :: TestType -> Label -> Dimension -> Dimension -> TestTree
-checkDim t s d1 d2 = testCase (T.unpack s) $ assert t d1 d2
+checkDim t s d1 d2 = testCase (T.unpack s) . runTest $
+  withExceptT (const "You can't specify parser failure on a non-parser test" :: e -> Label) $
+    assert t d1 d2
 
 checkUnit :: TestType -> Label -> Unit -> Unit -> TestTree
-checkUnit t s u1 u2 = testCase (T.unpack s) $ assert t u1 u2
+checkUnit t s u1 u2 = testCase (T.unpack s) . runTest $
+  withExceptT (const "You can't specify parser failure on a non-parser test" :: e -> Label) $
+    assert t u1 u2
 
 checkQu :: TestType -> Label -> Quantity -> Quantity -> TestTree
-checkQu t s q1 q2 = testCase (T.unpack s) $ assert t q1 q2
+checkQu t s q1 q2 = testCase (T.unpack s) . runTest $
+  withExceptT (const "You can't specify parser failure on a non-parser test" :: e -> Label) $
+    assert t q1 q2
 
-checkParseUnit :: TestType -> Label -> Unit -> CurrencyCache -> TestTree
-checkParseUnit t s u c = testCase (show s) $ checkParse unit t s u c
 
-checkParseQu :: TestType -> Label -> Quantity -> CurrencyCache -> TestTree
-checkParseQu t s q c = testCase (show s) $ checkParse quantity t s q c
+checkParseUnit :: TestType -> Label -> Unit -> TestTree
+checkParseUnit t s u = testCase (show s) . runTest $ checkParse unit t s u
 
-checkParseExpr :: TestType -> Label -> Quantity -> CurrencyCache -> TestTree
-checkParseExpr t s q c = testCase (show s) $ checkParse physical t s q c
+checkParseQu :: TestType -> Label -> Quantity -> TestTree
+checkParseQu t s q = testCase (show s) . runTest $ checkParse quantity t s q
+
+checkParseExpr :: TestType -> Label -> Quantity -> TestTree
+checkParseExpr t s q = testCase (show s) . runTest $ checkParse physical t s q
+

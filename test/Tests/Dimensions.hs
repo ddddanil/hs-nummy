@@ -15,38 +15,38 @@ testDimensions =
   localOption average_timeout $
   testGroup "Dimensions"
   [ testGroup "Algebra"
-    [ checkDim Succeed "len * len == len ^ 2" (length |*| length) (length |^| 2)
-    , checkDim Succeed "len * time / time == len" (length |*| time |/| time) (length)
-    , checkDim Succeed "time * len / time == len" (time |*| length |/| time) (length)
-    , checkDim Succeed "len ^2 / len == len" (length |^| 2 |/| length) (length)
+    [ checkDim Equal "len * len == len ^ 2" (length |*| length) (length |^| 2)
+    , checkDim Equal "len * time / time == len" (length |*| time |/| time) (length)
+    , checkDim Equal "time * len / time == len" (time |*| length |/| time) (length)
+    , checkDim Equal "len ^2 / len == len" (length |^| 2 |/| length) (length)
     ]
   , testGroup "Alternative definitions"
     -- Area
-    [ checkDim Succeed "area = length ^ 2" (area) (length |^| 2)
-    , checkDim Succeed "area = length * length" (area) (length |*| length)
+    [ checkDim Equal "area = length ^ 2" (area) (length |^| 2)
+    , checkDim Equal "area = length * length" (area) (length |*| length)
     -- Volume
-    , checkDim Succeed "vol = length ^ 3" (volume) (length |^| 3)
-    , checkDim Succeed "vol = length ^ 2 * length" (volume) (length |^| 2 |*| length)
-    , checkDim Succeed "vol = length * length ^ 2" (volume) (length |*| length |^| 2)
-    , checkDim Succeed "vol = length * length * length" (volume) (length |*| length |*| length)
+    , checkDim Equal "vol = length ^ 3" (volume) (length |^| 3)
+    , checkDim Equal "vol = length ^ 2 * length" (volume) (length |^| 2 |*| length)
+    , checkDim Equal "vol = length * length ^ 2" (volume) (length |*| length |^| 2)
+    , checkDim Equal "vol = length * length * length" (volume) (length |*| length |*| length)
     -- Acceleration
-    , checkDim Succeed "acc = velocity / time" (acceleration) (velocity |/| time)
-    , checkDim Succeed "acc = length / time ^ 2" (acceleration) (length |/| time |^| 2)
+    , checkDim Equal "acc = velocity / time" (acceleration) (velocity |/| time)
+    , checkDim Equal "acc = length / time ^ 2" (acceleration) (length |/| time |^| 2)
     -- Force
-    , checkDim Succeed "force = mass * acc" (force) (mass |*| acceleration)
-    , checkDim Succeed "force = mass * velocity / time" (force) (mass |*| velocity |/| time)
-    , checkDim Succeed "force = mass * len / time ^ 2" (force) (mass |*| length |/| time |^| 2)
+    , checkDim Equal "force = mass * acc" (force) (mass |*| acceleration)
+    , checkDim Equal "force = mass * velocity / time" (force) (mass |*| velocity |/| time)
+    , checkDim Equal "force = mass * len / time ^ 2" (force) (mass |*| length |/| time |^| 2)
     -- Energy
-    , checkDim Succeed "energy = mass * length ^ 2 / time ^ 2" (energy) (mass |*| (length |^| 2) |/| (time |^| 2))
-    , checkDim Succeed "energy = length * force" (energy) (length |*| force)
-    , checkDim Succeed "energy = charge * voltage" (energy) (charge |*| voltage)
-    , checkDim Succeed "energy = power * time" (energy) (power |*| time)
+    , checkDim Equal "energy = mass * length ^ 2 / time ^ 2" (energy) (mass |*| (length |^| 2) |/| (time |^| 2))
+    , checkDim Equal "energy = length * force" (energy) (length |*| force)
+    , checkDim Equal "energy = charge * voltage" (energy) (charge |*| voltage)
+    , checkDim Equal "energy = power * time" (energy) (power |*| time)
     -- Power
-    , checkDim Succeed "power = mass * length ^ 2 / time ^ 3" (power) (mass |*| length |^| 2 |/| time |^| 3)
-    , checkDim Succeed "power = energy / time" (power) (energy |/| time)
-    , checkDim Succeed "power = voltage * current" (power) (voltage |*| current)
+    , checkDim Equal "power = mass * length ^ 2 / time ^ 3" (power) (mass |*| length |^| 2 |/| time |^| 3)
+    , checkDim Equal "power = energy / time" (power) (energy |/| time)
+    , checkDim Equal "power = voltage * current" (power) (voltage |*| current)
     -- Charge
-    , checkDim Succeed "charge = time * current" (charge) (time |*| current)
-    -- , checkDim Succeed "charge = capacitance * voltage" (charge) (capacitance |*| voltage)
+    , checkDim Equal "charge = time * current" (charge) (time |*| current)
+    , checkDim Equal "charge = capacitance * voltage" (charge) (capacitance |*| voltage)
     ]
   ]
