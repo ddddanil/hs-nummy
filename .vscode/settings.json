@@ -1,6 +1,18 @@
 {
     "cSpell.words": [
+        // Library names
+        "Aeson",
+        "Combinators",
+        "Protolude",
         "Nummy",
-        "Protolude"
+        // Function names
+        "fmap",
+        "concat",
+        "mempty",
+        "uncurry",
+        "elems",
+        "hcat",
+        "mult",
+        "nano",
     ]
 }

@@ -23,7 +23,7 @@ testExpressions =
     , checkParseExpr Equal "7 nm * 1000000 | mm"   (7 %# milli -| meter)
     ]
   , testGroup "Addition and subtraction"
-    -- Dimless
+    -- Scalar
     [ checkParseExpr Equal "5 + 4.4" (9.4 %# scalar_unit)
     , checkParseExpr Equal "2.2 - 3" (-0.8 %# scalar_unit)
     , checkParseExpr Equal "5+6"     (11 %# scalar_unit)
