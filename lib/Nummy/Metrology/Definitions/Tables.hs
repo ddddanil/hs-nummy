@@ -11,11 +11,11 @@ import Nummy.Metrology.Definitions.Prefix
 
 
 no_prefix     :: [PrefixType]
-no_prefix     = []
+no_prefix     = [ ]
 metric_prefix :: [PrefixType]
-metric_prefix = [PrefixAboveOne, PrefixBelowOne]
+metric_prefix = [ PrefixAboveOne, PrefixBelowOne ]
 info_prefix   :: [PrefixType]
-info_prefix   = [PrefixAboveOne, PrefixBinary]
+info_prefix   = [ PrefixAboveOne, PrefixBinary ]
 
 
 unit_table :: [ ([Label], Unit, [PrefixType]) ]  -- ^ (Synonyms, Unit)
@@ -67,6 +67,7 @@ unit_table =
   , (["erg"],                 erg         , metric_prefix  )
   -- Power
   , (["W", "watt"],           watt        , metric_prefix  )
+  , (["hp", "horsepower"],    horsepower  , no_prefix      )
   -- Frequency
   , (["Hz", "herz", "hertz"], hertz       , metric_prefix  )
   -- Charge
@@ -83,6 +84,7 @@ unit_table =
 -- | [Source](https://en.wikipedia.org/wiki/Metric_prefix)
 prefix_table :: [ ([Label], Prefix, PrefixType) ]  -- ^ (Synonyms, Prefix)
 prefix_table =
+  -- Above one
   [ (["Y", "yotta"],  yotta , PrefixAboveOne )
   , (["Z", "zetta"],  zetta , PrefixAboveOne )
   , (["E", "exa"],    exa   , PrefixAboveOne )
@@ -93,6 +95,7 @@ prefix_table =
   , (["k", "kilo"],   kilo  , PrefixAboveOne )
   , (["h", "hecto"],  hecto , PrefixAboveOne )
   , (["da", "deca"],  deca  , PrefixAboveOne )
+  -- Below one
   , (["d", "deci"],   deci  , PrefixBelowOne )
   , (["c", "centi"],  centi , PrefixBelowOne )
   , (["m", "milli"],  milli , PrefixBelowOne )
@@ -103,4 +106,13 @@ prefix_table =
   , (["a", "atto"],   atto  , PrefixBelowOne )
   , (["z", "zepto"],  zepto , PrefixBelowOne )
   , (["y", "yocto"],  yocto , PrefixBelowOne )
+  -- Binary
+  , (["Ki", "kibi"],  kibi  , PrefixBinary   )
+  , (["Mi", "mebi"],  mebi  , PrefixBinary   )
+  , (["Gi", "gibi"],  gibi  , PrefixBinary   )
+  , (["Ti", "tebi"],  tebi  , PrefixBinary   )
+  , (["Pi", "pebi"],  pebi  , PrefixBinary   )
+  , (["Ei", "exbi"],  exbi  , PrefixBinary   )
+  , (["Zi", "zebi"],  zebi  , PrefixBinary   )
+  , (["Yi", "yobi"],  yobi  , PrefixBinary   )
   ]

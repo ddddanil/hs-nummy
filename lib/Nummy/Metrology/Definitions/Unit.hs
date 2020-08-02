@@ -204,6 +204,10 @@ erg = conversion_ratio energy "erg" (1/10_000_000)
 watt :: Unit
 watt = canonical_unit power "W"
 
+-- | Customary
+horsepower :: Unit
+horsepower = conversion_ratio power "hp" 735.49875
+
 -- **** Frequency
 
 -- | Canonical (SI, MKS)

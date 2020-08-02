@@ -88,3 +88,40 @@ zepto = Prefix (10 ^^ (-21), "z")
 -- | 10^-24
 yocto :: Prefix
 yocto = Prefix (10 ^^ (-24), "y")
+
+
+-- *** Binary
+
+-- | [wiki](https://en.wikipedia.org/wiki/Binary_prefix)
+
+-- | 2^10
+kibi :: Prefix
+kibi = Prefix(2 ^^ 10, "Ki")
+
+-- | 2^20
+mebi :: Prefix
+mebi = Prefix(2 ^^ 20, "Mi")
+
+-- | 2^30
+gibi :: Prefix
+gibi = Prefix(2 ^^ 30, "Gi")
+
+-- | 2^40
+tebi :: Prefix
+tebi = Prefix(2 ^^ 40, "Ti")
+
+-- | 2^50
+pebi :: Prefix
+pebi = Prefix(2 ^^ 50, "Pi")
+
+-- | 2^60
+exbi :: Prefix
+exbi = Prefix(2 ^^ 60, "Ei")
+
+-- | 2^70
+zebi :: Prefix
+zebi = Prefix(2 ^^ 70, "Zi")
+
+-- | 2^80
+yobi :: Prefix
+yobi = Prefix(2 ^^ 80, "Yi")

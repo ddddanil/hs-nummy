@@ -23,11 +23,20 @@ You can compute an arithmetic expression of units and present them in another un
 > 60 km/h + 3 m/s
 70.8 km/h
 
+> 1 lbf / 1lb | N/kg
+9.806650848205406 N/kg
+
 > 3 m^2 - 1ft^2 | mm^2
 2907096.96 mm²
 
+> 75 hp * 2 hour | MJ
+397.169325 MJ
+
 > 100 Mb/s | kB/s
 12500 kbyte/s
+
+> 2 TB | GiB
+1862.645149230957 Gibyte
 ```
 
 ### Currency
