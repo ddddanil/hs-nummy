@@ -1,7 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Repl (
+module Application.Repl (
   ReplAction
-, replAction
 , repl
 ) where
 
@@ -13,13 +12,12 @@ import Data.Char (isPrint)
 import Data.Bifoldable (bifoldl1, bimsum)
 import qualified Data.Map.Strict as M
 import qualified Data.Text as T
-import System.IO (getChar, hReady, hSetEcho, hSetBuffering, BufferMode (NoBuffering))
+import System.IO (getChar, putChar, hReady, hSetEcho, hSetBuffering, BufferMode (NoBuffering))
 import System.Console.ANSI
 
-type ReplExcept = ExceptT Text IO
-type Repl = StateT ReplState ReplExcept
+type Repl = StateT ReplState IO
 
-type ReplAction = Text -> ReplExcept Text
+type ReplAction = Text -> IO Text
 
 data ReplState = ReplState
   { _action :: ReplAction
@@ -32,6 +30,7 @@ repl f = do
   hSetBuffering stdin NoBuffering
   hSetBuffering stdout NoBuffering
   hSetEcho stdin False
+  putChar '\n'
   setTitle "Nummy"
   runRepl (forever (updateRepl >> handleInput) ) f
 
@@ -44,16 +43,7 @@ traceSt m = do
 
 runRepl :: Repl a -> ReplAction -> IO a
 runRepl m f = do
-  ex <- runExceptT (runStateT m (startState f))
-  case ex of
-    Right (x, _) -> return x
-    Left err -> fail ("Unhandled REPL exception:\n" ++ show err)
-
-replAction :: (Text -> IO (Either Text Text) ) -> ReplAction
-replAction f =
-  \t -> do
-    e <- liftIO $ f t
-    liftEither e
+  evalStateT m (startState f)
 
 startState :: ReplAction -> ReplState
 startState f = ReplState f ("", 0)

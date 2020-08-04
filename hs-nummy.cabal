@@ -1,6 +1,6 @@
 cabal-version: 2.2
 name:          hs-nummy
-version:       0.4
+version:       0.5
 
 common common-options
   default-language:   Haskell2010
@@ -73,7 +73,10 @@ executable nummy
   import:             common-options, common-depends
   main-is:            Main.hs
   other-modules:
-      Repl
+      Application.Base
+    , Application.Repl
+    , Application.Arguments
+    , Application.Parser
   hs-source-dirs:     exe
   build-depends:
       hs-nummy
@@ -81,7 +84,7 @@ executable nummy
     , ansi-terminal
     , haskeline
 
-test-suite tests
+test-suite lib
   import:             common-options, common-depends
   main-is:            Main.hs
   other-modules:
