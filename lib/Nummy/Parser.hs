@@ -20,6 +20,7 @@ module Nummy.Parser (
 import Nummy.Prelude
 import Control.Monad.Except (liftEither)
 import Text.Megaparsec
+import Text.Megaparsec.Char (space)
 import Data.Text.Prettyprint.Doc (pretty)
 
 import Nummy.Parser.Base
@@ -29,7 +30,7 @@ import Nummy.Parser.Unit
 -- | Parse input into an answer
 parse_nummy :: Parser Text
 parse_nummy = parse_physical where
-  parse_physical = show . pretty <$> physical <* eof
+  parse_physical = show . pretty <$> physical <* space <* eof
 
 nummy :: Text -> ParseExcept Text
 nummy t = liftEither =<< (lift $ runParserT parse_nummy "<input>" t)

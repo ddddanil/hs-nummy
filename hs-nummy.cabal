@@ -66,21 +66,24 @@ library
     , aeson
     -- Parsing
     , parser-combinators
-    -- Until
+    -- Util
     , clock
 
 executable nummy
   import:             common-options, common-depends
   main-is:            Main.hs
   other-modules:
-      Application.Base
-    , Application.Repl
-    , Application.Arguments
+      Application.Repl
+    , Application.Repl.Input
+    , Application.Repl.Output
     , Application.Parser
   hs-source-dirs:     exe
   build-depends:
       hs-nummy
     -- IO
+    , async
+    , pipes
+    , pipes-concurrency
     , ansi-terminal
     , haskeline
 
