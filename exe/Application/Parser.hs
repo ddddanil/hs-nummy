@@ -2,7 +2,7 @@ module Application.Parser where
 
 import Nummy.Prelude
 import Nummy.Parser
-import qualified Data.Text as T (pack, unpack)
+import qualified Data.Text as T (pack)
 import Data.Bifoldable (bifold)
 import Text.Megaparsec (errorBundlePretty)
 import Nummy.Cache (runReadCache)

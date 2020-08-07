@@ -6,10 +6,9 @@ module Application.Repl.Output (
 
 import Nummy.Prelude
 import Pipes
-import qualified Pipes.Prelude as P
 import Control.Lens
 import qualified Data.Text as T
-import System.IO (getChar, putChar, hFlush)
+import System.IO (putChar, hFlush)
 import System.Console.ANSI
 
 

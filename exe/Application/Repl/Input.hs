@@ -5,10 +5,9 @@ module Application.Repl.Input (
 
 import Nummy.Prelude
 import Pipes
-import qualified Pipes.Prelude as P
 import Control.Lens
 import Data.Char (isPrint)
-import Data.Bifoldable (bifoldl1, bimsum)
+import Data.Bifoldable (bifoldl1)
 import qualified Data.Map.Strict as M
 import qualified Data.Text as T
 import System.IO (getChar, hReady)
