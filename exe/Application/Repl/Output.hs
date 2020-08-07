@@ -66,9 +66,10 @@ printOutput = do
     setCursorColumn 0
     setSGR [Reset]
     putStr pr
+    setSGR [ SetColor Foreground Vivid White ]
     putStr p
-    putChar ' '
     setSGR [ SetColor Foreground Dull White ]
+    putChar ' '
     putStr trail
     putStr r
     setCursorColumn (c + T.length pr)

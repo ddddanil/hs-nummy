@@ -35,6 +35,9 @@ startState = InputState ("", 0)
 
 -- Stateful functions
 
+pushState :: InputM ()
+pushState = lift . yield =<< use input
+
 moveCursorRight :: InputM ()
 moveCursorRight = input %= advRight where
   advRight (str, pos) = (str, min (T.length str) (pos + 1) )
@@ -54,26 +57,22 @@ addCharLeft c = do
   (str, pos) <- use input
   input . _1 .= insertChar str pos c
   moveCursorRight
-  lift . yield =<< use input
 
 remCharLeft :: InputM ()
 remCharLeft = do
   (str, pos) <- use input
   input . _1 .= removeChar str (pos - 1)
   moveCursorLeft
-  lift . yield =<< use input
 
 addCharRight :: Char -> InputM ()
 addCharRight c = do
   (str, pos) <- use input
   input . _1 .= insertChar str pos c
-  lift . yield =<< use input
 
 remCharRight :: InputM ()
 remCharRight = do
   (str, pos) <- use input
   input . _1 .= removeChar str (pos - 1)
-  lift . yield =<< use input
 
 
 -- Input
@@ -97,6 +96,7 @@ handleInput = do
   i <- liftIO getKey
   whenJust (printableSequence i) addCharLeft
   whenJust (M.lookup i key_table) identity
+  pushState
 
 key_table :: M.Map [Char] (InputM ())
 key_table = M.fromList $

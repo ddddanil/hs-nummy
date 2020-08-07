@@ -23,7 +23,6 @@ repl p = do
   -- Prep
   hSetBuffering stdin NoBuffering
   hSetEcho stdin False
-  putChar '\n'
   setTitle "Nummy"
   -- Setup boxes
   (o1, i1, s1) <- spawn' Unbounded -- to output
@@ -34,6 +33,7 @@ repl p = do
   p <- async . runEffect $ fromInput i2 >-> runParser p >-> toOutput o1
   -- Output
   o <- async . runEffect $ fromInput i1 >-> runOutput
+  -- run all
   mapM_ wait [i, p, o]
 
 
