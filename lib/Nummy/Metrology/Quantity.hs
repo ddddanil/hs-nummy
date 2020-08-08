@@ -1,5 +1,6 @@
 module Nummy.Metrology.Quantity (
   Quantity
+, prettyQu
 , dimOfQu
 , (%#), (%<|)
 , (%+), (%-), (%*), (%/), (%^)
@@ -20,6 +21,10 @@ newtype Quantity = Quantity (Value, Unit) deriving Show
 
 instance Pretty Quantity where
   pretty (Quantity (v, u)) = pretty v <+> pretty u
+
+-- | Prettify quantity and include annotations
+prettyQu :: Quantity -> DocN
+prettyQu (Quantity (v, u)) = annotate SQuantity $ annotate SValue (pretty v) <+> annotate SUnit (pretty u)
 
 instance Eq Quantity where
   Quantity (v1, u1) == Quantity (v2, u2) =

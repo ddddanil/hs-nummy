@@ -32,6 +32,7 @@ common common-depends
     , megaparsec
     -- Util
     , prettyprinter
+    , prettyprinter-ansi-terminal
 
 library
   import:           common-options, common-depends

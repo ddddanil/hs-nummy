@@ -21,9 +21,9 @@ type ParserError = ParseErrorBundle Label Void
 
 -- | Possible results of parsing
 data ParserResult
-  = PResult Text
+  = PResult DocN
   | PError ParserError
-  deriving (Eq, Show)
+  deriving Show
 
 pValue :: Parser Value
 pValue = valueF <$> try float <|> valueI <$> decimal <?> "value"

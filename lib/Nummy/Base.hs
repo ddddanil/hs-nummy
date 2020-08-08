@@ -8,6 +8,9 @@ Stability     : experimental
 module Nummy.Base (
   -- * Label
   Label
+  -- * Styling
+, NummyStyle (..)
+, DocN
   -- * Value
 , Value(..), valueF, valueI, (^^^)
 ) where
@@ -22,6 +25,17 @@ import Data.Text.Prettyprint.Doc
 -- | Preferred string-like datatype
 type Label = Text
 
+
+-- | Annotations for 'Doc's
+data NummyStyle
+  = SResult
+  | SQuantity
+  | SUnit
+  | SValue
+  deriving (Show, Eq)
+
+-- | 'Doc' with 'NummyStyle' applied
+type DocN = Doc NummyStyle
 
 -- Value
 

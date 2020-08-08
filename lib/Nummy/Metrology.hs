@@ -26,7 +26,9 @@ module Nummy.Metrology (
 , (U.#/)
 -- * Quantity
 , Qu.Quantity
-, Qu.dimOfQu, (Qu.%#), (Qu.%<|)
+, Qu.prettyQu
+, Qu.dimOfQu
+, (Qu.%#), (Qu.%<|)
 -- ** Operators on quantities
 , (Qu.%^), (Qu.%*), (Qu.%/), (Qu.%+), (Qu.%-)
 ) where

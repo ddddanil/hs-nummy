@@ -7,6 +7,8 @@ module Application.Repl.Output (
 import Nummy.Prelude
 import Pipes
 import Control.Lens
+import qualified Data.Text.Prettyprint.Doc as PP
+import qualified Data.Text.Prettyprint.Doc.Render.Terminal as PP.T
 import Text.Megaparsec
 import qualified Data.Text as T
 import System.IO (putChar, hFlush)
@@ -20,7 +22,7 @@ data OutputEvent
   = OPrompt Text Int
   | OResult ParserResult
   | OCommand
-  deriving (Eq, Show)
+  deriving (Show)
 makePrisms ''OutputEvent
 
 data OutputState = OutputState
@@ -74,15 +76,15 @@ printOutput = do
     putStr p
     setSGR [ SetColor Foreground Dull White ]
     putChar ' '
-    putStr . printResult $ r
+    PP.T.putDoc . printResult $ r
     setCursorColumn (c + T.length pr)
     hFlush stdout
 
-printResult :: ParserResult -> Text
+printResult :: ParserResult -> PP.Doc PP.T.AnsiStyle
 printResult r =
   case r of
-    PError _ -> " ✗"
-    PResult x -> T.append " = " x
+    PError _ -> PP.annotate (PP.T.color PP.T.Red) . PP.pretty $ (" ✗" :: Text)
+    PResult x -> " =" PP.<+> PP.reAnnotate convertNummyStyle x
 
 printExec :: OutputM ()
 printExec = do
@@ -93,3 +95,8 @@ printExec = do
     case r of
       PResult _ -> return ()
       PError e -> putStrLn $ errorBundlePretty e
+
+convertNummyStyle :: NummyStyle -> PP.T.AnsiStyle
+convertNummyStyle SValue = PP.T.color PP.T.White <> PP.T.bold
+convertNummyStyle SUnit  = PP.T.colorDull PP.T.White
+convertNummyStyle _ = mempty
