@@ -7,22 +7,26 @@ module Application.Repl.Output (
 import Nummy.Prelude
 import Pipes
 import Control.Lens
+import Text.Megaparsec
 import qualified Data.Text as T
 import System.IO (putChar, hFlush)
 import System.Console.ANSI
 
+import Nummy.Parser
 
 -- Types
 
 data OutputEvent
   = OPrompt Text Int
-  | OResult Text
-  deriving (Eq, Ord, Show)
+  | OResult ParserResult
+  | OCommand
+  deriving (Eq, Show)
+makePrisms ''OutputEvent
 
 data OutputState = OutputState
   { _prompt :: Text
   , _cursor :: Int
-  , _result :: Text
+  , _result :: ParserResult
   }
 makeLenses ''OutputState
 
@@ -38,7 +42,7 @@ runOutput = evalStateT (printOutput >> forever (updateState >> printOutput) ) st
 -- Stateful functions
 
 startState :: OutputState
-startState = OutputState "" 0 ""
+startState = OutputState "" 0 (PResult "")
 
 updateState :: OutputM ()
 updateState = do
@@ -49,6 +53,8 @@ updateState = do
       cursor .= c
     OResult o   -> do
       result .= o
+    OCommand -> do
+      printExec
 
 
 -- Output
@@ -56,7 +62,6 @@ updateState = do
 printOutput :: OutputM ()
 printOutput = do
   let pr = "> " :: Text
-  let trail = " = " :: Text
   p <- use prompt
   r <- use result
   c <- use cursor
@@ -69,7 +74,22 @@ printOutput = do
     putStr p
     setSGR [ SetColor Foreground Dull White ]
     putChar ' '
-    putStr trail
-    putStr r
+    putStr . printResult $ r
     setCursorColumn (c + T.length pr)
     hFlush stdout
+
+printResult :: ParserResult -> Text
+printResult r =
+  case r of
+    PError _ -> " ✗"
+    PResult x -> T.append " = " x
+
+printExec :: OutputM ()
+printExec = do
+  r <- use result
+  liftIO $ do
+    putChar '\n'
+    setCursorColumn 0
+    case r of
+      PResult _ -> return ()
+      PError e -> putStrLn $ errorBundlePretty e

@@ -1,11 +1,11 @@
 module Main where
 
 import Nummy.Prelude
-import qualified Data.Text as T (pack, unpack, null)
+import qualified Data.Text as T
 import System.Console.Haskeline
 import System.Console.ANSI
 
-import Application.Parser
+import Nummy.Parser
 import Application.Repl
 
 
@@ -19,7 +19,7 @@ tryArgs fallback = do
   a <- args
   if T.null a
     then fallback
-    else putStrLn =<< runParser prettyParserError a
+    else print =<< nummy a
 
 
 -- Repl types
@@ -31,12 +31,12 @@ haskeline_repl = runInputT defaultSettings loop where
     case minput of
       Nothing -> return ()
       Just input -> do
-        output <- liftIO $ runParser prettyParserError input
-        putStrLn $ T.unpack output
+        output <- liftIO $ nummy input
+        print $ output
         loop
 
 custom_repl :: IO ()
-custom_repl = repl (runParser symbolParserError)
+custom_repl = repl nummy
 
 
 -- Main

@@ -8,7 +8,7 @@ Stability     : experimental
 module Nummy.Parser (
   Parser
 , ParserError
-, ParseExcept
+, ParserResult (..)
 , nummy
 , unit
 , quantity
@@ -18,19 +18,19 @@ module Nummy.Parser (
 ) where
 
 import Nummy.Prelude
-import Control.Monad.Except (liftEither)
 import Text.Megaparsec
 import Text.Megaparsec.Char (space)
 import Data.Text.Prettyprint.Doc (pretty)
 
 import Nummy.Parser.Base
-import Nummy.Parser.Expr
+import Nummy.Parser.Physical
 import Nummy.Parser.Unit
+import Nummy.Cache (runReadCache)
 
 -- | Parse input into an answer
-parse_nummy :: Parser Text
+parse_nummy :: Parser ParserResult
 parse_nummy = parse_physical where
-  parse_physical = show . pretty <$> physical <* space <* eof
+  parse_physical = PResult . show . pretty <$> physical <* space <* eof
 
-nummy :: Text -> ParseExcept Text
-nummy t = liftEither =<< (lift $ runParserT parse_nummy "<input>" t)
+nummy :: Text -> IO ParserResult
+nummy t = fmap (either PError identity) . runReadCache $ runParserT parse_nummy "<input>" t

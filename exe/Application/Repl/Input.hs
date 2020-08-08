@@ -12,10 +12,11 @@ import qualified Data.Map.Strict as M
 import qualified Data.Text as T
 import System.IO (getChar, hReady)
 
+import Application.Repl.Output
 
 -- Types
 
-type InputM = StateT InputState (Producer (Text, Int) IO)
+type InputM = StateT InputState (Producer OutputEvent IO)
 
 data InputState = InputState
   { _input :: (Text, Int)        -- ^ Text and cursor position inside it
@@ -25,7 +26,7 @@ makeLenses ''InputState
 
 -- Pipes
 
-runInput :: Producer (Text, Int) IO ()
+runInput :: Producer OutputEvent IO ()
 runInput = evalStateT (forever handleInput) startState
 
 startState :: InputState
@@ -35,7 +36,13 @@ startState = InputState ("", 0)
 -- Stateful functions
 
 pushState :: InputM ()
-pushState = lift . yield =<< use input
+pushState = lift . yield . (uncurry OPrompt) =<< use input
+
+pushCommand :: InputM ()
+pushCommand = lift . yield $ OCommand
+
+clearInput :: InputM ()
+clearInput = input .= ("", 0)
 
 moveCursorRight :: InputM ()
 moveCursorRight = input %= advRight where
@@ -55,13 +62,11 @@ addCharLeft :: Char -> InputM ()
 addCharLeft c = do
   (str, pos) <- use input
   input . _1 .= insertChar str pos c
-  moveCursorRight
 
 remCharLeft :: InputM ()
 remCharLeft = do
   (str, pos) <- use input
   input . _1 .= removeChar str (pos - 1)
-  moveCursorLeft
 
 addCharRight :: Char -> InputM ()
 addCharRight c = do
@@ -93,15 +98,16 @@ printableSequence s = do
 handleInput :: InputM ()
 handleInput = do
   i <- liftIO getKey
-  whenJust (printableSequence i) addCharLeft
+  whenJust (printableSequence i) ( \c -> addCharLeft c >> moveCursorRight )
   whenJust (M.lookup i key_table) identity
   pushState
 
 key_table :: M.Map [Char] (InputM ())
 key_table = M.fromList $
-  [ ("\ESC[C", moveCursorRight)
-  , ("\ESC[D", moveCursorLeft )
-  , ("\DEL",   remCharLeft    )
+  [ ("\ESC[C", moveCursorRight    )
+  , ("\ESC[D", moveCursorLeft     )
+  , ("\DEL",   remCharLeft >> moveCursorLeft   )
+  , ("\n",     pushCommand >> clearInput   )
   ]
 
 

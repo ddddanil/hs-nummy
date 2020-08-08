@@ -44,7 +44,7 @@ library
     , Nummy.Metrology.Definitions
   other-modules:
       Nummy.Parser.Base
-    , Nummy.Parser.Expr
+    , Nummy.Parser.Physical
     , Nummy.Parser.Unit
     , Nummy.Currency
     , Nummy.Currency.Base
@@ -76,7 +76,6 @@ executable nummy
       Application.Repl
     , Application.Repl.Input
     , Application.Repl.Output
-    , Application.Parser
   hs-source-dirs:     exe
   build-depends:
       hs-nummy

@@ -1,4 +1,4 @@
-module Nummy.Parser.Expr (
+module Nummy.Parser.Physical (
   quantity
 , expression
 , physical
@@ -68,13 +68,13 @@ pOpQuAdd :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
 pOpQuAdd = do
   _ <- char '+'
   _ <- space
-  return $ \a b -> concatMaybe $ (%+) <$> a <*> b
+  return $ \a b -> join $ (%+) <$> a <*> b
 
 pOpQuSub :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
 pOpQuSub = do
   _ <- char '-'
   _ <- space
-  return $ \a b -> concatMaybe $ (%-) <$> a <*> b
+  return $ \a b -> join $ (%-) <$> a <*> b
 
 
 -- Operator table
