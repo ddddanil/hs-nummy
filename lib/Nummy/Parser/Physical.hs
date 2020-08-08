@@ -83,8 +83,8 @@ opQuTable :: [[Operator Parser (Maybe Quantity)]]
 opQuTable =
   [ [ Prefix  pOpQuNeg ]
   , [ Postfix pOpQuPow ]
-  , [ InfixL  pOpQuMul ]
   , [ InfixL  pOpQuDiv ]
+  , [ InfixL  pOpQuMul ]
   , [ InfixL  pOpQuSub, InfixL pOpQuAdd ]
   ]
 

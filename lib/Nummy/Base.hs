@@ -28,10 +28,10 @@ type Label = Text
 
 -- | Annotations for 'Doc's
 data NummyStyle
-  = SResult
-  | SQuantity
-  | SUnit
-  | SValue
+  = SResult    -- ^ Any result
+  | SQuantity  -- ^ Physical quantity
+  | SUnit      -- ^ A unit
+  | SValue     -- ^ Numerical value
   deriving (Show, Eq)
 
 -- | 'Doc' with 'NummyStyle' applied
