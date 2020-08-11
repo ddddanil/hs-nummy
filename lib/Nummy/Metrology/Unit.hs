@@ -16,7 +16,7 @@ import Nummy.Metrology.Prefix
 
 -- | Datatype representing a unit
 data Unit
-  = ScalarUnit Value
+  = ScalarUnit
   | BaseUnit (Value -> Value) (Value -> Value) Dimension Label
   | PrefixUnit Prefix Unit
   | PowerUnit Unit Value
@@ -29,7 +29,7 @@ convert u1 u2 = fromSi u2 . toSi u1
 
 -- | Get a function that converts a value represented in that unit into SI
 toSi :: Unit -> (Value -> Value)
-toSi (ScalarUnit x) = \v -> v * x
+toSi (ScalarUnit) = identity
 toSi (BaseUnit f _ _ _) = f
 toSi (PrefixUnit (Prefix (p, _)) x) = \v -> p * toSi x v
 toSi (PowerUnit u p) = \v -> v * (toSi u 1 ^^^ p)
@@ -38,7 +38,7 @@ toSi (DivUnit u1 u2) = \v -> v * (toSi u1 1 / toSi u2 1)
 
 -- | Get a function that converts a value in SI into a given unit
 fromSi :: Unit -> (Value -> Value)
-fromSi (ScalarUnit x) = \v -> v / x
+fromSi (ScalarUnit) = identity
 fromSi (BaseUnit _ g _ _) = g
 fromSi (PrefixUnit (Prefix (p, _)) x) = \v -> fromSi x v / p
 fromSi (PowerUnit u p) = \v -> v * (fromSi u 1 ^^^ p)
@@ -47,7 +47,7 @@ fromSi (DivUnit u1 u2) = \v -> v * (fromSi u1 1 / fromSi u2 1)
 
 -- | Get the dimension of a unit
 dimension :: Unit -> Dimension
-dimension (ScalarUnit _) = scalar
+dimension (ScalarUnit) = scalar
 dimension (BaseUnit _ _ d _) = d
 dimension (PrefixUnit _ x) = dimension x
 dimension (PowerUnit u p) = dimension u |^| p
@@ -65,16 +65,17 @@ simplify (MultUnit (MultUnit u1 u2) u3) = simplify $ MultUnit (simplify u1) (sim
 -- Propagate multiplication into the numerator of division
 simplify (MultUnit un (DivUnit u1 u2)) = simplify $ DivUnit (simplify (MultUnit un u1)) (simplify u2)
 simplify (MultUnit (DivUnit u1 u2) un) = simplify $ DivUnit (simplify (MultUnit un u1)) (simplify u2)
--- Remove Scalar 1 from multiplication
-simplify (MultUnit (ScalarUnit 1) u2) = simplify u2
--- Remove Scalar 1 from division
-simplify (DivUnit u1 (ScalarUnit 1)) = simplify u1
+-- Remove Scalar from multiplication
+simplify (MultUnit u1 ScalarUnit) = simplify u1
+simplify (MultUnit ScalarUnit u2) = simplify u2
+-- Remove Scalar from division
+simplify (DivUnit u1 ScalarUnit) = simplify u1
 -- Remove double division
 simplify (DivUnit un (DivUnit u1 u2)) = simplify $ DivUnit (simplify (MultUnit un u2)) (simplify u1)
 -- Remove repeating terms
 simplify (DivUnit num den) =
   case new_den of
-    (ScalarUnit 1) -> new_num
+    ScalarUnit -> new_num
     _ -> DivUnit new_num new_den
   where
     mult_unfold :: Unit -> [Unit]
@@ -93,7 +94,7 @@ simplify x = x
 
 
 instance Show Unit where
-  show (ScalarUnit v) = "ScalarUnit " ++ S.show v
+  show (ScalarUnit) = "ScalarUnit"
   show (BaseUnit f g d l) = "BaseUnit(" ++ S.show (f 1) ++ "," ++ S.show (g 1)
                                  ++ "," ++ S.show d ++ "," ++ S.show l ++ ")"
   show (PrefixUnit p u) = "PrefixUnit(" ++ S.show p ++ " " ++ S.show u ++ ")"
@@ -103,10 +104,7 @@ instance Show Unit where
 
 
 instance Pretty Unit where
-  pretty (ScalarUnit v) =
-    if v == 1
-      then mempty
-      else pretty v
+  pretty (ScalarUnit) = pretty '1'
   pretty (BaseUnit _ _ _ l) = pretty l
   pretty (PrefixUnit p x) = pretty p <> pretty x
   pretty (PowerUnit u p) = pretty u <> pretty_power p where
@@ -119,8 +117,7 @@ instance Pretty Unit where
 
 instance Eq Unit where
   -- Structural equality
-  (ScalarUnit v1) == (ScalarUnit v2) =
-    v1 == v2
+  (ScalarUnit) == (ScalarUnit) = True
 
   (BaseUnit f1 g1 d1 l1) == (BaseUnit f2 g2 d2 l2) =
     f1 1 == f2 1 && g1 1 == g2 1 && d1 == d2 && l1 == l2
@@ -194,4 +191,4 @@ canonical_unit d l = conversion_ratio d l 1
 
 -- | Unit of a scalar value
 scalar_unit :: Unit
-scalar_unit = ScalarUnit 1
+scalar_unit = ScalarUnit
