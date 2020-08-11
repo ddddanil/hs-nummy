@@ -1,6 +1,7 @@
 module Application.Repl (
   ReplAction
 , repl
+, rep
 ) where
 
 import Nummy.Prelude
@@ -34,6 +35,15 @@ repl pa = do
   -- run all
   mapM_ wait [i, p, o]
 
+rep :: Text -> ReplAction -> IO ()
+rep s pa = do
+  -- Prep
+  setTitle "Nummy"
+  -- Pipes
+  let e1 = OPrompt s 1                                -- fake input
+  Right (e2, _) <- next $ yield e1 >-> runParser pa   -- run parser over input
+  let e3 = OCommand                                   -- fake Return press
+  runEffect $ each [ e1, e2, e3 ] >-> runOutput       -- Send three events in sequence
 
 runParser :: ReplAction -> Pipe OutputEvent OutputEvent IO ()
 runParser p =

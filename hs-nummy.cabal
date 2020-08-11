@@ -85,7 +85,6 @@ executable nummy
     , pipes
     , pipes-concurrency
     , ansi-terminal
-    , haskeline
 
 test-suite lib
   import:             common-options, common-depends
