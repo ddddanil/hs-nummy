@@ -6,12 +6,14 @@ module Nummy.Prelude (
 , module Data.List
 , (&|&)
 , whenJust
+, liftMaybe
 ) where
 
 import Protolude
 import Data.String (String)
 import Data.Tuple.Extra hiding (first, second)
 import Data.List (lookup, partition, foldl1)
+import Control.Monad.Trans.Maybe (MaybeT (MaybeT))
 
 
 -- | Boolean XOR
@@ -25,3 +27,6 @@ infixr 2 &|&
 whenJust :: (Applicative m) => Maybe a -> (a -> m () ) -> m ()
 whenJust (Just a) k = k a
 whenJust Nothing _ = pure ()
+
+liftMaybe :: (Monad m) => Maybe a -> MaybeT m a
+liftMaybe = MaybeT . return

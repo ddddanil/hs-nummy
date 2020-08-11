@@ -3,6 +3,7 @@ module Nummy.Parser.Unit (
 ) where
 
 import Nummy.Prelude hiding (many, Prefix, try)
+import Control.Monad.Trans.Maybe (MaybeT(runMaybeT))
 import Data.Char (isAlpha)
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -20,7 +21,7 @@ import Nummy.Metrology.Definitions.Unit (scalar_unit)
 pBaseUnit :: Parser Unit
 pBaseUnit = do
   str <- takeWhile1P (Just "base unit") isAlpha
-  mu <- lift $ lookupUnit Nothing str
+  mu <- lift . runMaybeT $ lookupUnit Nothing str
   case mu of
     Just u -> return u
     Nothing -> fail "Not a known base unit"

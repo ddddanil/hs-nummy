@@ -20,10 +20,10 @@ module Nummy.Metrology.Definitions (
 ) where
 
 import Nummy.Prelude hiding (Prefix)
+import Control.Monad.Trans.Maybe (MaybeT)
 import Data.Char (isUpper)
 import qualified Data.Text as T
 
-import Nummy.Base
 import Nummy.Metrology.Dimension as D
 import Nummy.Metrology.Unit as U
 import Nummy.Metrology.Prefix as P
@@ -81,23 +81,15 @@ baseUnitTable = sortOn (T.length . fst) $ map (\(a, b, _)->(a, b)) unitTable ++ 
 -- Just minute
 -- >>> lookupUnit Nothing "x"
 -- Nothing
-lookupUnit :: Maybe Dimension          -- ^ Optional dimension specifier
+lookupUnit :: Maybe Dimension         -- ^ Optional dimension specifier
            -> Text                    -- ^ Unit synonym
-           -> ReadCache (Maybe Unit)   -- ^ Result
-lookupUnit md unit =
-  case find_unit baseUnitTable of
-    Just u -> return . return $ u
-    Nothing ->
-      if T.length unit == 3 && T.foldl (flip $ (&&) . isUpper) True unit
-         -- Possible units are only 3-letter uppercase names
-        then find_unit <$> currencyTable
-        else return Nothing
+           -> MaybeT ReadCache Unit   -- ^ Result
+lookupUnit md u =
+  liftMaybe munit <|> if isCurrency then (lift  mcurrency >>= liftMaybe) else mzero
   where
-    find_unit :: [(Text, Unit)] -> Maybe Unit
-    find_unit t =
-      let has_unit = filter matches_unit t
-      in case md of
-        Just dim -> snd <$> find (matches_dimension dim) has_unit
-        Nothing ->  snd <$> headMay has_unit
-    matches_unit = (== unit) . fst
-    matches_dimension dim = (==dim) . dimension . snd
+    getUnit = fmap snd . headMay
+    filterDim = filter (maybe (const True) (==) md . dimension . snd)
+    filterUnit = filter ((== u) . fst)
+    isCurrency = T.length u == 3 && T.all isUpper u && (md == Nothing || md == Just currency)
+    munit = getUnit . filterDim . filterUnit $ baseUnitTable
+    mcurrency = getUnit . filterDim . filterUnit <$> currencyTable
