@@ -1,5 +1,6 @@
 module Tests.Definitions (
-  runTest
+  ParseExcept
+, runTest
 , TestType(..), assert
 , short_timeout, average_timeout, long_timeout
 ) where
@@ -16,6 +17,8 @@ import Nummy.Cache (ReadCache, runReadCache)
 
 
 -- Test monad
+
+type ParseExcept = ExceptT ParserError ReadCache
 
 runTest :: (Show e) => ExceptT e ReadCache a -> IO a
 runTest m = do
