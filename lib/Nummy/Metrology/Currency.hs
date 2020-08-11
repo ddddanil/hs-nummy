@@ -7,7 +7,7 @@ import Nummy.Metrology.Unit
 import Nummy.Currency
 import Nummy.Cache
 
-transformCurrency :: Currency -> (Label, Unit)
+transformCurrency :: Currency -> (Text, Unit)
 transformCurrency Currency{ rate = r, short_name = n } =
   (n, conversion_ratio currency n (1 / valueF r) )
 

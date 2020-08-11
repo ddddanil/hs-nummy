@@ -6,10 +6,8 @@ Stability     : experimental
 -}
 
 module Nummy.Base (
-  -- * Label
-  Label
   -- * Styling
-, NummyStyle (..)
+  NummyStyle (..)
 , DocN
   -- * Value
 , Value(..), valueF, valueI, (^^^)
@@ -18,12 +16,6 @@ module Nummy.Base (
 import Nummy.Prelude
 import Data.Ratio (approxRational)
 import Data.Text.Prettyprint.Doc
-
-
--- Label
-
--- | Preferred string-like datatype
-type Label = Text
 
 
 -- | Annotations for 'Doc's
@@ -36,6 +28,7 @@ data NummyStyle
 
 -- | 'Doc' with 'NummyStyle' applied
 type DocN = Doc NummyStyle
+
 
 -- Value
 

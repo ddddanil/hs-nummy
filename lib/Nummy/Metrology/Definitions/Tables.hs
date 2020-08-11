@@ -18,7 +18,7 @@ info_prefix   :: [PrefixType]
 info_prefix   = [ PrefixAboveOne, PrefixBinary ]
 
 
-unit_table :: [ ([Label], Unit, [PrefixType]) ]  -- ^ (Synonyms, Unit)
+unit_table :: [ ([Text], Unit, [PrefixType]) ]  -- ^ (Synonyms, Unit)
 unit_table =
   -- Length
   [ (["m", "meter", "metre"], meter       , metric_prefix  )
@@ -86,7 +86,7 @@ unit_table =
 
 
 -- | [Source](https://en.wikipedia.org/wiki/Metric_prefix)
-prefix_table :: [ ([Label], Prefix, PrefixType) ]  -- ^ (Synonyms, Prefix)
+prefix_table :: [ ([Text], Prefix, PrefixType) ]  -- ^ (Synonyms, Prefix)
 prefix_table =
   -- Above one
   [ (["Y", "yotta"],  yotta , PrefixAboveOne )

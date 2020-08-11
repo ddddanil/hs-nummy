@@ -11,7 +11,7 @@ import Nummy.Base
 -- Prefix
 
 -- | Representation of a unit prefix
-newtype Prefix = Prefix (Value, Label) -- ^ (prefix multiplier, prefix name)
+newtype Prefix = Prefix (Value, Text) -- ^ (prefix multiplier, prefix name)
   deriving (Show, Eq)
 
 data PrefixType = PrefixBelowOne | PrefixBinary | PrefixAboveOne

@@ -36,19 +36,19 @@ import Nummy.Cache
 
 
 -- | All unit synonyms
-unitTable :: [(Label, Unit, [PrefixType])]
+unitTable :: [(Text, Unit, [PrefixType])]
 unitTable = concatMap (\(ls, u, p) -> [ (l, u, p) | l <- ls] ) $ unit_table
 
 -- | All prefix synonyms
-prefixTable :: [(Label, Prefix, PrefixType)]
+prefixTable :: [(Text, Prefix, PrefixType)]
 prefixTable = concatMap (\(ls, p, t) -> [ (l, p, t) | l <- ls] ) $ prefix_table
 
 -- | All currencies
-currencyTable :: ReadCache [(Label, Unit)]
+currencyTable :: ReadCache [(Text, Unit)]
 currencyTable = accessCurrency >>= return . map transformCurrency
 
 -- | Mix units with allowed prefixes
-baseUnitTable :: [(Label, Unit)]
+baseUnitTable :: [(Text, Unit)]
 baseUnitTable = sortOn (T.length . fst) $ map (\(a, b, _)->(a, b)) unitTable ++ units_with_prefixes
   where
       units_with_prefixes =
@@ -82,7 +82,7 @@ baseUnitTable = sortOn (T.length . fst) $ map (\(a, b, _)->(a, b)) unitTable ++ 
 -- >>> lookupUnit Nothing "x"
 -- Nothing
 lookupUnit :: Maybe Dimension          -- ^ Optional dimension specifier
-           -> Label                    -- ^ Unit synonym
+           -> Text                    -- ^ Unit synonym
            -> ReadCache (Maybe Unit)   -- ^ Result
 lookupUnit md unit =
   case find_unit baseUnitTable of
@@ -93,7 +93,7 @@ lookupUnit md unit =
         then find_unit <$> currencyTable
         else return Nothing
   where
-    find_unit :: [(Label, Unit)] -> Maybe Unit
+    find_unit :: [(Text, Unit)] -> Maybe Unit
     find_unit t =
       let has_unit = filter matches_unit t
       in case md of

@@ -17,7 +17,7 @@ import Nummy.Metrology.Prefix
 -- | Datatype representing a unit
 data Unit
   = ScalarUnit
-  | BaseUnit (Value -> Value) (Value -> Value) Dimension Label
+  | BaseUnit (Value -> Value) (Value -> Value) Dimension Text
   | PrefixUnit Prefix Unit
   | PowerUnit Unit Value
   | MultUnit Unit Unit
@@ -178,15 +178,15 @@ u1 #/ u2 = simplify $ DivUnit u1 u2
 -- Basic constructors
 
 -- | Provide functions to convert to SI and back
-complex_conversion :: Dimension -> Label -> (Value -> Value) -> (Value -> Value) -> Unit
+complex_conversion :: Dimension -> Text -> (Value -> Value) -> (Value -> Value) -> Unit
 complex_conversion d l f g = BaseUnit f g d l
 
 -- | Unit is proportional to SI
-conversion_ratio :: Dimension -> Label -> Value -> Unit
+conversion_ratio :: Dimension -> Text -> Value -> Unit
 conversion_ratio d l r = complex_conversion d l (*r) (/r)
 
 -- | Unit is a canonical SI unit
-canonical_unit :: Dimension -> Label -> Unit
+canonical_unit :: Dimension -> Text -> Unit
 canonical_unit d l = conversion_ratio d l 1
 
 -- | Unit of a scalar value
