@@ -12,7 +12,6 @@ import Text.Megaparsec
 import qualified Data.Text as T (unpack)
 import Data.Text.Prettyprint.Doc (Pretty)
 
-import Nummy.Base
 import Nummy.Parser
 import Nummy.Metrology
 import Tests.Definitions
