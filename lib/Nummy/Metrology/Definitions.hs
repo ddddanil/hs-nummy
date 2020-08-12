@@ -24,10 +24,10 @@ import Control.Monad.Trans.Maybe (MaybeT)
 import Data.Char (isUpper)
 import qualified Data.Text as T
 
+import Nummy.Currency
 import Nummy.Metrology.Dimension as D
 import Nummy.Metrology.Unit as U
 import Nummy.Metrology.Prefix as P
-import Nummy.Metrology.Currency
 import Nummy.Metrology.Definitions.Dimension as D.D
 import Nummy.Metrology.Definitions.Unit as D.U
 import Nummy.Metrology.Definitions.Prefix as D.P
@@ -45,7 +45,7 @@ prefixTable = concatMap (\(ls, p, t) -> [ (l, p, t) | l <- ls] ) $ prefix_table
 
 -- | All currencies
 currencyTable :: ReadCache [(Text, Unit)]
-currencyTable = accessCurrency >>= return . map transformCurrency
+currencyTable = getCurrency
 
 -- | Mix units with allowed prefixes
 baseUnitTable :: [(Text, Unit)]

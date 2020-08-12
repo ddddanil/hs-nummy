@@ -10,11 +10,11 @@ module Nummy.Cache where
 import Nummy.Prelude
 import Data.Cache
 import System.Clock (fromNanoSecs)
-import Nummy.Currency.Base
+import Nummy.Metrology.Unit (Unit)
 
 
 -- | Caches all recorded currencies
-type CurrencyCache = Cache Int [Currency]
+type CurrencyCache = Cache Int [(Text, Unit)]
 
 -- | Make a new cache with a 5 minute timeout
 newCurrencyCache :: IO CurrencyCache

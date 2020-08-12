@@ -9,6 +9,7 @@ common common-options
     , OverloadedStrings
     , GeneralizedNewtypeDeriving
     , NumericUnderscores
+    , RecordWildCards
   ghc-options:        -Wall
                       -Wno-type-defaults
                       -fwrite-ide-info
@@ -22,7 +23,6 @@ common common-depends
     , extra
     , text
     , lens
-    , scientific
     , containers
     , unordered-containers
     -- Trans
@@ -48,9 +48,6 @@ library
     , Nummy.Parser.Physical
     , Nummy.Parser.Unit
     , Nummy.Currency
-    , Nummy.Currency.Base
-    , Nummy.Currency.Request
-    , Nummy.Metrology.Currency
     , Nummy.Metrology.Dimension
     , Nummy.Metrology.Definitions.Dimension
     , Nummy.Metrology.Definitions.Unit
