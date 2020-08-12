@@ -11,11 +11,12 @@ import System.IO (hSetEcho, hSetBuffering, BufferMode (NoBuffering))
 import System.Console.ANSI
 
 import Nummy.Parser
+import Nummy.Cache
 import Application.Repl.Input
 import Application.Repl.Output
 
 
-type ReplAction = Text -> IO ParserResult
+type ReplAction = Text -> ReadCache ParserResult
 
 repl :: ReplAction -> IO ()
 repl pa = do
@@ -29,7 +30,7 @@ repl pa = do
   -- Input
   i <- async . runEffect $ runInput >-> toOutput ( o1 <> o2 )
   -- Parser
-  p <- async . runEffect $ fromInput i2 >-> runParser pa >-> toOutput o1
+  p <- async . runReadCache . runEffect $ fromInput i2 >-> runParser pa >-> toOutput o1
   -- Output
   o <- async . runEffect $ fromInput i1 >-> runOutput
   -- run all
@@ -41,17 +42,18 @@ rep s pa = do
   setTitle "Nummy"
   -- Pipes
   let e1 = OPrompt s 1                                -- fake input
-  Right (e2, _) <- next $ yield e1 >-> runParser pa   -- run parser over input
+  Right (e2, _) <- runReadCache . next
+                    $ yield e1 >-> runParser pa       -- run parser over input
   let e3 = OCommand                                   -- fake Return press
   runEffect $ each [ e1, e2, e3 ] >-> runOutput       -- Send three events in sequence
 
-runParser :: ReplAction -> Pipe OutputEvent OutputEvent IO ()
+runParser :: ReplAction -> Pipe OutputEvent OutputEvent ReadCache ()
 runParser p =
   forever $ do
     e <- await
     case e of
       OPrompt s _ -> do
-        res <- liftIO $ p s
+        res <- lift $ p s
         yield $ OResult res
       _ -> return ()
 

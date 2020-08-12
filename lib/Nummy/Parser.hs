@@ -29,7 +29,7 @@ import Nummy.Metrology (prettyQu)
 import Nummy.Parser.Base
 import Nummy.Parser.Physical
 import Nummy.Parser.Unit
-import Nummy.Cache (runReadCache)
+import Nummy.Cache
 
 -- | Parse input into an answer
 parse_nummy :: Parser ParserResult
@@ -37,5 +37,5 @@ parse_nummy = parse_physical where
   parse_physical = PResult . annotate SResult . prettyQu <$> physical <* space <* eof
 
 -- | Top level parser
-nummy :: Text -> IO ParserResult
-nummy t = fmap (either PError identity) . runReadCache $ runParserT parse_nummy "<input>" t
+nummy :: Text -> ReadCache ParserResult
+nummy t = either PError identity <$> runParserT parse_nummy "<input>" t
