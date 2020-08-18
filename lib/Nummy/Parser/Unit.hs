@@ -3,7 +3,7 @@ module Nummy.Parser.Unit (
 ) where
 
 import Nummy.Prelude hiding (many, Prefix, try)
-import Control.Monad.Trans.Maybe (MaybeT(runMaybeT))
+import Control.Lens
 import Data.Char (isAlpha)
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -12,46 +12,45 @@ import Control.Monad.Fail
 
 import Nummy.Parser.Base
 import Nummy.Metrology
-import Nummy.Metrology.Definitions (lookupUnit)
 import Nummy.Metrology.Definitions.Unit (scalar_unit)
 
 
 -- Term
 
-pBaseUnit :: Parser Unit
+pBaseUnit :: Parser c Unit
 pBaseUnit = do
   str <- takeWhile1P (Just "base unit") isAlpha
-  mu <- lift . runMaybeT $ lookupUnit Nothing str
-  case mu of
+  lookupU <- lift $ asks (^. lookupUnit)
+  case lookupU str of
     Just u -> return u
     Nothing -> fail "Not a known base unit"
 
 
 -- Operators
 
-pOpUnitPow :: Parser (Unit -> Unit)
+pOpUnitPow :: Parser c (Unit -> Unit)
 pOpUnitPow = do
   _ <- char '^'
   v <- pValue
   return $ \u -> u #^ v
 
-pOpUnitMultC :: Parser (Unit -> Unit -> Unit)
+pOpUnitMultC :: Parser c (Unit -> Unit -> Unit)
 pOpUnitMultC = do
   _ <- char '*'
   return (#*)
 
-pOpUnitMultS :: Parser (Unit -> Unit -> Unit)
+pOpUnitMultS :: Parser c (Unit -> Unit -> Unit)
 pOpUnitMultS = try $ do
   _ <- char ' '
   _ <- lookAhead pBaseUnit
   return (#*)
 
-pOpUnitDiv :: Parser (Unit -> Unit -> Unit)
+pOpUnitDiv :: Parser c (Unit -> Unit -> Unit)
 pOpUnitDiv = do
   _ <- char '/'
   return (#/)
 
-pOpUnitInv :: Parser (Unit -> Unit)
+pOpUnitInv :: Parser c (Unit -> Unit)
 pOpUnitInv = do
   _ <- string "1/"
   return $ ((#/) (scalar_unit))
@@ -59,7 +58,7 @@ pOpUnitInv = do
 
 -- Operator table
 
-opUnitTable :: [[Operator Parser Unit]]
+opUnitTable :: [[Operator (Parser c) Unit]]
 opUnitTable =
   [ [ Postfix pOpUnitPow   ]
   , [ InfixL  pOpUnitMultS ]
@@ -84,5 +83,5 @@ opUnitTable =
 -- > kg
 -- > km/h
 -- > N ms
-unit :: Parser Unit
+unit :: Parser c Unit
 unit = makeExprParser pBaseUnit opUnitTable

@@ -29,7 +29,7 @@ import Nummy.Metrology.Definitions.Unit (scalar_unit)
 -- > 4m
 -- > 8 Pa
 -- > 9.8 m/s^2
-quantity :: Parser Quantity
+quantity :: Parser c Quantity
 quantity = do
   v <- pValue
   _ <- space
@@ -39,7 +39,7 @@ quantity = do
 
 -- Operators
 
-pOpQuPow :: Parser (Maybe Quantity -> Maybe Quantity)
+pOpQuPow :: Parser c (Maybe Quantity -> Maybe Quantity)
 pOpQuPow = do
   _ <- char '^'
   _ <- space
@@ -47,30 +47,30 @@ pOpQuPow = do
   _ <- space
   return $ fmap (%^ p)
 
-pOpQuNeg :: Parser (Maybe Quantity -> Maybe Quantity)
+pOpQuNeg :: Parser c (Maybe Quantity -> Maybe Quantity)
 pOpQuNeg = do
   _ <- char '-'
   return $ fmap (%* (-1) %# scalar_unit)
 
-pOpQuMul :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
+pOpQuMul :: Parser c (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
 pOpQuMul = do
   _ <- char '*'
   _ <- space
   return $ \a b -> (%*) <$> a <*> b
 
-pOpQuDiv :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
+pOpQuDiv :: Parser c (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
 pOpQuDiv = do
   _ <- char '/'
   _ <- space
   return $ \a b -> (%/) <$> a <*> b
 
-pOpQuAdd :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
+pOpQuAdd :: Parser c (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
 pOpQuAdd = do
   _ <- char '+'
   _ <- space
   return $ \a b -> join $ (%+) <$> a <*> b
 
-pOpQuSub :: Parser (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
+pOpQuSub :: Parser c (Maybe Quantity -> Maybe Quantity -> Maybe Quantity)
 pOpQuSub = do
   _ <- char '-'
   _ <- space
@@ -79,7 +79,7 @@ pOpQuSub = do
 
 -- Operator table
 
-opQuTable :: [[Operator Parser (Maybe Quantity)]]
+opQuTable :: [[Operator (Parser c) (Maybe Quantity)]]
 opQuTable =
   [ [ Prefix  pOpQuNeg ]
   , [ Postfix pOpQuPow ]
@@ -94,13 +94,13 @@ opQuTable =
 -- | Parses a quantity expression
 --
 -- Returns 'Just' when all dimensions are consistent and 'Nothing' otherwise
-expression :: Parser (Maybe Quantity)
+expression :: Parser c (Maybe Quantity)
 expression = makeExprParser (Just <$> quantity <* space) opQuTable
 
 
 -- Line parser
 
-pFormat :: Parser (Quantity -> Maybe Quantity)
+pFormat :: Parser c (Quantity -> Maybe Quantity)
 pFormat = do
   _ <- char '|'
   _ <- space
@@ -112,7 +112,7 @@ pFormat = do
 -- | Parser for an expression with physical units
 --
 -- Accepts a unit as its format. Fails if the dimensions are not consistent
-physical :: Parser Quantity
+physical :: Parser c Quantity
 physical = do
   _ <- space
   mqu <- expression

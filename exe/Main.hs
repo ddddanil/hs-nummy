@@ -3,7 +3,6 @@ module Main where
 import Nummy.Prelude
 import qualified Data.Text as T
 
-import Nummy.Parser
 import Application.Repl
 
 
@@ -18,5 +17,5 @@ args = T.pack . intercalate " " <$> getArgs
 main :: IO ()
 main = do
   a <- args
-  when (T.null a) $ repl nummy
-  rep a nummy
+  when (T.null a) $ repl
+  rep a

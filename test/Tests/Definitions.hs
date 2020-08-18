@@ -1,7 +1,5 @@
 module Tests.Definitions (
-  ParseExcept
-, runTest
-, TestType(..), assert
+  TestType(..), assert
 , short_timeout, average_timeout, long_timeout
 ) where
 
@@ -9,23 +7,11 @@ import Nummy.Prelude hiding (length, second)
 
 import Control.Monad.Fail (fail)
 import Test.Tasty (Timeout(Timeout))
-import Test.Tasty.HUnit ((@?), assertFailure)
+import Test.Tasty.HUnit ((@?), assertFailure, Assertion)
 import Data.Text.Prettyprint.Doc
 
 import Nummy.Parser
 import Nummy.Cache (ReadCache, runReadCache)
-
-
--- Test monad
-
-type ParseExcept = ExceptT ParserError ReadCache
-
-runTest :: (Show e) => ExceptT e ReadCache a -> IO a
-runTest m = do
-  ex <- runReadCache . runExceptT $ m
-  case ex of
-    Right x -> return x
-    Left err -> fail ("Unhandled parser exception:\n" ++ show err)
 
 
 -- TestType
@@ -33,12 +19,12 @@ runTest m = do
 data TestType = Equal | NotEqual | Fail
   deriving (Show, Eq, Ord)
 
-assert :: (Eq a, Pretty a) => TestType -> a -> a -> ParseExcept ()
+assert :: (Eq a, Pretty a) => TestType -> a -> a -> Assertion
 assert t x y =
   case t of
-    Equal ->    liftIO $ x == y @? ( show $ (pretty x) <+> "==" <+> (pretty y) )
-    NotEqual -> liftIO $ x /= y @? ( show $ (pretty x) <+> "/=" <+> (pretty y) )
-    Fail -> liftIO . assertFailure $ "Expected failure, got " ++ ( show $ (pretty x) <+> (pretty y) )
+    Equal ->    x == y @? ( show $ (pretty x) <+> "==" <+> (pretty y) )
+    NotEqual -> x /= y @? ( show $ (pretty x) <+> "/=" <+> (pretty y) )
+    Fail ->     assertFailure $ "Expected failure, got " ++ ( show $ (pretty x) <+> (pretty y) )
 
 
 -- Timeouts

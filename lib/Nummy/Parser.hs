@@ -9,6 +9,7 @@ module Nummy.Parser (
   Parser
 , ParserError
 , ParserResult (..)
+, ParserOptions (..)
 , NummyStyle (..)
 , DocN
 , nummy
@@ -28,14 +29,15 @@ import Nummy.Base
 import Nummy.Metrology (prettyQu)
 import Nummy.Parser.Base
 import Nummy.Parser.Physical
+import Nummy.Parser.Command
 import Nummy.Parser.Unit
-import Nummy.Cache
 
 -- | Parse input into an answer
-parse_nummy :: Parser ParserResult
-parse_nummy = parse_physical where
+parse_nummy :: Parser c (ParserResult c)
+parse_nummy = parse_command <|> parse_physical where
   parse_physical = PResult . annotate SResult . prettyQu <$> physical <* space <* eof
+  parse_command = PCommand <$> command <* space <* eof
 
 -- | Top level parser
-nummy :: Text -> ReadCache ParserResult
-nummy t = either PError identity <$> runParserT parse_nummy "<input>" t
+nummy :: ParserOptions cmd -> Text -> ParserResult cmd
+nummy o t = either PError identity $ runReader (runParserT parse_nummy "<input>" t) o

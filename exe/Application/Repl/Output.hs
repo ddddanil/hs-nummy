@@ -12,15 +12,17 @@ import qualified Data.Text.Prettyprint.Doc.Render.Terminal as PP.T
 import Text.Megaparsec
 import qualified Data.Text as T
 import System.IO (putChar, hFlush)
+import System.Exit
 import System.Console.ANSI
 
 import Nummy.Parser
+import Application.Repl.Commands
 
 -- Types
 
 data OutputEvent
   = OPrompt Text Int
-  | OResult ParserResult
+  | OResult (ParserResult Command)
   | OCommand
   deriving (Show)
 makePrisms ''OutputEvent
@@ -28,7 +30,7 @@ makePrisms ''OutputEvent
 data OutputState = OutputState
   { _prompt :: Text
   , _cursor :: Int
-  , _result :: ParserResult
+  , _result :: (ParserResult Command)
   }
 makeLenses ''OutputState
 
@@ -80,11 +82,12 @@ printOutput = do
     setCursorColumn (c + T.length pr)
     hFlush stdout
 
-printResult :: ParserResult -> PP.Doc PP.T.AnsiStyle
+printResult :: ParserResult Command -> PP.Doc PP.T.AnsiStyle
 printResult r =
   case r of
     PError _ -> PP.annotate (PP.T.color PP.T.Red) . PP.pretty $ (" ✗" :: Text)
     PResult x -> " =" PP.<+> PP.reAnnotate convertNummyStyle x
+    PCommand _ -> PP.annotate (PP.T.colorDull PP.T.Green) . PP.pretty $ (" cmd" :: Text)
 
 printExec :: OutputM ()
 printExec = do
@@ -95,6 +98,9 @@ printExec = do
     case r of
       PResult _ -> return ()
       PError e -> putStrLn $ errorBundlePretty e
+      PCommand c ->
+        case c of
+          CmdQuit -> liftIO $ exitSuccess
 
 convertNummyStyle :: NummyStyle -> PP.T.AnsiStyle
 convertNummyStyle SValue = PP.T.color PP.T.White <> PP.T.bold

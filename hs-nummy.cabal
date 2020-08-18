@@ -1,6 +1,6 @@
 cabal-version: 2.2
 name:          hs-nummy
-version:       0.5
+version:       0.6
 
 common common-options
   default-language:   Haskell2010
@@ -39,15 +39,16 @@ library
   exposed-modules:
       Nummy.Prelude
     , Nummy.Base
-    , Nummy.Parser
     , Nummy.Cache
+    , Nummy.Currency
+    , Nummy.Parser
     , Nummy.Metrology
     , Nummy.Metrology.Definitions
   other-modules:
       Nummy.Parser.Base
-    , Nummy.Parser.Physical
     , Nummy.Parser.Unit
-    , Nummy.Currency
+    , Nummy.Parser.Physical
+    , Nummy.Parser.Command
     , Nummy.Metrology.Dimension
     , Nummy.Metrology.Definitions.Dimension
     , Nummy.Metrology.Definitions.Unit
@@ -74,6 +75,8 @@ executable nummy
       Application.Repl
     , Application.Repl.Input
     , Application.Repl.Output
+    , Application.Repl.Parser
+    , Application.Repl.Commands
   hs-source-dirs:     exe
   build-depends:
       hs-nummy
