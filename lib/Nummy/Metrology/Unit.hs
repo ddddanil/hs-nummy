@@ -5,7 +5,7 @@ module Nummy.Metrology.Unit (
 , complex_conversion, conversion_ratio, canonical_unit, scalar_unit
 ) where
 
-import Nummy.Prelude hiding (Prefix)
+import Nummy.Prelude hiding (Prefix, group)
 import GHC.Show as S
 import Data.List (intersect, (\\))
 import Data.Text.Prettyprint.Doc
@@ -104,7 +104,7 @@ instance Show Unit where
 
 
 instance Pretty Unit where
-  pretty (ScalarUnit) = pretty '1'
+  pretty (ScalarUnit) = flatAlt "" $ pretty '1'
   pretty (BaseUnit _ _ _ l) = pretty l
   pretty (PrefixUnit p x) = pretty p <> pretty x
   pretty (PowerUnit u p) = pretty u <> pretty_power p where
@@ -112,8 +112,8 @@ instance Pretty Unit where
     pretty_power 2 = pretty '²'
     pretty_power 3 = pretty '³'
     pretty_power x = pretty '^' <> pretty x
-  pretty (MultUnit u1 u2) = pretty u1 <+> pretty u2
-  pretty (DivUnit u1 u2) = pretty u1 <> pretty '/' <> pretty u2
+  pretty (MultUnit u1 u2) = group $ pretty u1 <+> pretty u2
+  pretty (DivUnit u1 u2) = group $ pretty u1 <> pretty '/' <> pretty u2
 
 instance Eq Unit where
   -- Structural equality
