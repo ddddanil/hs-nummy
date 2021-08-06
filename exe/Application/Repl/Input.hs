@@ -3,7 +3,7 @@ module Application.Repl.Input (
   runInput
 ) where
 
-import Nummy.Prelude
+import Nummy.Prelude hiding (yield)
 import Pipes
 import Control.Lens
 import Data.Char (isPrint)

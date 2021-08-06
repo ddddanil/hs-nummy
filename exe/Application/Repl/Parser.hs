@@ -1,6 +1,6 @@
 module Application.Repl.Parser (runParser) where
 
-import Nummy.Prelude
+import Nummy.Prelude hiding (yield)
 import Pipes
 import Nummy.Parser
 import Nummy.Cache

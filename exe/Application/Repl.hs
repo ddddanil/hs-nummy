@@ -3,7 +3,7 @@ module Application.Repl (
 , rep
 ) where
 
-import Nummy.Prelude
+import Nummy.Prelude hiding (yield)
 import Pipes
 import Pipes.Concurrent
 import System.IO (hSetEcho, hSetBuffering, BufferMode (NoBuffering))
